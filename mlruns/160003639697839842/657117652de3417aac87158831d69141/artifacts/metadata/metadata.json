@@ -1,0 +1,24 @@
+{
+  "name": "simple_test",
+  "version": "1.0.0",
+  "timestamp": "2025-08-26T09:03:03.405166",
+  "hyperparameters": {
+    "lr": 0.001
+  },
+  "performance_metrics": {
+    "accuracy": 0.95
+  },
+  "training_data_hash": "unknown",
+  "code_version": "unknown",
+  "random_seed": null,
+  "platform": "macOS-15.6-arm64-arm-64bit-Mach-O",
+  "device": "cpu",
+  "python_version": "3.13.5 (main, Jun 11 2025, 15:36:57) [Clang 17.0.0 (clang-1700.0.13.3)]",
+  "torch_version": "2.8.0",
+  "model_size_mb": 0.0,
+  "model_architecture": "SimpleModel",
+  "input_shape": null,
+  "output_shape": null,
+  "description": null,
+  "tags": []
+}

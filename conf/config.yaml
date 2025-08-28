@@ -1,0 +1,34 @@
+# Main GeminiSDR Configuration
+# This is the base configuration that can be overridden by environment-specific configs
+
+defaults:
+  - hardware: auto
+  - ml: default
+  - environments: development
+  - _self_
+
+# System-wide settings
+environment: development
+debug_mode: false
+config_version: "1.0"
+
+# Default logging configuration (can be overridden by environments)
+logging:
+  level: INFO
+  format: structured
+  output: [console, file]
+  rotation: daily
+  max_file_size_mb: 100
+  backup_count: 5
+  log_dir: logs
+  enable_performance_logging: true
+
+# Default performance configuration (can be overridden by environments)
+performance:
+  memory_threshold: 0.8
+  auto_optimize: true
+  profiling_enabled: false
+  gc_frequency: 100
+  memory_cleanup_threshold: 0.9
+  batch_size_auto_tune: true
+  model_compilation: false

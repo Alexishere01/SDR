@@ -1,0 +1,479 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>core.sdr_interface &mdash; GeminiSDR 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            GeminiSDR
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">User Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../architecture/index.html">System Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/index.html">Examples and Tutorials</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">GeminiSDR</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">core.sdr_interface</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for core.sdr_interface</h1><div class="highlight"><pre>
+<span></span><span class="c1"># core/sdr_interface.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.core.error_handling</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ErrorHandler</span><span class="p">,</span> <span class="n">GeminiSDRError</span><span class="p">,</span> <span class="n">HardwareError</span><span class="p">,</span> <span class="n">ConfigurationError</span><span class="p">,</span>
+    <span class="n">ErrorSeverity</span><span class="p">,</span> <span class="n">ErrorContext</span><span class="p">,</span> <span class="n">retry_with_backoff</span><span class="p">,</span> <span class="n">fallback_to_simulation</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.core.logging_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">StructuredLogger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.config.config_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_config_manager</span><span class="p">,</span> <span class="n">SystemConfig</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">queue</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">deque</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">adi</span>
+    <span class="n">PLUTO_AVAILABLE</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">PLUTO_AVAILABLE</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: pyadi-iio not available. Using simulation mode.&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PlutoSDRInterface">
+<a class="viewcode-back" href="../../api/core/core.sdr_interface.html#core.sdr_interface.PlutoSDRInterface">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PlutoSDRInterface</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Robust PlutoSDR interface with real-time and batch modes, error handling, and configuration management.&quot;&quot;&quot;</span>
+    
+<div class="viewcode-block" id="PlutoSDRInterface.__init__">
+<a class="viewcode-back" href="../../api/core/core.sdr_interface.html#core.sdr_interface.PlutoSDRInterface.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">retry_attempts</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">SystemConfig</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Load configuration</span>
+        <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">config_manager</span> <span class="o">=</span> <span class="n">get_config_manager</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config_manager</span><span class="o">.</span><span class="n">get_config</span><span class="p">()</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config_manager</span><span class="o">.</span><span class="n">load_config</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="c1"># Use fallback configuration</span>
+                <span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.config.config_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">SystemConfig</span><span class="p">,</span> <span class="n">HardwareConfig</span><span class="p">,</span> <span class="n">LoggingConfig</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">SystemConfig</span><span class="p">(</span>
+                    <span class="n">hardware</span><span class="o">=</span><span class="n">HardwareConfig</span><span class="p">(),</span>
+                    <span class="n">logging</span><span class="o">=</span><span class="n">LoggingConfig</span><span class="p">()</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+        
+        <span class="c1"># Initialize error handling and logging</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">StructuredLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">logging</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_handler</span> <span class="o">=</span> <span class="n">ErrorHandler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_register_recovery_strategies</span><span class="p">()</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">sdr</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">retry_attempts</span> <span class="o">=</span> <span class="n">retry_attempts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_streaming</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_queue</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">Queue</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">capture_thread</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_mode</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">PLUTO_AVAILABLE</span>
+        
+        <span class="c1"># Use configuration for simulation parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sim_center_freq</span> <span class="o">=</span> <span class="mf">100e6</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sim_sample_rate</span> <span class="o">=</span> <span class="mf">2e6</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sim_gain</span> <span class="o">=</span> <span class="mi">30</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation_mode</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;PlutoSDR not available, using simulation mode&quot;</span><span class="p">)</span></div>
+
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_register_recovery_strategies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Register error recovery strategies.&quot;&quot;&quot;</span>
+        <span class="c1"># Hardware connection recovery - fallback to simulation</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">connection_fallback_strategy</span><span class="p">(</span><span class="n">error</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">ErrorContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Hardware connection failed, switching to simulation: </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">simulation_mode</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Successfully switched to simulation mode&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Connection fallback strategy failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        
+        <span class="c1"># Configuration error recovery - use defaults</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">config_recovery_strategy</span><span class="p">(</span><span class="n">error</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">ErrorContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Configuration error, using defaults: </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="c1"># Reset to default simulation parameters</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sim_center_freq</span> <span class="o">=</span> <span class="mf">100e6</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sim_sample_rate</span> <span class="o">=</span> <span class="mf">2e6</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sim_gain</span> <span class="o">=</span> <span class="mi">30</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Configuration recovery strategy failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        
+        <span class="c1"># Register strategies</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_handler</span><span class="o">.</span><span class="n">register_recovery_strategy</span><span class="p">(</span><span class="n">HardwareError</span><span class="p">,</span> <span class="n">connection_fallback_strategy</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_handler</span><span class="o">.</span><span class="n">register_recovery_strategy</span><span class="p">(</span><span class="n">ConfigurationError</span><span class="p">,</span> <span class="n">config_recovery_strategy</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="PlutoSDRInterface.connect">
+<a class="viewcode-back" href="../../api/core/core.sdr_interface.html#core.sdr_interface.PlutoSDRInterface.connect">[docs]</a>
+    <span class="nd">@retry_with_backoff</span><span class="p">(</span><span class="n">max_retries</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">base_delay</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">exceptions</span><span class="o">=</span><span class="p">(</span><span class="n">HardwareError</span><span class="p">,))</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Connect to PlutoSDR with retry logic and error handling.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_handler</span><span class="o">.</span><span class="n">error_context</span><span class="p">(</span><span class="s2">&quot;sdr_connection&quot;</span><span class="p">,</span> <span class="n">component</span><span class="o">=</span><span class="s2">&quot;PlutoSDRInterface&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">PLUTO_AVAILABLE</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;✓ Using simulation mode (PlutoSDR not available)&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">simulation_mode</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+                    
+                <span class="k">for</span> <span class="n">attempt</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">retry_attempts</span><span class="p">):</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="c1"># Close any existing connection first</span>
+                        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;sdr&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">sdr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="k">try</span><span class="p">:</span>
+                                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">sdr</span>
+                            <span class="k">except</span><span class="p">:</span>
+                                <span class="k">pass</span>
+                        
+                        <span class="bp">self</span><span class="o">.</span><span class="n">sdr</span> <span class="o">=</span> <span class="n">adi</span><span class="o">.</span><span class="n">Pluto</span><span class="p">(</span><span class="s1">&#39;ip:192.168.4.1&#39;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✓ Connected to PlutoSDR on attempt </span><span class="si">{</span><span class="n">attempt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        
+                        <span class="c1"># Test connection</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">sdr</span><span class="o">.</span><span class="n">rx_lo</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">100e6</span><span class="p">)</span>
+                        <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sdr</span><span class="o">.</span><span class="n">rx_lo</span>
+                        
+                        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_mode</span> <span class="o">=</span> <span class="kc">False</span>
+                        <span class="k">return</span> <span class="kc">True</span>
+                    
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="n">error_msg</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✗ Connection attempt </span><span class="si">{</span><span class="n">attempt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2"> failed: </span><span class="si">{</span><span class="n">error_msg</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        
+                        <span class="c1"># If device is busy, suggest solution</span>
+                        <span class="k">if</span> <span class="s2">&quot;Device or resource busy&quot;</span> <span class="ow">in</span> <span class="n">error_msg</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Device appears to be in use. Try closing other SDR applications or reconnecting device&quot;</span><span class="p">)</span>
+                        
+                        <span class="k">if</span> <span class="n">attempt</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">retry_attempts</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>  <span class="c1"># Longer wait for device busy issues</span>
+                
+                <span class="c1"># All attempts failed, raise error to trigger recovery</span>
+                <span class="k">raise</span> <span class="n">HardwareError</span><span class="p">(</span>
+                    <span class="s2">&quot;Failed to connect to PlutoSDR after all attempts&quot;</span><span class="p">,</span>
+                    <span class="n">device_type</span><span class="o">=</span><span class="s2">&quot;PlutoSDR&quot;</span><span class="p">,</span>
+                    <span class="n">device_id</span><span class="o">=</span><span class="s2">&quot;ip:192.168.4.1&quot;</span><span class="p">,</span>
+                    <span class="n">severity</span><span class="o">=</span><span class="n">ErrorSeverity</span><span class="o">.</span><span class="n">HIGH</span>
+                <span class="p">)</span>
+                
+        <span class="k">except</span> <span class="n">HardwareError</span><span class="p">:</span>
+            <span class="c1"># Let the error handler try recovery strategies</span>
+            <span class="k">raise</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">HardwareError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Unexpected error during SDR connection: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">device_type</span><span class="o">=</span><span class="s2">&quot;PlutoSDR&quot;</span><span class="p">,</span>
+                <span class="n">severity</span><span class="o">=</span><span class="n">ErrorSeverity</span><span class="o">.</span><span class="n">HIGH</span><span class="p">,</span>
+                <span class="n">cause</span><span class="o">=</span><span class="n">e</span>
+            <span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="PlutoSDRInterface.configure">
+<a class="viewcode-back" href="../../api/core/core.sdr_interface.html#core.sdr_interface.PlutoSDRInterface.configure">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center_freq</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">bandwidth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gain</span><span class="o">=</span><span class="mi">30</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Configure SDR parameters with error handling.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_handler</span><span class="o">.</span><span class="n">error_context</span><span class="p">(</span>
+                <span class="s2">&quot;sdr_configuration&quot;</span><span class="p">,</span> 
+                <span class="n">component</span><span class="o">=</span><span class="s2">&quot;PlutoSDRInterface&quot;</span><span class="p">,</span>
+                <span class="n">center_freq</span><span class="o">=</span><span class="n">center_freq</span><span class="p">,</span>
+                <span class="n">sample_rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">,</span>
+                <span class="n">gain</span><span class="o">=</span><span class="n">gain</span>
+            <span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation_mode</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sim_center_freq</span> <span class="o">=</span> <span class="n">center_freq</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sim_sample_rate</span> <span class="o">=</span> <span class="n">sample_rate</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sim_gain</span> <span class="o">=</span> <span class="n">gain</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✓ Simulated Config: </span><span class="si">{</span><span class="n">center_freq</span><span class="o">/</span><span class="mf">1e6</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MHz, &quot;</span>
+                          <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sample_rate</span><span class="o">/</span><span class="mf">1e6</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MSps, Gain: </span><span class="si">{</span><span class="n">gain</span><span class="si">}</span><span class="s2"> dB&quot;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+                    
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sdr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">HardwareError</span><span class="p">(</span>
+                        <span class="s2">&quot;SDR not connected&quot;</span><span class="p">,</span>
+                        <span class="n">device_type</span><span class="o">=</span><span class="s2">&quot;PlutoSDR&quot;</span><span class="p">,</span>
+                        <span class="n">severity</span><span class="o">=</span><span class="n">ErrorSeverity</span><span class="o">.</span><span class="n">HIGH</span>
+                    <span class="p">)</span>
+                
+                <span class="c1"># Validate configuration parameters</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mf">70e6</span> <span class="o">&lt;=</span> <span class="n">center_freq</span> <span class="o">&lt;=</span> <span class="mf">6e9</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="n">ConfigurationError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Center frequency </span><span class="si">{</span><span class="n">center_freq</span><span class="o">/</span><span class="mf">1e6</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MHz out of range (70-6000 MHz)&quot;</span><span class="p">,</span>
+                        <span class="n">config_key</span><span class="o">=</span><span class="s2">&quot;center_freq&quot;</span><span class="p">,</span>
+                        <span class="n">severity</span><span class="o">=</span><span class="n">ErrorSeverity</span><span class="o">.</span><span class="n">MEDIUM</span>
+                    <span class="p">)</span>
+                
+                <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">520833</span> <span class="o">&lt;=</span> <span class="n">sample_rate</span> <span class="o">&lt;=</span> <span class="mi">61440000</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="n">ConfigurationError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Sample rate </span><span class="si">{</span><span class="n">sample_rate</span><span class="o">/</span><span class="mf">1e6</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MSps out of range (0.52-61.44 MSps)&quot;</span><span class="p">,</span>
+                        <span class="n">config_key</span><span class="o">=</span><span class="s2">&quot;sample_rate&quot;</span><span class="p">,</span>
+                        <span class="n">severity</span><span class="o">=</span><span class="n">ErrorSeverity</span><span class="o">.</span><span class="n">MEDIUM</span>
+                    <span class="p">)</span>
+                
+                <span class="bp">self</span><span class="o">.</span><span class="n">sdr</span><span class="o">.</span><span class="n">rx_lo</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">center_freq</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sdr</span><span class="o">.</span><span class="n">sample_rate</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">)</span>
+                
+                <span class="k">if</span> <span class="n">bandwidth</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">bandwidth</span> <span class="o">=</span> <span class="n">sample_rate</span> <span class="o">*</span> <span class="mf">0.8</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sdr</span><span class="o">.</span><span class="n">rx_rf_bandwidth</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">bandwidth</span><span class="p">)</span>
+                
+                <span class="bp">self</span><span class="o">.</span><span class="n">sdr</span><span class="o">.</span><span class="n">rx_hardwaregain_chan0</span> <span class="o">=</span> <span class="n">gain</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sdr</span><span class="o">.</span><span class="n">rx_buffer_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sample_rate</span> <span class="o">*</span> <span class="mf">0.001</span><span class="p">)</span>  <span class="c1"># 1ms buffer</span>
+                
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✓ Configured: </span><span class="si">{</span><span class="n">center_freq</span><span class="o">/</span><span class="mf">1e6</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MHz, &quot;</span>
+                      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sample_rate</span><span class="o">/</span><span class="mf">1e6</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MSps, Gain: </span><span class="si">{</span><span class="n">gain</span><span class="si">}</span><span class="s2"> dB&quot;</span><span class="p">)</span>
+                
+                <span class="k">return</span> <span class="kc">True</span>
+        
+        <span class="k">except</span> <span class="p">(</span><span class="n">HardwareError</span><span class="p">,</span> <span class="n">ConfigurationError</span><span class="p">):</span>
+            <span class="c1"># Let error handler try recovery strategies</span>
+            <span class="k">raise</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">HardwareError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Configuration failed: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">device_type</span><span class="o">=</span><span class="s2">&quot;PlutoSDR&quot;</span><span class="p">,</span>
+                <span class="n">severity</span><span class="o">=</span><span class="n">ErrorSeverity</span><span class="o">.</span><span class="n">HIGH</span><span class="p">,</span>
+                <span class="n">cause</span><span class="o">=</span><span class="n">e</span>
+            <span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="PlutoSDRInterface.capture_batch">
+<a class="viewcode-back" href="../../api/core/core.sdr_interface.html#core.sdr_interface.PlutoSDRInterface.capture_batch">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">capture_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">duration_seconds</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Capture samples in batch mode.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation_mode</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simulate_capture</span><span class="p">(</span><span class="n">duration_seconds</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sdr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;SDR not connected&quot;</span><span class="p">)</span>
+        
+        <span class="n">samples_needed</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sdr</span><span class="o">.</span><span class="n">sample_rate</span> <span class="o">*</span> <span class="n">duration_seconds</span><span class="p">)</span>
+        <span class="n">samples_per_buffer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sdr</span><span class="o">.</span><span class="n">rx_buffer_size</span>
+        <span class="n">num_buffers</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">samples_needed</span> <span class="o">/</span> <span class="n">samples_per_buffer</span><span class="p">))</span>
+        
+        <span class="n">all_samples</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Capturing </span><span class="si">{</span><span class="n">num_buffers</span><span class="si">}</span><span class="s2"> buffers...&quot;</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_buffers</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">buffer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sdr</span><span class="o">.</span><span class="n">rx</span><span class="p">()</span>
+                <span class="n">all_samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">buffer</span><span class="p">)</span>
+                
+                <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">10</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">progress</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">num_buffers</span> <span class="o">*</span> <span class="mi">100</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Progress: </span><span class="si">{</span><span class="n">progress</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+            
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✗ Buffer capture failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">break</span>
+        
+        <span class="c1"># Combine and trim to exact length</span>
+        <span class="k">if</span> <span class="n">all_samples</span><span class="p">:</span>
+            <span class="n">combined</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">all_samples</span><span class="p">)[:</span><span class="n">samples_needed</span><span class="p">]</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✓ Captured </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">combined</span><span class="p">)</span><span class="si">}</span><span class="s2"> samples&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">combined</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_simulate_capture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">duration_seconds</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Simulate signal capture for testing.&quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">core.signal_generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">SDRSignalGenerator</span>
+        
+        <span class="n">samples_needed</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sim_sample_rate</span> <span class="o">*</span> <span class="n">duration_seconds</span><span class="p">)</span>
+        
+        <span class="c1"># Generate a mix of signals and noise</span>
+        <span class="n">generator</span> <span class="o">=</span> <span class="n">SDRSignalGenerator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sim_sample_rate</span><span class="p">)</span>
+        
+        <span class="c1"># Simulate signal based on frequency tuning accuracy</span>
+        <span class="n">target_freq</span> <span class="o">=</span> <span class="mf">100e6</span>  <span class="c1"># Assume signal at 100 MHz</span>
+        <span class="n">freq_error</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sim_center_freq</span> <span class="o">-</span> <span class="n">target_freq</span><span class="p">)</span>
+        
+        <span class="c1"># SNR decreases with frequency error and increases with gain</span>
+        <span class="n">base_snr</span> <span class="o">=</span> <span class="mi">20</span> <span class="o">-</span> <span class="p">(</span><span class="n">freq_error</span> <span class="o">/</span> <span class="mf">1e6</span><span class="p">)</span>  <span class="c1"># Lose 1 dB per MHz off</span>
+        <span class="n">snr_with_gain</span> <span class="o">=</span> <span class="n">base_snr</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sim_gain</span> <span class="o">-</span> <span class="mi">30</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="n">actual_snr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">snr_with_gain</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">40</span><span class="p">)</span>
+        
+        <span class="c1"># Generate signal</span>
+        <span class="n">num_symbols</span> <span class="o">=</span> <span class="n">samples_needed</span> <span class="o">//</span> <span class="mi">8</span>
+        <span class="n">modulation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="s1">&#39;BPSK&#39;</span><span class="p">,</span> <span class="s1">&#39;QPSK&#39;</span><span class="p">,</span> <span class="s1">&#39;8PSK&#39;</span><span class="p">,</span> <span class="s1">&#39;16QAM&#39;</span><span class="p">])</span>
+        
+        <span class="n">signal</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">generate_modulated_signal</span><span class="p">(</span>
+            <span class="n">modulation</span><span class="p">,</span>
+            <span class="n">num_symbols</span><span class="o">=</span><span class="n">num_symbols</span><span class="p">,</span>
+            <span class="n">snr_db</span><span class="o">=</span><span class="n">actual_snr</span>
+        <span class="p">)</span>
+        
+        <span class="c1"># Pad or trim to exact length</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">samples_needed</span><span class="p">:</span>
+            <span class="n">signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">samples_needed</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">signal</span><span class="p">)),</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;constant&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">signal</span> <span class="o">=</span> <span class="n">signal</span><span class="p">[:</span><span class="n">samples_needed</span><span class="p">]</span>
+        
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✓ Simulated </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span><span class="si">}</span><span class="s2"> samples (SNR: </span><span class="si">{</span><span class="n">actual_snr</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> dB)&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">signal</span>
+    
+<div class="viewcode-block" id="PlutoSDRInterface.start_streaming">
+<a class="viewcode-back" href="../../api/core/core.sdr_interface.html#core.sdr_interface.PlutoSDRInterface.start_streaming">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">start_streaming</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback_func</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Start real-time streaming mode.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_streaming</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Already streaming&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_streaming</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">capture_thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span>
+            <span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_streaming_worker</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">callback_func</span><span class="p">,),</span>
+            <span class="n">daemon</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">capture_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✓ Started streaming mode&quot;</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="PlutoSDRInterface.stop_streaming">
+<a class="viewcode-back" href="../../api/core/core.sdr_interface.html#core.sdr_interface.PlutoSDRInterface.stop_streaming">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stop_streaming</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop real-time streaming.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_streaming</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">capture_thread</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">capture_thread</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✓ Stopped streaming&quot;</span><span class="p">)</span></div>
+
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_streaming_worker</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback_func</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Worker thread for continuous streaming.&quot;&quot;&quot;</span>
+        <span class="n">error_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">max_errors</span> <span class="o">=</span> <span class="mi">10</span>
+        
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_streaming</span> <span class="ow">and</span> <span class="n">error_count</span> <span class="o">&lt;</span> <span class="n">max_errors</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation_mode</span><span class="p">:</span>
+                    <span class="n">samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simulate_capture</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>  <span class="c1"># 10ms chunks</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sdr</span><span class="o">.</span><span class="n">rx</span><span class="p">()</span>
+                
+                <span class="c1"># Put in queue for processing</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_queue</span><span class="o">.</span><span class="n">full</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sample_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
+                
+                <span class="c1"># Call callback if provided</span>
+                <span class="k">if</span> <span class="n">callback_func</span><span class="p">:</span>
+                    <span class="n">callback_func</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
+                
+                <span class="n">error_count</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Reset on success</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>  <span class="c1"># Small delay for simulation</span>
+            
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">error_count</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✗ Streaming error (</span><span class="si">{</span><span class="n">error_count</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">max_errors</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">error_count</span> <span class="o">&gt;=</span> <span class="n">max_errors</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✗ Too many errors, stopping stream&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_streaming</span> <span class="o">=</span> <span class="kc">False</span>
+    
+<div class="viewcode-block" id="PlutoSDRInterface.get_stream_samples">
+<a class="viewcode-back" href="../../api/core/core.sdr_interface.html#core.sdr_interface.PlutoSDRInterface.get_stream_samples">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_stream_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get samples from streaming queue.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_queue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">queue</span><span class="o">.</span><span class="n">Empty</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, GeminiSDR Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,25 @@
+# @package _global_
+# Development environment configuration
+# Settings optimized for development and debugging
+
+environment: development
+debug_mode: true
+
+logging:
+  level: DEBUG
+  format: structured
+  output: [console, file]
+  rotation: daily
+  max_file_size_mb: 50
+  backup_count: 3
+  log_dir: logs/dev
+  enable_performance_logging: true
+
+performance:
+  memory_threshold: 0.7
+  auto_optimize: true
+  profiling_enabled: true
+  gc_frequency: 50
+  memory_cleanup_threshold: 0.8
+  batch_size_auto_tune: true
+  model_compilation: false  # Faster startup for development

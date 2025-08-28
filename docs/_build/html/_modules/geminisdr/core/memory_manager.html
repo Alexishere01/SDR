@@ -1,0 +1,823 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>geminisdr.core.memory_manager &mdash; GeminiSDR 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            GeminiSDR
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../guides/index.html">User Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../architecture/index.html">System Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/index.html">Examples and Tutorials</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">GeminiSDR</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">geminisdr.core.memory_manager</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for geminisdr.core.memory_manager</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Memory management and optimization system for GeminiSDR.</span>
+
+<span class="sd">This module provides comprehensive memory monitoring, optimization, and cleanup</span>
+<span class="sd">utilities for both system RAM and GPU memory across different platforms.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">gc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">psutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">weakref</span>
+
+<span class="c1"># Platform-specific imports</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+    <span class="n">TORCH_AVAILABLE</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">TORCH_AVAILABLE</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">torch</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+    <span class="n">NUMPY_AVAILABLE</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">NUMPY_AVAILABLE</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">np</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.config.config_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">SystemConfig</span><span class="p">,</span> <span class="n">PerformanceConfig</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="MemoryStats">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.MemoryStats">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MemoryStats</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Memory usage statistics for system and GPU.&quot;&quot;&quot;</span>
+    <span class="n">total_ram_mb</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">available_ram_mb</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">used_ram_mb</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">ram_usage_percent</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">gpu_memory_mb</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">gpu_available_mb</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">gpu_usage_percent</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">swap_used_mb</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">process_memory_mb</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="MemoryMonitor">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.MemoryMonitor">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MemoryMonitor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Background memory monitoring with threshold alerts.&quot;&quot;&quot;</span>
+    
+<div class="viewcode-block" id="MemoryMonitor.__init__">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.MemoryMonitor.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memory_manager</span><span class="p">:</span> <span class="s1">&#39;MemoryManager&#39;</span><span class="p">,</span> <span class="n">check_interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5.0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">memory_manager</span> <span class="o">=</span> <span class="n">memory_manager</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_interval</span> <span class="o">=</span> <span class="n">check_interval</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">monitoring</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">monitor_thread</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">callbacks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">MemoryStats</span><span class="p">],</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+        
+<div class="viewcode-block" id="MemoryMonitor.add_callback">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.MemoryMonitor.add_callback">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">MemoryStats</span><span class="p">],</span> <span class="kc">None</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add callback to be called when memory stats are updated.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="MemoryMonitor.start_monitoring">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.MemoryMonitor.start_monitoring">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">start_monitoring</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Start background memory monitoring.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">monitoring</span><span class="p">:</span>
+            <span class="k">return</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">monitoring</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">monitor_thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_monitor_loop</span><span class="p">,</span> <span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">monitor_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Memory monitoring started&quot;</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="MemoryMonitor.stop_monitoring">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.MemoryMonitor.stop_monitoring">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stop_monitoring</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop background memory monitoring.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">monitoring</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">monitor_thread</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">monitor_thread</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Memory monitoring stopped&quot;</span><span class="p">)</span></div>
+
+        
+    <span class="k">def</span><span class="w"> </span><span class="nf">_monitor_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Main monitoring loop.&quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">monitoring</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">memory_manager</span><span class="o">.</span><span class="n">get_memory_stats</span><span class="p">()</span>
+                
+                <span class="c1"># Check thresholds and trigger cleanup if needed</span>
+                <span class="k">if</span> <span class="n">stats</span><span class="o">.</span><span class="n">ram_usage_percent</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">memory_manager</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">performance</span><span class="o">.</span><span class="n">memory_cleanup_threshold</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Memory usage high: </span><span class="si">{</span><span class="n">stats</span><span class="o">.</span><span class="n">ram_usage_percent</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">memory_manager</span><span class="o">.</span><span class="n">cleanup_memory</span><span class="p">()</span>
+                    
+                <span class="c1"># Call registered callbacks</span>
+                <span class="k">for</span> <span class="n">callback</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">callbacks</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">callback</span><span class="p">(</span><span class="n">stats</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in memory monitor callback: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in memory monitoring: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">check_interval</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="MemoryManager">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.MemoryManager">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MemoryManager</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;System memory management and optimization.&quot;&quot;&quot;</span>
+    
+<div class="viewcode-block" id="MemoryManager.__init__">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.MemoryManager.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">SystemConfig</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">performance_config</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">performance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hardware_config</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">hardware</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">memory_threshold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">performance_config</span><span class="o">.</span><span class="n">memory_threshold</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_threshold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">performance_config</span><span class="o">.</span><span class="n">memory_cleanup_threshold</span>
+        
+        <span class="c1"># Memory tracking</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_callbacks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[],</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_memory_history</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">MemoryStats</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_max_history</span> <span class="o">=</span> <span class="mi">100</span>
+        
+        <span class="c1"># Background monitoring</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">monitor</span> <span class="o">=</span> <span class="n">MemoryMonitor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        
+        <span class="c1"># Device detection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_detect_device</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gpu_available</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_gpu_availability</span><span class="p">()</span>
+        
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;MemoryManager initialized for device: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+        
+    <span class="k">def</span><span class="w"> </span><span class="nf">_detect_device</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Detect the best available compute device.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardware_config</span><span class="o">.</span><span class="n">device_preference</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">TORCH_AVAILABLE</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+                    <span class="k">return</span> <span class="s2">&quot;cuda&quot;</span>
+                <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="p">,</span> <span class="s1">&#39;mps&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+                    <span class="k">return</span> <span class="s2">&quot;mps&quot;</span>
+            <span class="k">return</span> <span class="s2">&quot;cpu&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardware_config</span><span class="o">.</span><span class="n">device_preference</span><span class="o">.</span><span class="n">value</span>
+            
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_gpu_availability</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if GPU is available for memory monitoring.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">TORCH_AVAILABLE</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+            
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="s2">&quot;cuda&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="s2">&quot;mps&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="p">,</span> <span class="s1">&#39;mps&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">False</span>
+        
+<div class="viewcode-block" id="MemoryManager.get_memory_stats">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.MemoryManager.get_memory_stats">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_memory_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MemoryStats</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get current memory usage statistics.&quot;&quot;&quot;</span>
+        <span class="c1"># System memory stats</span>
+        <span class="n">memory</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">virtual_memory</span><span class="p">()</span>
+        <span class="n">swap</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">swap_memory</span><span class="p">()</span>
+        <span class="n">process</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">Process</span><span class="p">()</span>
+        <span class="n">process_memory</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">memory_info</span><span class="p">()</span>
+        
+        <span class="n">stats</span> <span class="o">=</span> <span class="n">MemoryStats</span><span class="p">(</span>
+            <span class="n">total_ram_mb</span><span class="o">=</span><span class="n">memory</span><span class="o">.</span><span class="n">total</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">),</span>
+            <span class="n">available_ram_mb</span><span class="o">=</span><span class="n">memory</span><span class="o">.</span><span class="n">available</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">),</span>
+            <span class="n">used_ram_mb</span><span class="o">=</span><span class="n">memory</span><span class="o">.</span><span class="n">used</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">),</span>
+            <span class="n">ram_usage_percent</span><span class="o">=</span><span class="n">memory</span><span class="o">.</span><span class="n">percent</span><span class="p">,</span>
+            <span class="n">swap_used_mb</span><span class="o">=</span><span class="n">swap</span><span class="o">.</span><span class="n">used</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">),</span>
+            <span class="n">process_memory_mb</span><span class="o">=</span><span class="n">process_memory</span><span class="o">.</span><span class="n">rss</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">)</span>
+        <span class="p">)</span>
+        
+        <span class="c1"># GPU memory stats</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gpu_available</span> <span class="ow">and</span> <span class="n">TORCH_AVAILABLE</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="s2">&quot;cuda&quot;</span><span class="p">:</span>
+                    <span class="n">gpu_memory</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_device_properties</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">total_memory</span>
+                    <span class="n">gpu_allocated</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">memory_allocated</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="n">gpu_reserved</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">memory_reserved</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                    
+                    <span class="n">stats</span><span class="o">.</span><span class="n">gpu_memory_mb</span> <span class="o">=</span> <span class="n">gpu_memory</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">)</span>
+                    <span class="n">stats</span><span class="o">.</span><span class="n">gpu_available_mb</span> <span class="o">=</span> <span class="p">(</span><span class="n">gpu_memory</span> <span class="o">-</span> <span class="n">gpu_reserved</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">)</span>
+                    <span class="n">stats</span><span class="o">.</span><span class="n">gpu_usage_percent</span> <span class="o">=</span> <span class="p">(</span><span class="n">gpu_allocated</span> <span class="o">/</span> <span class="n">gpu_memory</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+                    
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="s2">&quot;mps&quot;</span><span class="p">:</span>
+                    <span class="c1"># MPS doesn&#39;t provide detailed memory stats, use approximation</span>
+                    <span class="n">stats</span><span class="o">.</span><span class="n">gpu_memory_mb</span> <span class="o">=</span> <span class="mf">8192.0</span>  <span class="c1"># Approximate for M1/M2</span>
+                    <span class="n">stats</span><span class="o">.</span><span class="n">gpu_available_mb</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">gpu_memory_mb</span> <span class="o">*</span> <span class="mf">0.8</span>  <span class="c1"># Conservative estimate</span>
+                    <span class="n">stats</span><span class="o">.</span><span class="n">gpu_usage_percent</span> <span class="o">=</span> <span class="mf">20.0</span>  <span class="c1"># Placeholder</span>
+                    
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not get GPU memory stats: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                
+        <span class="c1"># Store in history</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_memory_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stats</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_memory_history</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_history</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_memory_history</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            
+        <span class="k">return</span> <span class="n">stats</span></div>
+
+        
+<div class="viewcode-block" id="MemoryManager.optimize_batch_size">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.MemoryManager.optimize_batch_size">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">optimize_batch_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">model_size_mb</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Dynamically optimize batch size based on available memory.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">performance_config</span><span class="o">.</span><span class="n">batch_size_auto_tune</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">base_batch_size</span>
+            
+        <span class="n">stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_memory_stats</span><span class="p">()</span>
+        
+        <span class="c1"># Calculate available memory for processing</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gpu_available</span> <span class="ow">and</span> <span class="n">stats</span><span class="o">.</span><span class="n">gpu_available_mb</span><span class="p">:</span>
+            <span class="n">available_mb</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">gpu_available_mb</span>
+            <span class="c1"># Reserve some memory for model and operations</span>
+            <span class="n">usable_mb</span> <span class="o">=</span> <span class="n">available_mb</span> <span class="o">-</span> <span class="n">model_size_mb</span> <span class="o">-</span> <span class="mi">512</span>  <span class="c1"># 512MB buffer</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">available_mb</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">available_ram_mb</span>
+            <span class="c1"># Reserve more memory for system operations</span>
+            <span class="n">usable_mb</span> <span class="o">=</span> <span class="n">available_mb</span> <span class="o">-</span> <span class="n">model_size_mb</span> <span class="o">-</span> <span class="mi">1024</span>  <span class="c1"># 1GB buffer</span>
+            
+        <span class="k">if</span> <span class="n">usable_mb</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Very low memory available, using minimum batch size&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">base_batch_size</span> <span class="o">//</span> <span class="mi">4</span><span class="p">)</span>
+            
+        <span class="c1"># Estimate memory per sample (rough heuristic)</span>
+        <span class="n">estimated_mb_per_sample</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">model_size_mb</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span>  <span class="c1"># Very rough estimate</span>
+        <span class="n">max_batch_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">usable_mb</span> <span class="o">/</span> <span class="n">estimated_mb_per_sample</span><span class="p">)</span>
+        
+        <span class="c1"># Apply memory threshold</span>
+        <span class="n">target_batch_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">base_batch_size</span><span class="p">,</span> <span class="n">max_batch_size</span><span class="p">)</span>
+        <span class="n">target_batch_size</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">target_batch_size</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">memory_threshold</span><span class="p">))</span>
+        
+        <span class="k">if</span> <span class="n">target_batch_size</span> <span class="o">!=</span> <span class="n">base_batch_size</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Optimized batch size: </span><span class="si">{</span><span class="n">base_batch_size</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">target_batch_size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            
+        <span class="k">return</span> <span class="n">target_batch_size</span></div>
+
+        
+<div class="viewcode-block" id="MemoryManager.cleanup_memory">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.MemoryManager.cleanup_memory">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cleanup_memory</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Force memory cleanup and garbage collection.&quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Starting memory cleanup&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># Call registered cleanup callbacks</span>
+        <span class="k">for</span> <span class="n">callback</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_callbacks</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">callback</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in cleanup callback: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                
+        <span class="c1"># Python garbage collection</span>
+        <span class="n">collected</span> <span class="o">=</span> <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Garbage collection freed </span><span class="si">{</span><span class="n">collected</span><span class="si">}</span><span class="s2"> objects&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># GPU memory cleanup</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gpu_available</span> <span class="ow">and</span> <span class="n">TORCH_AVAILABLE</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="s2">&quot;cuda&quot;</span><span class="p">:</span>
+                    <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">()</span>
+                    <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;CUDA cache cleared&quot;</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="s2">&quot;mps&quot;</span><span class="p">:</span>
+                    <span class="n">torch</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">()</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;MPS cache cleared&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error clearing GPU cache: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                
+        <span class="c1"># Force additional cleanup for numpy arrays if available</span>
+        <span class="k">if</span> <span class="n">NUMPY_AVAILABLE</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># This is a bit aggressive but helps with memory fragmentation</span>
+                <span class="kn">import</span><span class="w"> </span><span class="nn">ctypes</span>
+                <span class="n">libc</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">CDLL</span><span class="p">(</span><span class="s2">&quot;libc.so.6&quot;</span><span class="p">)</span>
+                <span class="n">libc</span><span class="o">.</span><span class="n">malloc_trim</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">pass</span>  <span class="c1"># Not available on all systems</span>
+                
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Memory cleanup completed&quot;</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="MemoryManager.register_cleanup_callback">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.MemoryManager.register_cleanup_callback">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">register_cleanup_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="kc">None</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Register a callback to be called during memory cleanup.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="MemoryManager.monitor_memory_usage">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.MemoryManager.monitor_memory_usage">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">monitor_memory_usage</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Start monitoring memory usage and trigger cleanup if needed.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">monitor</span><span class="o">.</span><span class="n">monitoring</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">monitor</span><span class="o">.</span><span class="n">start_monitoring</span><span class="p">()</span></div>
+
+            
+<div class="viewcode-block" id="MemoryManager.stop_monitoring">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.MemoryManager.stop_monitoring">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stop_monitoring</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop memory monitoring.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">monitor</span><span class="o">.</span><span class="n">stop_monitoring</span><span class="p">()</span></div>
+
+        
+<div class="viewcode-block" id="MemoryManager.get_memory_history">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.MemoryManager.get_memory_history">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_memory_history</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">last_n</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">MemoryStats</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get memory usage history.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">last_n</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_memory_history</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_memory_history</span><span class="p">[</span><span class="o">-</span><span class="n">last_n</span><span class="p">:]</span></div>
+
+        
+<div class="viewcode-block" id="MemoryManager.estimate_model_memory">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.MemoryManager.estimate_model_memory">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">estimate_model_memory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_parameters</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dtype_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Estimate memory usage for a model in MB.&quot;&quot;&quot;</span>
+        <span class="c1"># Base model memory (parameters + gradients + optimizer states)</span>
+        <span class="n">base_memory</span> <span class="o">=</span> <span class="n">num_parameters</span> <span class="o">*</span> <span class="n">dtype_size</span> <span class="o">*</span> <span class="mi">3</span>  <span class="c1"># params + grads + optimizer</span>
+        
+        <span class="c1"># Add overhead for activations and intermediate computations</span>
+        <span class="n">overhead_factor</span> <span class="o">=</span> <span class="mf">1.5</span>
+        <span class="n">total_bytes</span> <span class="o">=</span> <span class="n">base_memory</span> <span class="o">*</span> <span class="n">overhead_factor</span>
+        
+        <span class="k">return</span> <span class="n">total_bytes</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">)</span>  <span class="c1"># Convert to MB</span></div>
+
+        
+<div class="viewcode-block" id="MemoryManager.memory_efficient_context">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.MemoryManager.memory_efficient_context">[docs]</a>
+    <span class="nd">@contextmanager</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">memory_efficient_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cleanup_on_exit</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Context manager for memory-efficient operations.&quot;&quot;&quot;</span>
+        <span class="n">initial_stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_memory_stats</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Entering memory-efficient context. RAM: </span><span class="si">{</span><span class="n">initial_stats</span><span class="o">.</span><span class="n">ram_usage_percent</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Pre-cleanup if memory usage is high</span>
+            <span class="k">if</span> <span class="n">initial_stats</span><span class="o">.</span><span class="n">ram_usage_percent</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">memory_threshold</span> <span class="o">*</span> <span class="mi">100</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_memory</span><span class="p">()</span>
+                
+            <span class="k">yield</span> <span class="bp">self</span>
+            
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">cleanup_on_exit</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_memory</span><span class="p">()</span>
+                
+            <span class="n">final_stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_memory_stats</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exiting memory-efficient context. RAM: </span><span class="si">{</span><span class="n">final_stats</span><span class="o">.</span><span class="n">ram_usage_percent</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span></div>
+
+            
+<div class="viewcode-block" id="MemoryManager.get_optimal_worker_count">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.MemoryManager.get_optimal_worker_count">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_optimal_worker_count</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get optimal number of worker processes based on available memory.&quot;&quot;&quot;</span>
+        <span class="n">stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_memory_stats</span><span class="p">()</span>
+        
+        <span class="c1"># Base on CPU count but limit by available memory</span>
+        <span class="n">cpu_count</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>
+        
+        <span class="c1"># Estimate memory per worker (rough heuristic)</span>
+        <span class="n">memory_per_worker_mb</span> <span class="o">=</span> <span class="mi">512</span>  <span class="c1"># Conservative estimate</span>
+        <span class="n">max_workers_by_memory</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">stats</span><span class="o">.</span><span class="n">available_ram_mb</span> <span class="o">/</span> <span class="n">memory_per_worker_mb</span><span class="p">)</span>
+        
+        <span class="c1"># Don&#39;t exceed CPU count or memory constraints</span>
+        <span class="n">optimal_workers</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">cpu_count</span><span class="p">,</span> <span class="n">max_workers_by_memory</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>  <span class="c1"># Cap at 8</span>
+        <span class="n">optimal_workers</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">optimal_workers</span><span class="p">)</span>  <span class="c1"># At least 1</span>
+        
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Optimal worker count: </span><span class="si">{</span><span class="n">optimal_workers</span><span class="si">}</span><span class="s2"> (CPU: </span><span class="si">{</span><span class="n">cpu_count</span><span class="si">}</span><span class="s2">, Memory limit: </span><span class="si">{</span><span class="n">max_workers_by_memory</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">optimal_workers</span></div>
+
+        
+<div class="viewcode-block" id="MemoryManager.__enter__">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.MemoryManager.__enter__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Context manager entry.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">monitor_memory_usage</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+        
+<div class="viewcode-block" id="MemoryManager.__exit__">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.MemoryManager.__exit__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Context manager exit.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stop_monitoring</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">performance_config</span><span class="o">.</span><span class="n">auto_optimize</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_memory</span><span class="p">()</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ModelCache">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.ModelCache">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ModelCache</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;LRU cache for ML models with memory-based eviction.&quot;&quot;&quot;</span>
+    
+<div class="viewcode-block" id="ModelCache.__init__">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.ModelCache.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">max_memory_mb</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">2048</span><span class="p">,</span> 
+                 <span class="n">memory_manager</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MemoryManager</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_size</span> <span class="o">=</span> <span class="n">max_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_memory_mb</span> <span class="o">=</span> <span class="n">max_memory_mb</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">memory_manager</span> <span class="o">=</span> <span class="n">memory_manager</span>
+        
+        <span class="c1"># Use OrderedDict for LRU behavior</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span> <span class="n">OrderedDict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_sizes</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Track model sizes in MB</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">access_count</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        
+        <span class="c1"># Weak references to models to help with garbage collection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_model_refs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">weakref</span><span class="o">.</span><span class="n">ref</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ModelCache initialized: max_size=</span><span class="si">{</span><span class="n">max_size</span><span class="si">}</span><span class="s2">, max_memory_mb=</span><span class="si">{</span><span class="n">max_memory_mb</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="ModelCache.get_model">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.ModelCache.get_model">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get model from cache, loading if necessary.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">model_key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
+            <span class="c1"># Move to end (most recently used)</span>
+            <span class="n">model_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">model_key</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">model_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_info</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">access_count</span><span class="p">[</span><span class="n">model_key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">access_count</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">model_key</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            
+            <span class="c1"># Check if model is still alive via weak reference</span>
+            <span class="n">model_ref</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_refs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">model_key</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">model_ref</span><span class="p">:</span>
+                <span class="n">model</span> <span class="o">=</span> <span class="n">model_ref</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cache hit for model: </span><span class="si">{</span><span class="n">model_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">model</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Model was garbage collected, remove from cache</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model </span><span class="si">{</span><span class="n">model_key</span><span class="si">}</span><span class="s2"> was garbage collected, removing from cache&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_remove_model</span><span class="p">(</span><span class="n">model_key</span><span class="p">)</span>
+                    
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cache miss for model: </span><span class="si">{</span><span class="n">model_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+        
+<div class="viewcode-block" id="ModelCache.put_model">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.ModelCache.put_model">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">put_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">size_mb</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add model to cache with LRU eviction.&quot;&quot;&quot;</span>
+        <span class="c1"># Estimate model size if not provided</span>
+        <span class="k">if</span> <span class="n">size_mb</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">size_mb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_estimate_model_size</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+            
+        <span class="c1"># Check if we need to evict models to make space</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_space</span><span class="p">(</span><span class="n">size_mb</span><span class="p">)</span>
+        
+        <span class="c1"># Remove existing entry if present</span>
+        <span class="k">if</span> <span class="n">model_key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_remove_model</span><span class="p">(</span><span class="n">model_key</span><span class="p">)</span>
+            
+        <span class="c1"># Add new model</span>
+        <span class="n">model_info</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;size_mb&#39;</span><span class="p">:</span> <span class="n">size_mb</span><span class="p">,</span>
+            <span class="s1">&#39;timestamp&#39;</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+            <span class="s1">&#39;access_count&#39;</span><span class="p">:</span> <span class="mi">1</span>
+        <span class="p">}</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">model_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_info</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_sizes</span><span class="p">[</span><span class="n">model_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">size_mb</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">access_count</span><span class="p">[</span><span class="n">model_key</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        
+        <span class="c1"># Store weak reference to help with memory management</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_model_refs</span><span class="p">[</span><span class="n">model_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">weakref</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">ref</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_on_model_deleted</span><span class="p">(</span><span class="n">model_key</span><span class="p">))</span>
+        
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Added model to cache: </span><span class="si">{</span><span class="n">model_key</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">size_mb</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MB)&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># Final check to ensure we&#39;re within limits</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_enforce_limits</span><span class="p">()</span></div>
+
+        
+    <span class="k">def</span><span class="w"> </span><span class="nf">_estimate_model_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Estimate model size in MB.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">TORCH_AVAILABLE</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s1">&#39;parameters&#39;</span><span class="p">):</span>
+            <span class="c1"># PyTorch model</span>
+            <span class="n">total_params</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
+            <span class="c1"># Assume float32 (4 bytes per parameter)</span>
+            <span class="n">size_bytes</span> <span class="o">=</span> <span class="n">total_params</span> <span class="o">*</span> <span class="mi">4</span>
+            <span class="k">return</span> <span class="n">size_bytes</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s1">&#39;__sizeof__&#39;</span><span class="p">):</span>
+            <span class="c1"># Generic Python object</span>
+            <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">__sizeof__</span><span class="p">()</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Fallback estimate</span>
+            <span class="k">return</span> <span class="mf">100.0</span>  <span class="c1"># 100MB default estimate</span>
+            
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ensure_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_mb</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Ensure there&#39;s enough space for a new model.&quot;&quot;&quot;</span>
+        <span class="n">current_memory</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_sizes</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        
+        <span class="c1"># Check memory limit</span>
+        <span class="k">while</span> <span class="p">(</span><span class="n">current_memory</span> <span class="o">+</span> <span class="n">required_mb</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_memory_mb</span> <span class="ow">and</span> 
+               <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_evict_lru</span><span class="p">()</span>
+            <span class="n">current_memory</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_sizes</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+            
+        <span class="c1"># Check size limit</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_size</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_evict_lru</span><span class="p">()</span>
+            
+    <span class="k">def</span><span class="w"> </span><span class="nf">_evict_lru</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Evict least recently used model.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
+            <span class="k">return</span>
+            
+        <span class="c1"># Get least recently used (first item in OrderedDict)</span>
+        <span class="n">lru_key</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_remove_model</span><span class="p">(</span><span class="n">lru_key</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Evicted LRU model: </span><span class="si">{</span><span class="n">lru_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+    <span class="k">def</span><span class="w"> </span><span class="nf">_remove_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove model from cache and cleanup references.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">model_key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">model_key</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">model_key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_sizes</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_sizes</span><span class="p">[</span><span class="n">model_key</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">model_key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">access_count</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">access_count</span><span class="p">[</span><span class="n">model_key</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">model_key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_refs</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_refs</span><span class="p">[</span><span class="n">model_key</span><span class="p">]</span>
+            
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_model_deleted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Callback when a model is garbage collected.&quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model </span><span class="si">{</span><span class="n">model_key</span><span class="si">}</span><span class="s2"> was garbage collected&quot;</span><span class="p">)</span>
+        
+    <span class="k">def</span><span class="w"> </span><span class="nf">_enforce_limits</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enforce cache size and memory limits.&quot;&quot;&quot;</span>
+        <span class="c1"># Remove any dead references</span>
+        <span class="n">dead_keys</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">ref</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_refs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">ref</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">dead_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+                
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">dead_keys</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_remove_model</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            
+        <span class="c1"># Enforce memory limit</span>
+        <span class="n">current_memory</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_sizes</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">while</span> <span class="n">current_memory</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_memory_mb</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_evict_lru</span><span class="p">()</span>
+            <span class="n">current_memory</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_sizes</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+            
+        <span class="c1"># Enforce size limit</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_size</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_evict_lru</span><span class="p">()</span>
+            
+<div class="viewcode-block" id="ModelCache.clear">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.ModelCache.clear">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Clear all models from cache.&quot;&quot;&quot;</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_remove_model</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Model cache cleared&quot;</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="ModelCache.get_cache_stats">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.ModelCache.get_cache_stats">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_cache_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get cache statistics.&quot;&quot;&quot;</span>
+        <span class="n">total_memory</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_sizes</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">),</span>
+            <span class="s1">&#39;max_size&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_size</span><span class="p">,</span>
+            <span class="s1">&#39;total_memory_mb&#39;</span><span class="p">:</span> <span class="n">total_memory</span><span class="p">,</span>
+            <span class="s1">&#39;max_memory_mb&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_memory_mb</span><span class="p">,</span>
+            <span class="s1">&#39;memory_utilization&#39;</span><span class="p">:</span> <span class="n">total_memory</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_memory_mb</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_memory_mb</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s1">&#39;models&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
+            <span class="s1">&#39;access_counts&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">access_count</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="p">}</span></div>
+
+        
+<div class="viewcode-block" id="ModelCache.get_model_info">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.ModelCache.get_model_info">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_model_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get information about a cached model.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">model_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+            
+        <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">model_key</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">info</span><span class="p">[</span><span class="s1">&#39;access_count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">access_count</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">model_key</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">info</span><span class="p">[</span><span class="s1">&#39;is_alive&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_refs</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_refs</span><span class="p">[</span><span class="n">model_key</span><span class="p">]()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">info</span></div>
+
+        
+<div class="viewcode-block" id="ModelCache.__len__">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.ModelCache.__len__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return number of cached models.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="ModelCache.__contains__">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.ModelCache.__contains__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if model is in cache.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">model_key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span></div>
+
+        
+<div class="viewcode-block" id="ModelCache.__repr__">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.ModelCache.__repr__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;String representation of cache.&quot;&quot;&quot;</span>
+        <span class="n">total_memory</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_sizes</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">return</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ModelCache(size=</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">)</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_size</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;memory=</span><span class="si">{</span><span class="n">total_memory</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_memory_mb</span><span class="si">}</span><span class="s2"> MB)&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="c1"># Utility functions for memory management</span>
+
+<div class="viewcode-block" id="get_system_memory_info">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.get_system_memory_info">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_system_memory_info</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get comprehensive system memory information.&quot;&quot;&quot;</span>
+    <span class="n">memory</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">virtual_memory</span><span class="p">()</span>
+    <span class="n">swap</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">swap_memory</span><span class="p">()</span>
+    
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s1">&#39;total_ram_gb&#39;</span><span class="p">:</span> <span class="n">memory</span><span class="o">.</span><span class="n">total</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span><span class="o">**</span><span class="mi">3</span><span class="p">),</span>
+        <span class="s1">&#39;available_ram_gb&#39;</span><span class="p">:</span> <span class="n">memory</span><span class="o">.</span><span class="n">available</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span><span class="o">**</span><span class="mi">3</span><span class="p">),</span>
+        <span class="s1">&#39;used_ram_gb&#39;</span><span class="p">:</span> <span class="n">memory</span><span class="o">.</span><span class="n">used</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span><span class="o">**</span><span class="mi">3</span><span class="p">),</span>
+        <span class="s1">&#39;ram_percent&#39;</span><span class="p">:</span> <span class="n">memory</span><span class="o">.</span><span class="n">percent</span><span class="p">,</span>
+        <span class="s1">&#39;total_swap_gb&#39;</span><span class="p">:</span> <span class="n">swap</span><span class="o">.</span><span class="n">total</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span><span class="o">**</span><span class="mi">3</span><span class="p">),</span>
+        <span class="s1">&#39;used_swap_gb&#39;</span><span class="p">:</span> <span class="n">swap</span><span class="o">.</span><span class="n">used</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span><span class="o">**</span><span class="mi">3</span><span class="p">),</span>
+        <span class="s1">&#39;swap_percent&#39;</span><span class="p">:</span> <span class="n">swap</span><span class="o">.</span><span class="n">percent</span>
+    <span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="get_gpu_memory_info">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.get_gpu_memory_info">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_gpu_memory_info</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get GPU memory information if available.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">TORCH_AVAILABLE</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+        
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+            <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">current_device</span><span class="p">()</span>
+            <span class="n">props</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_device_properties</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">allocated</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">memory_allocated</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">reserved</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">memory_reserved</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s1">&#39;total_gb&#39;</span><span class="p">:</span> <span class="n">props</span><span class="o">.</span><span class="n">total_memory</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span><span class="o">**</span><span class="mi">3</span><span class="p">),</span>
+                <span class="s1">&#39;allocated_gb&#39;</span><span class="p">:</span> <span class="n">allocated</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span><span class="o">**</span><span class="mi">3</span><span class="p">),</span>
+                <span class="s1">&#39;reserved_gb&#39;</span><span class="p">:</span> <span class="n">reserved</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span><span class="o">**</span><span class="mi">3</span><span class="p">),</span>
+                <span class="s1">&#39;free_gb&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">props</span><span class="o">.</span><span class="n">total_memory</span> <span class="o">-</span> <span class="n">reserved</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span><span class="o">**</span><span class="mi">3</span><span class="p">),</span>
+                <span class="s1">&#39;utilization_percent&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">allocated</span> <span class="o">/</span> <span class="n">props</span><span class="o">.</span><span class="n">total_memory</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+            <span class="p">}</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="p">,</span> <span class="s1">&#39;mps&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+            <span class="c1"># MPS doesn&#39;t provide detailed memory stats</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s1">&#39;total_gb&#39;</span><span class="p">:</span> <span class="mf">8.0</span><span class="p">,</span>  <span class="c1"># Approximate for M1/M2</span>
+                <span class="s1">&#39;allocated_gb&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>  <span class="c1"># Placeholder</span>
+                <span class="s1">&#39;reserved_gb&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>  <span class="c1"># Placeholder</span>
+                <span class="s1">&#39;free_gb&#39;</span><span class="p">:</span> <span class="mf">6.0</span><span class="p">,</span>  <span class="c1"># Placeholder</span>
+                <span class="s1">&#39;utilization_percent&#39;</span><span class="p">:</span> <span class="mf">12.5</span>  <span class="c1"># Placeholder</span>
+            <span class="p">}</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not get GPU memory info: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="optimize_torch_memory_settings">
+<a class="viewcode-back" href="../../../api/geminisdr/core/memory_manager.html#geminisdr.core.memory_manager.optimize_torch_memory_settings">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">optimize_torch_memory_settings</span><span class="p">(</span><span class="n">device</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Optimize PyTorch memory settings for the given device.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">TORCH_AVAILABLE</span><span class="p">:</span>
+        <span class="k">return</span>
+        
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">device</span> <span class="o">==</span> <span class="s2">&quot;cuda&quot;</span> <span class="ow">and</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+            <span class="c1"># Enable memory pool for better allocation</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">()</span>
+            <span class="c1"># Set memory fraction if configured</span>
+            <span class="c1"># torch.cuda.set_per_process_memory_fraction(0.8)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Optimized CUDA memory settings&quot;</span><span class="p">)</span>
+            
+        <span class="k">elif</span> <span class="n">device</span> <span class="o">==</span> <span class="s2">&quot;mps&quot;</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="p">,</span> <span class="s1">&#39;mps&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+            <span class="c1"># MPS-specific optimizations</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Optimized MPS memory settings&quot;</span><span class="p">)</span>
+            
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not optimize memory settings for </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, GeminiSDR Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

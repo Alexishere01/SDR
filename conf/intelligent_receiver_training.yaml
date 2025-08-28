@@ -1,0 +1,163 @@
+# Configuration for Intelligent Receiver Training
+# This configuration optimizes settings for training the Deep Q-Learning receiver
+
+hardware:
+  device_preference: "auto"  # Let system choose optimal device (MPS, CUDA, CPU)
+  memory_optimization: "balanced"
+  sdr_mode: "simulation"  # Use simulation for training
+
+ml:
+  # Training parameters
+  batch_size: 64  # Larger batch for stable Q-learning
+  learning_rate: 0.0001  # Conservative learning rate for DQN
+  model_cache_size: 3
+  
+  # DQN specific parameters
+  replay_memory_size: 10000
+  target_update_frequency: 10
+  epsilon_start: 1.0
+  epsilon_end: 0.01
+  epsilon_decay: 0.995
+  
+  # Training optimization
+  gradient_clipping: true
+  gradient_clip_value: 1.0
+  use_double_dqn: true
+  use_dueling_dqn: true
+
+performance:
+  # Memory management
+  memory_threshold: 0.8
+  cleanup_frequency: 50  # Clean memory every 50 episodes
+  
+  # Training optimization
+  num_workers: 4
+  pin_memory: true
+  prefetch_factor: 2
+  
+  # Monitoring
+  metrics_collection_interval: 10
+  checkpoint_interval: 100
+  evaluation_interval: 50
+
+logging:
+  level: "INFO"
+  format: "structured"
+  output: ["console", "file"]
+  
+  # Training specific logging
+  log_training_metrics: true
+  log_episode_details: false  # Set to true for debugging
+  log_memory_usage: true
+  
+  # File logging
+  log_file: "logs/intelligent_receiver_training.log"
+  max_file_size_mb: 100
+  backup_count: 5
+
+# Training environment settings
+environment:
+  # Simulation parameters
+  sample_rate: 2000000  # 2 MHz
+  frequency_range: [70000000, 200000000]  # 70-200 MHz
+  snr_range: [-10, 30]  # dB
+  
+  # Training scenarios
+  num_training_scenarios: 1000
+  scenario_difficulty_distribution:
+    easy: 0.3
+    medium: 0.4
+    hard: 0.2
+    very_hard: 0.1
+  
+  # Episode parameters
+  max_episode_steps: 50
+  reward_shaping: true
+  early_termination: true
+
+# Model architecture
+model:
+  # Network architecture
+  hidden_size: 512
+  num_hidden_layers: 3
+  dropout_rate: 0.2
+  
+  # Input/output dimensions
+  state_size: 256  # Spectrum + metadata features
+  action_size: 3   # [freq_adjust, gain_adjust, bandwidth_adjust]
+  action_discretization: 11  # Levels per action dimension
+  
+  # Activation functions
+  activation: "relu"
+  output_activation: "linear"
+
+# Training schedule
+training:
+  # Episode configuration
+  num_episodes: 1000
+  warmup_episodes: 100
+  
+  # Evaluation
+  eval_episodes: 50
+  eval_frequency: 50
+  
+  # Checkpointing
+  save_frequency: 100
+  keep_best_model: true
+  early_stopping_patience: 200
+  
+  # Curriculum learning
+  use_curriculum: true
+  curriculum_stages:
+    - episodes: 200
+      difficulty: "easy"
+      snr_range: [10, 30]
+    - episodes: 300
+      difficulty: "medium" 
+      snr_range: [0, 20]
+    - episodes: 500
+      difficulty: "mixed"
+      snr_range: [-10, 30]
+
+# Testing configuration
+testing:
+  num_test_episodes: 100
+  test_scenarios:
+    - name: "high_snr"
+      snr_range: [15, 30]
+      episodes: 25
+    - name: "medium_snr"
+      snr_range: [5, 15]
+      episodes: 25
+    - name: "low_snr"
+      snr_range: [-5, 5]
+      episodes: 25
+    - name: "interference"
+      snr_range: [0, 20]
+      has_interference: true
+      episodes: 25
+  
+  # Success criteria
+  success_snr_threshold: 15  # dB
+  success_freq_error_threshold: 100000  # Hz (100 kHz)
+  
+  # Metrics to collect
+  collect_convergence_time: true
+  collect_frequency_accuracy: true
+  collect_snr_improvement: true
+
+# Output configuration
+output:
+  base_dir: "outputs/intelligent_receiver"
+  save_training_plots: true
+  save_test_plots: true
+  save_model_artifacts: true
+  
+  # Report generation
+  generate_final_report: true
+  include_recommendations: true
+  
+  # Data export
+  export_training_data: true
+  export_test_results: true
+  export_format: "json"

@@ -1,0 +1,25 @@
+Metadata-Version: 2.4
+Name: geminisdr
+Version: 0.1.0
+Summary: A general-purpose SDR toolkit for researching interference mitigation techniques in drone mesh networks.
+Home-page: 
+Author: Gemini
+Author-email: 
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Requires-Dist: numpy
+Requires-Dist: matplotlib
+Requires-Dist: torch
+Requires-Dist: scipy
+Requires-Dist: h5py
+Requires-Dist: scikit-learn
+Requires-Dist: psutil
+Requires-Dist: mlflow
+Requires-Dist: pyadi-iio
+Dynamic: author
+Dynamic: classifier
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary

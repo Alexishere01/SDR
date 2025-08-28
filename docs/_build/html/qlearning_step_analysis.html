@@ -1,0 +1,329 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Q-Learning Step Size Analysis &mdash; GeminiSDR 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            GeminiSDR
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="guides/index.html">User Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture/index.html">System Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/index.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/index.html">Examples and Tutorials</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">GeminiSDR</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Q-Learning Step Size Analysis</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/qlearning_step_analysis.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="q-learning-step-size-analysis">
+<h1>Q-Learning Step Size Analysis<a class="headerlink" href="#q-learning-step-size-analysis" title="Link to this heading"></a></h1>
+<section id="current-action-space-configuration">
+<h2>Current Action Space Configuration<a class="headerlink" href="#current-action-space-configuration" title="Link to this heading"></a></h2>
+<section id="frequency-adjustments">
+<h3>Frequency Adjustments<a class="headerlink" href="#frequency-adjustments" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">freq_actions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">500e3</span><span class="p">,</span> <span class="mf">500e3</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Step Size: 100 kHz</strong></p>
+<p><strong>Reasoning:</strong></p>
+<ul class="simple">
+<li><p><strong>Typical Channel Spacing</strong>: Most digital communications use channel spacings of 25 kHz to 200 kHz</p></li>
+<li><p><strong>100 kHz steps</strong> allow fine-tuning within a channel while being large enough to hop between adjacent channels</p></li>
+<li><p><strong>±500 kHz range</strong> covers typical frequency uncertainty in SDR systems</p></li>
+<li><p><strong>11 steps</strong> provide good granularity without making the action space too large</p></li>
+</ul>
+<p><strong>Real-world Impact:</strong></p>
+<ul class="simple">
+<li><p>At 100 MHz carrier: 100 kHz = 0.1% frequency adjustment</p></li>
+<li><p>Allows precise tuning for narrow-band signals</p></li>
+<li><p>Can quickly escape interference in adjacent frequencies</p></li>
+</ul>
+</section>
+<section id="gain-adjustments">
+<h3>Gain Adjustments<a class="headerlink" href="#gain-adjustments" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">gain_actions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Step Size: 1 dB</strong></p>
+<p><strong>Reasoning:</strong></p>
+<ul class="simple">
+<li><p><strong>1 dB steps</strong> are the standard granularity in RF systems</p></li>
+<li><p><strong>±5 dB range</strong> covers typical gain adjustments needed for optimization</p></li>
+<li><p>Smaller than 1 dB is usually not meaningful due to noise</p></li>
+<li><p>Larger than 1 dB can cause overshooting in sensitive systems</p></li>
+</ul>
+<p><strong>Real-world Impact:</strong></p>
+<ul class="simple">
+<li><p>1 dB ≈ 26% power change (10^(1/10) = 1.26)</p></li>
+<li><p>Allows fine-tuning without causing instability</p></li>
+<li><p>Matches typical SDR hardware granularity</p></li>
+</ul>
+</section>
+<section id="bandwidth-adjustments">
+<h3>Bandwidth Adjustments<a class="headerlink" href="#bandwidth-adjustments" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">bw_actions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Step Size: 0.04 (4% of sample rate)</strong></p>
+<p><strong>Reasoning:</strong></p>
+<ul class="simple">
+<li><p><strong>4% steps</strong> allow gradual bandwidth optimization</p></li>
+<li><p><strong>±20% range</strong> covers most practical bandwidth adjustments</p></li>
+<li><p>Prevents dramatic changes that could lose the signal</p></li>
+<li><p>Matches typical filter bandwidth adjustments</p></li>
+</ul>
+<p><strong>Real-world Impact:</strong></p>
+<ul class="simple">
+<li><p>At 2 MHz sample rate: 4% = 80 kHz bandwidth change</p></li>
+<li><p>Allows optimization between noise rejection and signal capture</p></li>
+<li><p>Prevents over-narrowing that loses signal components</p></li>
+</ul>
+</section>
+</section>
+<section id="alternative-step-size-configurations">
+<h2>Alternative Step Size Configurations<a class="headerlink" href="#alternative-step-size-configurations" title="Link to this heading"></a></h2>
+<section id="fine-tuning-configuration-more-precise">
+<h3>Fine-Tuning Configuration (More Precise)<a class="headerlink" href="#fine-tuning-configuration-more-precise" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Smaller steps for precision</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">freq_actions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">200e3</span><span class="p">,</span> <span class="mf">200e3</span><span class="p">,</span> <span class="mi">21</span><span class="p">)</span>    <span class="c1"># 20 kHz steps</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">gain_actions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">13</span><span class="p">)</span>            <span class="c1"># 0.5 dB steps</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">bw_actions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>          <span class="c1"># 2% steps</span>
+</pre></div>
+</div>
+<p><strong>Pros:</strong> More precise control, better for weak signals
+<strong>Cons:</strong> Slower learning, more actions to explore</p>
+</section>
+<section id="coarse-tuning-configuration-faster-learning">
+<h3>Coarse-Tuning Configuration (Faster Learning)<a class="headerlink" href="#coarse-tuning-configuration-faster-learning" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Larger steps for speed</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">freq_actions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">1e6</span><span class="p">,</span> <span class="mf">1e6</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>        <span class="c1"># 200 kHz steps</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">gain_actions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>          <span class="c1"># 2 dB steps</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">bw_actions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>           <span class="c1"># ~8.5% steps</span>
+</pre></div>
+</div>
+<p><strong>Pros:</strong> Faster learning, good for strong signals
+<strong>Cons:</strong> Less precise, might miss optimal settings</p>
+</section>
+<section id="adversarial-configuration-anti-jamming">
+<h3>Adversarial Configuration (Anti-Jamming)<a class="headerlink" href="#adversarial-configuration-anti-jamming" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Larger frequency hops to escape jamming</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">freq_actions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">2e6</span><span class="p">,</span> <span class="mf">2e6</span><span class="p">,</span> <span class="mi">21</span><span class="p">)</span>        <span class="c1"># 200 kHz steps, wider range</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">gain_actions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">21</span><span class="p">)</span>          <span class="c1"># 1 dB steps, wider range</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">bw_actions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>          <span class="c1"># 8% steps, wider range</span>
+</pre></div>
+</div>
+<p><strong>Pros:</strong> Better jamming evasion, more agile
+<strong>Cons:</strong> Might overshoot optimal settings</p>
+</section>
+</section>
+<section id="step-size-impact-on-learning">
+<h2>Step Size Impact on Learning<a class="headerlink" href="#step-size-impact-on-learning" title="Link to this heading"></a></h2>
+<section id="learning-speed-vs-precision-trade-off">
+<h3>Learning Speed vs Precision Trade-off<a class="headerlink" href="#learning-speed-vs-precision-trade-off" title="Link to this heading"></a></h3>
+<p><strong>Smaller Steps:</strong></p>
+<ul class="simple">
+<li><p><strong>Advantages:</strong></p>
+<ul>
+<li><p>More precise final tuning</p></li>
+<li><p>Better for weak signals</p></li>
+<li><p>Smoother convergence</p></li>
+</ul>
+</li>
+<li><p><strong>Disadvantages:</strong></p>
+<ul>
+<li><p>Slower exploration</p></li>
+<li><p>More episodes needed</p></li>
+<li><p>Larger action space</p></li>
+</ul>
+</li>
+</ul>
+<p><strong>Larger Steps:</strong></p>
+<ul class="simple">
+<li><p><strong>Advantages:</strong></p>
+<ul>
+<li><p>Faster initial learning</p></li>
+<li><p>Better exploration</p></li>
+<li><p>Smaller action space</p></li>
+</ul>
+</li>
+<li><p><strong>Disadvantages:</strong></p>
+<ul>
+<li><p>Less precise final tuning</p></li>
+<li><p>Might overshoot optimal</p></li>
+<li><p>Oscillation around optimum</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="current-choice-justification">
+<h3>Current Choice Justification<a class="headerlink" href="#current-choice-justification" title="Link to this heading"></a></h3>
+<p>Our current configuration balances:</p>
+<ol class="arabic simple">
+<li><p><strong>Learning Speed</strong>: 11 actions per dimension = 11³ = 1,331 total combinations</p></li>
+<li><p><strong>Precision</strong>: Steps small enough for practical tuning</p></li>
+<li><p><strong>Coverage</strong>: Range large enough to handle typical scenarios</p></li>
+<li><p><strong>Hardware Compatibility</strong>: Matches typical SDR capabilities</p></li>
+</ol>
+</section>
+</section>
+<section id="adaptive-step-sizes-future-enhancement">
+<h2>Adaptive Step Sizes (Future Enhancement)<a class="headerlink" href="#adaptive-step-sizes-future-enhancement" title="Link to this heading"></a></h2>
+<section id="curriculum-learning-approach">
+<h3>Curriculum Learning Approach<a class="headerlink" href="#curriculum-learning-approach" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Start with large steps, reduce over time</span>
+<span class="k">if</span> <span class="n">episode</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">:</span>
+    <span class="n">freq_step</span> <span class="o">=</span> <span class="mf">200e3</span>  <span class="c1"># Large steps for exploration</span>
+<span class="k">elif</span> <span class="n">episode</span> <span class="o">&lt;</span> <span class="mi">300</span><span class="p">:</span>
+    <span class="n">freq_step</span> <span class="o">=</span> <span class="mf">100e3</span>  <span class="c1"># Medium steps for refinement</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">freq_step</span> <span class="o">=</span> <span class="mf">50e3</span>   <span class="c1"># Small steps for precision</span>
+</pre></div>
+</div>
+</section>
+<section id="dynamic-step-sizing">
+<h3>Dynamic Step Sizing<a class="headerlink" href="#dynamic-step-sizing" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Adjust step size based on reward gradient</span>
+<span class="k">if</span> <span class="n">reward_improving</span><span class="p">:</span>
+    <span class="n">step_size</span> <span class="o">*=</span> <span class="mf">0.9</span>   <span class="c1"># Smaller steps when close to optimum</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">step_size</span> <span class="o">*=</span> <span class="mf">1.1</span>   <span class="c1"># Larger steps when far from optimum</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="practical-examples">
+<h2>Practical Examples<a class="headerlink" href="#practical-examples" title="Link to this heading"></a></h2>
+<section id="example-1-finding-a-100-mhz-signal">
+<h3>Example 1: Finding a 100 MHz Signal<a class="headerlink" href="#example-1-finding-a-100-mhz-signal" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Initial frequency</strong>: 99.5 MHz (500 kHz off)</p></li>
+<li><p><strong>Q-learning actions</strong>: [+100k, +100k, +100k, +100k, +100k] = +500 kHz</p></li>
+<li><p><strong>Result</strong>: Perfectly tuned to 100 MHz in 5 steps</p></li>
+</ul>
+</section>
+<section id="example-2-gain-optimization">
+<h3>Example 2: Gain Optimization<a class="headerlink" href="#example-2-gain-optimization" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Initial gain</strong>: 25 dB (too low, SNR = 5 dB)</p></li>
+<li><p><strong>Optimal gain</strong>: 35 dB (SNR = 20 dB)</p></li>
+<li><p><strong>Q-learning actions</strong>: [+1, +1, +1, +1, +1, +1, +1, +1, +1, +1] = +10 dB</p></li>
+<li><p><strong>Result</strong>: Optimized gain in 10 steps</p></li>
+</ul>
+</section>
+<section id="example-3-bandwidth-tuning">
+<h3>Example 3: Bandwidth Tuning<a class="headerlink" href="#example-3-bandwidth-tuning" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Initial BW</strong>: 80% of sample rate (too wide, noisy)</p></li>
+<li><p><strong>Optimal BW</strong>: 60% of sample rate</p></li>
+<li><p><strong>Sample rate</strong>: 2 MHz</p></li>
+<li><p><strong>Q-learning actions</strong>: [-0.04, -0.04, -0.04, -0.04, -0.04] = -0.2 (20% reduction)</p></li>
+<li><p><strong>Result</strong>: BW reduced from 1.6 MHz to 1.2 MHz</p></li>
+</ul>
+</section>
+</section>
+<section id="conclusion">
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Link to this heading"></a></h2>
+<p>The current step sizes (100 kHz, 1 dB, 4%) provide a good balance between:</p>
+<ul class="simple">
+<li><p><strong>Learning efficiency</strong> (reasonable action space size)</p></li>
+<li><p><strong>Practical precision</strong> (meaningful adjustments)</p></li>
+<li><p><strong>Hardware compatibility</strong> (matches SDR capabilities)</p></li>
+<li><p><strong>Robustness</strong> (works across various scenarios)</p></li>
+</ul>
+<p>These can be adjusted based on specific requirements:</p>
+<ul class="simple">
+<li><p><strong>Precision applications</strong>: Reduce step sizes</p></li>
+<li><p><strong>Speed applications</strong>: Increase step sizes</p></li>
+<li><p><strong>Adversarial environments</strong>: Increase ranges</p></li>
+<li><p><strong>Weak signal scenarios</strong>: Reduce frequency steps</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, GeminiSDR Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,705 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Debugging and Troubleshooting &mdash; GeminiSDR 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Examples and Tutorials" href="../examples/index.html" />
+    <link rel="prev" title="Testing Guidelines" href="testing.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            GeminiSDR
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">User Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/index.html">System Architecture</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="contributing.html">Contributing to GeminiSDR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coding_standards.html">Coding Standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html">Testing Guidelines</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Debugging and Troubleshooting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#debugging-strategies">Debugging Strategies</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#logging-based-debugging">Logging-Based Debugging</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#interactive-debugging">Interactive Debugging</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#memory-debugging">Memory Debugging</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gpu-memory-debugging">GPU Memory Debugging</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#common-issues-and-solutions">Common Issues and Solutions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#configuration-issues">Configuration Issues</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#memory-issues">Memory Issues</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#model-loading-issues">Model Loading Issues</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hardware-issues">Hardware Issues</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#performance-issues">Performance Issues</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cross-platform-issues">Cross-Platform Issues</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#debugging-tools-and-utilities">Debugging Tools and Utilities</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#log-analysis">Log Analysis</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#system-diagnostics">System Diagnostics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#testing-and-validation">Testing and Validation</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#best-practices-for-debugging">Best Practices for Debugging</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#proactive-debugging">Proactive Debugging</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#debugging-workflow">Debugging Workflow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#documentation">Documentation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#contributing">Contributing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#coding-standards">Coding Standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#testing-guidelines">Testing Guidelines</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#debugging-and-troubleshooting">Debugging and Troubleshooting</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Debugging and Troubleshooting</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#debugging-strategies">Debugging Strategies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#common-issues-and-solutions">Common Issues and Solutions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#debugging-tools-and-utilities">Debugging Tools and Utilities</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#best-practices-for-debugging">Best Practices for Debugging</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples and Tutorials</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">GeminiSDR</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Developer Guide</a></li>
+      <li class="breadcrumb-item active">Debugging and Troubleshooting</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/development/debugging.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="debugging-and-troubleshooting">
+<h1>Debugging and Troubleshooting<a class="headerlink" href="#debugging-and-troubleshooting" title="Link to this heading"></a></h1>
+<p>This guide provides debugging strategies and troubleshooting information for GeminiSDR development and deployment.</p>
+<section id="debugging-strategies">
+<h2>Debugging Strategies<a class="headerlink" href="#debugging-strategies" title="Link to this heading"></a></h2>
+<section id="logging-based-debugging">
+<h3>Logging-Based Debugging<a class="headerlink" href="#logging-based-debugging" title="Link to this heading"></a></h3>
+<p>GeminiSDR uses structured logging for comprehensive debugging information:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.core.logging_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">StructuredLogger</span>
+
+<span class="c1"># Enable debug logging</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">StructuredLogger</span><span class="p">(</span><span class="s2">&quot;my_module&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">logging</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">add_context</span><span class="p">(</span><span class="n">operation</span><span class="o">=</span><span class="s2">&quot;model_training&quot;</span><span class="p">,</span> <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;resnet50&quot;</span><span class="p">)</span>
+
+<span class="c1"># Debug-level logging</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Starting model initialization&quot;</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
+    <span class="s2">&quot;model_params&quot;</span><span class="p">:</span> <span class="n">model_params</span><span class="p">,</span>
+    <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">device</span><span class="p">),</span>
+    <span class="s2">&quot;memory_available&quot;</span><span class="p">:</span> <span class="n">memory_stats</span><span class="o">.</span><span class="n">available_ram_mb</span>
+<span class="p">})</span>
+
+<span class="c1"># Performance logging</span>
+<span class="k">with</span> <span class="n">logger</span><span class="o">.</span><span class="n">performance_context</span><span class="p">(</span><span class="s2">&quot;model_forward_pass&quot;</span><span class="p">):</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Enable debug logging in configuration:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># conf/environments/debug.yaml</span>
+<span class="nt">logging</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">level</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;DEBUG&quot;</span>
+<span class="w">  </span><span class="nt">format</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;structured&quot;</span>
+<span class="w">  </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;console&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;file&quot;</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">console_format</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;detailed&quot;</span><span class="w">  </span><span class="c1"># More verbose console output</span>
+</pre></div>
+</div>
+</section>
+<section id="interactive-debugging">
+<h3>Interactive Debugging<a class="headerlink" href="#interactive-debugging" title="Link to this heading"></a></h3>
+<p>Use Python debugger for interactive debugging:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pdb</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">problematic_function</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="c1"># Set breakpoint</span>
+    <span class="n">pdb</span><span class="o">.</span><span class="n">set_trace</span><span class="p">()</span>
+
+    <span class="c1"># Debug interactively</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">complex_computation</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+<span class="c1"># Or use ipdb for enhanced debugging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ipdb</span>
+<span class="n">ipdb</span><span class="o">.</span><span class="n">set_trace</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>For remote debugging in containers or VMs:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pdb</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="c1"># Remote debugging</span>
+<span class="n">pdb</span><span class="o">.</span><span class="n">Pdb</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">__stdout__</span><span class="p">)</span><span class="o">.</span><span class="n">set_trace</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="memory-debugging">
+<h3>Memory Debugging<a class="headerlink" href="#memory-debugging" title="Link to this heading"></a></h3>
+<p>Debug memory issues using the memory manager:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.core.memory_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">MemoryManager</span>
+
+<span class="n">memory_manager</span> <span class="o">=</span> <span class="n">MemoryManager</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+<span class="c1"># Monitor memory usage</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">debug_memory_usage</span><span class="p">(</span><span class="n">operation_name</span><span class="p">):</span>
+    <span class="n">stats_before</span> <span class="o">=</span> <span class="n">memory_manager</span><span class="o">.</span><span class="n">get_memory_stats</span><span class="p">()</span>
+
+    <span class="c1"># Your operation here</span>
+    <span class="k">yield</span>
+
+    <span class="n">stats_after</span> <span class="o">=</span> <span class="n">memory_manager</span><span class="o">.</span><span class="n">get_memory_stats</span><span class="p">()</span>
+    <span class="n">memory_diff</span> <span class="o">=</span> <span class="n">stats_after</span><span class="o">.</span><span class="n">used_ram_mb</span> <span class="o">-</span> <span class="n">stats_before</span><span class="o">.</span><span class="n">used_ram_mb</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Memory usage for </span><span class="si">{</span><span class="n">operation_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;memory_before_mb&quot;</span><span class="p">:</span> <span class="n">stats_before</span><span class="o">.</span><span class="n">used_ram_mb</span><span class="p">,</span>
+        <span class="s2">&quot;memory_after_mb&quot;</span><span class="p">:</span> <span class="n">stats_after</span><span class="o">.</span><span class="n">used_ram_mb</span><span class="p">,</span>
+        <span class="s2">&quot;memory_diff_mb&quot;</span><span class="p">:</span> <span class="n">memory_diff</span>
+    <span class="p">})</span>
+
+<span class="c1"># Usage</span>
+<span class="k">with</span> <span class="n">debug_memory_usage</span><span class="p">(</span><span class="s2">&quot;model_training&quot;</span><span class="p">):</span>
+    <span class="n">train_model</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="gpu-memory-debugging">
+<h3>GPU Memory Debugging<a class="headerlink" href="#gpu-memory-debugging" title="Link to this heading"></a></h3>
+<p>Debug GPU memory issues:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">debug_gpu_memory</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Debug GPU memory usage.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GPU Memory Allocated: </span><span class="si">{</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">memory_allocated</span><span class="p">()</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1e9</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> GB&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GPU Memory Cached: </span><span class="si">{</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">memory_reserved</span><span class="p">()</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1e9</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> GB&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GPU Memory Summary:&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">memory_summary</span><span class="p">())</span>
+    <span class="k">elif</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;MPS Memory Allocated: </span><span class="si">{</span><span class="n">torch</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">current_allocated_memory</span><span class="p">()</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1e9</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> GB&quot;</span><span class="p">)</span>
+
+<span class="c1"># Clear GPU memory</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">clear_gpu_memory</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Clear GPU memory cache.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="common-issues-and-solutions">
+<h2>Common Issues and Solutions<a class="headerlink" href="#common-issues-and-solutions" title="Link to this heading"></a></h2>
+<section id="configuration-issues">
+<h3>Configuration Issues<a class="headerlink" href="#configuration-issues" title="Link to this heading"></a></h3>
+<p><strong>Problem</strong>: Configuration file not found or invalid</p>
+<p><strong>Symptoms</strong>:
+* <code class="docutils literal notranslate"><span class="pre">ConfigurationError:</span> <span class="pre">Configuration</span> <span class="pre">file</span> <span class="pre">not</span> <span class="pre">found</span></code>
+* <code class="docutils literal notranslate"><span class="pre">ValidationError:</span> <span class="pre">Invalid</span> <span class="pre">configuration</span> <span class="pre">value</span></code></p>
+<p><strong>Solutions</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Debug configuration loading</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.config.config_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigManager</span>
+
+<span class="n">config_manager</span> <span class="o">=</span> <span class="n">ConfigManager</span><span class="p">()</span>
+
+<span class="c1"># Check configuration file paths</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Config search paths: </span><span class="si">{</span><span class="n">config_manager</span><span class="o">.</span><span class="n">get_search_paths</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Validate configuration step by step</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">raw_config</span> <span class="o">=</span> <span class="n">config_manager</span><span class="o">.</span><span class="n">load_raw_config</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Raw config loaded: </span><span class="si">{</span><span class="n">raw_config</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">validated_config</span> <span class="o">=</span> <span class="n">config_manager</span><span class="o">.</span><span class="n">validate_config</span><span class="p">(</span><span class="n">raw_config</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Validation successful&quot;</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Configuration error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error context: </span><span class="si">{</span><span class="nb">getattr</span><span class="p">(</span><span class="n">e</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;context&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{})</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Common fixes</strong>:
+* Verify configuration file exists and has correct permissions
+* Check YAML syntax using online validators
+* Ensure environment-specific overrides are properly formatted
+* Validate configuration values against expected ranges</p>
+</section>
+<section id="memory-issues">
+<h3>Memory Issues<a class="headerlink" href="#memory-issues" title="Link to this heading"></a></h3>
+<p><strong>Problem</strong>: Out of memory errors during training or inference</p>
+<p><strong>Symptoms</strong>:
+* <code class="docutils literal notranslate"><span class="pre">RuntimeError:</span> <span class="pre">CUDA</span> <span class="pre">out</span> <span class="pre">of</span> <span class="pre">memory</span></code>
+* <code class="docutils literal notranslate"><span class="pre">RuntimeError:</span> <span class="pre">MPS</span> <span class="pre">backend</span> <span class="pre">out</span> <span class="pre">of</span> <span class="pre">memory</span></code>
+* System becomes unresponsive</p>
+<p><strong>Solutions</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Enable memory optimization</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.core.memory_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">MemoryManager</span>
+
+<span class="n">memory_manager</span> <span class="o">=</span> <span class="n">MemoryManager</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+<span class="c1"># Use memory-efficient context</span>
+<span class="k">with</span> <span class="n">memory_manager</span><span class="o">.</span><span class="n">memory_efficient_context</span><span class="p">():</span>
+    <span class="c1"># Reduce batch size automatically</span>
+    <span class="n">optimal_batch_size</span> <span class="o">=</span> <span class="n">memory_manager</span><span class="o">.</span><span class="n">optimize_batch_size</span><span class="p">(</span>
+        <span class="n">base_batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+        <span class="n">model_size_mb</span><span class="o">=</span><span class="mi">500</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Train with optimized batch size</span>
+    <span class="n">train_model</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">optimal_batch_size</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Prevention strategies</strong>:
+* Enable gradient checkpointing for large models
+* Use mixed precision training when available
+* Implement data streaming for large datasets
+* Monitor memory usage and set appropriate limits</p>
+</section>
+<section id="model-loading-issues">
+<h3>Model Loading Issues<a class="headerlink" href="#model-loading-issues" title="Link to this heading"></a></h3>
+<p><strong>Problem</strong>: Model fails to load or produces incorrect results</p>
+<p><strong>Symptoms</strong>:
+* <code class="docutils literal notranslate"><span class="pre">ModelError:</span> <span class="pre">Model</span> <span class="pre">file</span> <span class="pre">corrupted</span></code>
+* <code class="docutils literal notranslate"><span class="pre">ModelError:</span> <span class="pre">Incompatible</span> <span class="pre">model</span> <span class="pre">version</span></code>
+* Unexpected model outputs</p>
+<p><strong>Solutions</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.core.model_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.core.error_handling</span><span class="w"> </span><span class="kn">import</span> <span class="n">ErrorHandler</span>
+
+<span class="n">model_manager</span> <span class="o">=</span> <span class="n">ModelManager</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+<span class="n">error_handler</span> <span class="o">=</span> <span class="n">ErrorHandler</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+<span class="c1"># Debug model loading</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">error_handler</span><span class="o">.</span><span class="n">error_context</span><span class="p">(</span><span class="s2">&quot;model_loading&quot;</span><span class="p">):</span>
+        <span class="n">model</span><span class="p">,</span> <span class="n">metadata</span> <span class="o">=</span> <span class="n">model_manager</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="s2">&quot;my_model&quot;</span><span class="p">,</span> <span class="s2">&quot;1.0.0&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Validate model</span>
+        <span class="n">validation_errors</span> <span class="o">=</span> <span class="n">model_manager</span><span class="o">.</span><span class="n">validate_model_compatibility</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">validation_errors</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Compatibility issues: </span><span class="si">{</span><span class="n">validation_errors</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model loading failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Try alternative versions</span>
+    <span class="n">available_versions</span> <span class="o">=</span> <span class="n">model_manager</span><span class="o">.</span><span class="n">list_model_versions</span><span class="p">(</span><span class="s2">&quot;my_model&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Available versions: </span><span class="si">{</span><span class="n">available_versions</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Troubleshooting steps</strong>:
+* Verify model file integrity using checksums
+* Check model metadata for compatibility information
+* Try loading alternative model versions
+* Validate model architecture matches expected format</p>
+</section>
+<section id="hardware-issues">
+<h3>Hardware Issues<a class="headerlink" href="#hardware-issues" title="Link to this heading"></a></h3>
+<p><strong>Problem</strong>: Hardware detection fails or SDR device not accessible</p>
+<p><strong>Symptoms</strong>:
+* <code class="docutils literal notranslate"><span class="pre">HardwareError:</span> <span class="pre">SDR</span> <span class="pre">device</span> <span class="pre">not</span> <span class="pre">found</span></code>
+* <code class="docutils literal notranslate"><span class="pre">HardwareError:</span> <span class="pre">Device</span> <span class="pre">initialization</span> <span class="pre">failed</span></code>
+* Automatic fallback to simulation mode</p>
+<p><strong>Solutions</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.environments.hardware_abstraction</span><span class="w"> </span><span class="kn">import</span> <span class="n">HardwareAbstraction</span>
+
+<span class="n">hw_abstraction</span> <span class="o">=</span> <span class="n">HardwareAbstraction</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+<span class="c1"># Debug hardware detection</span>
+<span class="n">detected_devices</span> <span class="o">=</span> <span class="n">hw_abstraction</span><span class="o">.</span><span class="n">detect_available_devices</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Detected devices: </span><span class="si">{</span><span class="n">detected_devices</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Test device connectivity</span>
+<span class="k">for</span> <span class="n">device</span> <span class="ow">in</span> <span class="n">detected_devices</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">hw_abstraction</span><span class="o">.</span><span class="n">test_device_connection</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Device </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2"> is accessible&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Device </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2"> failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Check device permissions</span>
+<span class="n">device_permissions</span> <span class="o">=</span> <span class="n">hw_abstraction</span><span class="o">.</span><span class="n">check_device_permissions</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Device permissions: </span><span class="si">{</span><span class="n">device_permissions</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Common fixes</strong>:
+* Verify SDR device is properly connected
+* Check USB permissions and udev rules on Linux
+* Ensure device drivers are installed
+* Test device with manufacturer software first</p>
+</section>
+<section id="performance-issues">
+<h3>Performance Issues<a class="headerlink" href="#performance-issues" title="Link to this heading"></a></h3>
+<p><strong>Problem</strong>: Training or inference is slower than expected</p>
+<p><strong>Symptoms</strong>:
+* Long training times
+* High CPU/GPU utilization without progress
+* Memory usage growing over time</p>
+<p><strong>Debugging approach</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.profiler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.core.metrics_collector</span><span class="w"> </span><span class="kn">import</span> <span class="n">MetricsCollector</span>
+
+<span class="n">metrics_collector</span> <span class="o">=</span> <span class="n">MetricsCollector</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+<span class="c1"># Profile training performance</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">profile_training</span><span class="p">():</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">profiler</span><span class="o">.</span><span class="n">profile</span><span class="p">(</span>
+        <span class="n">activities</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">profiler</span><span class="o">.</span><span class="n">ProfilerActivity</span><span class="o">.</span><span class="n">CPU</span><span class="p">,</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">profiler</span><span class="o">.</span><span class="n">ProfilerActivity</span><span class="o">.</span><span class="n">CUDA</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">record_shapes</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">profile_memory</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">with_stack</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span> <span class="k">as</span> <span class="n">prof</span><span class="p">:</span>
+        <span class="c1"># Training loop</span>
+        <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">data_loader</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+            <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+            <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+
+    <span class="c1"># Export profiling results</span>
+    <span class="n">prof</span><span class="o">.</span><span class="n">export_chrome_trace</span><span class="p">(</span><span class="s2">&quot;training_profile.json&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">prof</span><span class="o">.</span><span class="n">key_averages</span><span class="p">()</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">sort_by</span><span class="o">=</span><span class="s2">&quot;cuda_time_total&quot;</span><span class="p">,</span> <span class="n">row_limit</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+
+<span class="c1"># Monitor system metrics</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">monitor_performance</span><span class="p">():</span>
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="c1"># Your operation</span>
+    <span class="n">train_model</span><span class="p">()</span>
+
+    <span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="n">metrics_collector</span><span class="o">.</span><span class="n">record_performance_metrics</span><span class="p">({</span>
+        <span class="s2">&quot;operation&quot;</span><span class="p">:</span> <span class="s2">&quot;training&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;duration_seconds&quot;</span><span class="p">:</span> <span class="n">end_time</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">,</span>
+        <span class="s2">&quot;samples_processed&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span>
+        <span class="s2">&quot;samples_per_second&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">end_time</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span>
+    <span class="p">})</span>
+</pre></div>
+</div>
+<p><strong>Optimization strategies</strong>:
+* Use appropriate data types (float16 vs float32)
+* Optimize data loading with multiple workers
+* Enable compiler optimizations (torch.compile)
+* Use platform-specific optimizations</p>
+</section>
+<section id="cross-platform-issues">
+<h3>Cross-Platform Issues<a class="headerlink" href="#cross-platform-issues" title="Link to this heading"></a></h3>
+<p><strong>Problem</strong>: Code works on one platform but fails on another</p>
+<p><strong>Symptoms</strong>:
+* Different results across platforms
+* Platform-specific errors
+* Performance variations</p>
+<p><strong>Debugging approach</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">platform</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">debug_platform_differences</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Debug platform-specific issues.&quot;&quot;&quot;</span>
+    <span class="n">platform_info</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;system&quot;</span><span class="p">:</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">(),</span>
+        <span class="s2">&quot;machine&quot;</span><span class="p">:</span> <span class="n">platform</span><span class="o">.</span><span class="n">machine</span><span class="p">(),</span>
+        <span class="s2">&quot;python_version&quot;</span><span class="p">:</span> <span class="n">platform</span><span class="o">.</span><span class="n">python_version</span><span class="p">(),</span>
+        <span class="s2">&quot;pytorch_version&quot;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="c1"># Check device availability</span>
+    <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+        <span class="n">platform_info</span><span class="p">[</span><span class="s2">&quot;cuda_version&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">cuda</span>
+        <span class="n">platform_info</span><span class="p">[</span><span class="s2">&quot;gpu_count&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">device_count</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+        <span class="n">platform_info</span><span class="p">[</span><span class="s2">&quot;mps_available&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Platform info: </span><span class="si">{</span><span class="n">platform_info</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Test basic operations</span>
+    <span class="n">test_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+
+    <span class="c1"># Test on different devices</span>
+    <span class="k">for</span> <span class="n">device</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="s2">&quot;mps&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">device</span> <span class="o">==</span> <span class="s2">&quot;cuda&quot;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">device</span> <span class="o">==</span> <span class="s2">&quot;mps&quot;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+            <span class="k">continue</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">test_tensor_device</span> <span class="o">=</span> <span class="n">test_tensor</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">mm</span><span class="p">(</span><span class="n">test_tensor_device</span><span class="p">,</span> <span class="n">test_tensor_device</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Device </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">: OK&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Device </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">: Failed - </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Solutions</strong>:
+* Use platform-specific configuration profiles
+* Implement device-specific optimizations
+* Add platform detection and fallback logic
+* Test on all target platforms regularly</p>
+</section>
+</section>
+<section id="debugging-tools-and-utilities">
+<h2>Debugging Tools and Utilities<a class="headerlink" href="#debugging-tools-and-utilities" title="Link to this heading"></a></h2>
+<section id="log-analysis">
+<h3>Log Analysis<a class="headerlink" href="#log-analysis" title="Link to this heading"></a></h3>
+<p>Analyze structured logs for debugging:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">analyze_logs</span><span class="p">(</span><span class="n">log_file</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Analyze structured log files for debugging.&quot;&quot;&quot;</span>
+    <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">performance_issues</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">log_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">log_entry</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+                <span class="c1"># Check for errors</span>
+                <span class="k">if</span> <span class="n">log_entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;level&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;ERROR&quot;</span><span class="p">:</span>
+                    <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">log_entry</span><span class="p">)</span>
+
+                <span class="c1"># Check for performance issues</span>
+                <span class="k">if</span> <span class="s2">&quot;duration&quot;</span> <span class="ow">in</span> <span class="n">log_entry</span> <span class="ow">and</span> <span class="n">log_entry</span><span class="p">[</span><span class="s2">&quot;duration&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">10.0</span><span class="p">:</span>
+                    <span class="n">performance_issues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">log_entry</span><span class="p">)</span>
+
+            <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span><span class="si">}</span><span class="s2"> errors&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">performance_issues</span><span class="p">)</span><span class="si">}</span><span class="s2"> performance issues&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">errors</span><span class="p">,</span> <span class="n">performance_issues</span>
+</pre></div>
+</div>
+</section>
+<section id="system-diagnostics">
+<h3>System Diagnostics<a class="headerlink" href="#system-diagnostics" title="Link to this heading"></a></h3>
+<p>Create diagnostic reports for troubleshooting:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">generate_diagnostic_report</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate comprehensive diagnostic report.&quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">psutil</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.config.config_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigManager</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.core.memory_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">MemoryManager</span>
+
+    <span class="n">report</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+        <span class="s2">&quot;system&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;platform&quot;</span><span class="p">:</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">(),</span>
+            <span class="s2">&quot;architecture&quot;</span><span class="p">:</span> <span class="n">platform</span><span class="o">.</span><span class="n">machine</span><span class="p">(),</span>
+            <span class="s2">&quot;python_version&quot;</span><span class="p">:</span> <span class="n">platform</span><span class="o">.</span><span class="n">python_version</span><span class="p">(),</span>
+            <span class="s2">&quot;cpu_count&quot;</span><span class="p">:</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">(),</span>
+            <span class="s2">&quot;memory_total_gb&quot;</span><span class="p">:</span> <span class="n">psutil</span><span class="o">.</span><span class="n">virtual_memory</span><span class="p">()</span><span class="o">.</span><span class="n">total</span> <span class="o">/</span> <span class="mf">1e9</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;pytorch&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="p">,</span>
+            <span class="s2">&quot;cuda_available&quot;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">(),</span>
+            <span class="s2">&quot;mps_available&quot;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">is_available</span><span class="p">(),</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;configuration&quot;</span><span class="p">:</span> <span class="p">{},</span>
+        <span class="s2">&quot;memory&quot;</span><span class="p">:</span> <span class="p">{},</span>
+        <span class="s2">&quot;errors&quot;</span><span class="p">:</span> <span class="p">[]</span>
+    <span class="p">}</span>
+
+    <span class="c1"># Add configuration info</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">config_manager</span> <span class="o">=</span> <span class="n">ConfigManager</span><span class="p">()</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">config_manager</span><span class="o">.</span><span class="n">load_config</span><span class="p">()</span>
+        <span class="n">report</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;loaded&quot;</span>
+        <span class="n">report</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;device_preference&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">device_preference</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">report</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;failed&quot;</span>
+        <span class="n">report</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;error&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+    <span class="c1"># Add memory info</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">memory_manager</span> <span class="o">=</span> <span class="n">MemoryManager</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="n">memory_stats</span> <span class="o">=</span> <span class="n">memory_manager</span><span class="o">.</span><span class="n">get_memory_stats</span><span class="p">()</span>
+        <span class="n">report</span><span class="p">[</span><span class="s2">&quot;memory&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;total_ram_mb&quot;</span><span class="p">:</span> <span class="n">memory_stats</span><span class="o">.</span><span class="n">total_ram_mb</span><span class="p">,</span>
+            <span class="s2">&quot;available_ram_mb&quot;</span><span class="p">:</span> <span class="n">memory_stats</span><span class="o">.</span><span class="n">available_ram_mb</span><span class="p">,</span>
+            <span class="s2">&quot;used_ram_mb&quot;</span><span class="p">:</span> <span class="n">memory_stats</span><span class="o">.</span><span class="n">used_ram_mb</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">report</span><span class="p">[</span><span class="s2">&quot;errors&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Memory manager failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">report</span>
+</pre></div>
+</div>
+</section>
+<section id="testing-and-validation">
+<h3>Testing and Validation<a class="headerlink" href="#testing-and-validation" title="Link to this heading"></a></h3>
+<p>Create debugging test cases:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># tests/debug/test_debugging_tools.py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.debug.diagnostics</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_diagnostic_report</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">TestDebuggingTools</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test debugging and diagnostic tools.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_diagnostic_report_generation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test that diagnostic report can be generated.&quot;&quot;&quot;</span>
+        <span class="n">report</span> <span class="o">=</span> <span class="n">generate_diagnostic_report</span><span class="p">()</span>
+
+        <span class="k">assert</span> <span class="s2">&quot;timestamp&quot;</span> <span class="ow">in</span> <span class="n">report</span>
+        <span class="k">assert</span> <span class="s2">&quot;system&quot;</span> <span class="ow">in</span> <span class="n">report</span>
+        <span class="k">assert</span> <span class="s2">&quot;pytorch&quot;</span> <span class="ow">in</span> <span class="n">report</span>
+
+        <span class="c1"># Validate system info</span>
+        <span class="k">assert</span> <span class="n">report</span><span class="p">[</span><span class="s2">&quot;system&quot;</span><span class="p">][</span><span class="s2">&quot;platform&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;Darwin&quot;</span><span class="p">,</span> <span class="s2">&quot;Linux&quot;</span><span class="p">,</span> <span class="s2">&quot;Windows&quot;</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">report</span><span class="p">[</span><span class="s2">&quot;system&quot;</span><span class="p">][</span><span class="s2">&quot;cpu_count&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="k">assert</span> <span class="n">report</span><span class="p">[</span><span class="s2">&quot;system&quot;</span><span class="p">][</span><span class="s2">&quot;memory_total_gb&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
+
+    <span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">&quot;log_level&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;DEBUG&quot;</span><span class="p">,</span> <span class="s2">&quot;INFO&quot;</span><span class="p">,</span> <span class="s2">&quot;WARNING&quot;</span><span class="p">,</span> <span class="s2">&quot;ERROR&quot;</span><span class="p">])</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_log_analysis_tools</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_level</span><span class="p">,</span> <span class="n">tmp_path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test log analysis functionality.&quot;&quot;&quot;</span>
+        <span class="c1"># Create test log file</span>
+        <span class="n">log_file</span> <span class="o">=</span> <span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">&quot;test.log&quot;</span>
+
+        <span class="n">test_log_entry</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="s2">&quot;2024-01-01T12:00:00&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;level&quot;</span><span class="p">:</span> <span class="n">log_level</span><span class="p">,</span>
+            <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Test message&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;module&quot;</span><span class="p">:</span> <span class="s2">&quot;test_module&quot;</span>
+        <span class="p">}</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">log_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">test_log_entry</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Analyze logs</span>
+        <span class="n">errors</span><span class="p">,</span> <span class="n">performance_issues</span> <span class="o">=</span> <span class="n">analyze_logs</span><span class="p">(</span><span class="n">log_file</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">log_level</span> <span class="o">==</span> <span class="s2">&quot;ERROR&quot;</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="best-practices-for-debugging">
+<h2>Best Practices for Debugging<a class="headerlink" href="#best-practices-for-debugging" title="Link to this heading"></a></h2>
+<section id="proactive-debugging">
+<h3>Proactive Debugging<a class="headerlink" href="#proactive-debugging" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Add Comprehensive Logging</strong>: Include debug information in all major operations</p></li>
+<li><p><strong>Use Assertions</strong>: Add assertions to validate assumptions</p></li>
+<li><p><strong>Implement Health Checks</strong>: Regular system health validation</p></li>
+<li><p><strong>Monitor Resource Usage</strong>: Track memory, CPU, and GPU usage</p></li>
+</ol>
+</section>
+<section id="debugging-workflow">
+<h3>Debugging Workflow<a class="headerlink" href="#debugging-workflow" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Reproduce the Issue</strong>: Create minimal reproduction case</p></li>
+<li><p><strong>Gather Information</strong>: Collect logs, system info, and error context</p></li>
+<li><p><strong>Form Hypothesis</strong>: Based on available information</p></li>
+<li><p><strong>Test Hypothesis</strong>: Use debugging tools to validate</p></li>
+<li><p><strong>Implement Fix</strong>: Make targeted changes</p></li>
+<li><p><strong>Verify Fix</strong>: Ensure issue is resolved and no regressions</p></li>
+</ol>
+</section>
+<section id="documentation">
+<h3>Documentation<a class="headerlink" href="#documentation" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Document Known Issues</strong>: Maintain list of known issues and workarounds</p></li>
+<li><p><strong>Update Troubleshooting Guide</strong>: Add new solutions as they’re discovered</p></li>
+<li><p><strong>Share Debugging Tips</strong>: Document effective debugging strategies</p></li>
+<li><p><strong>Create Runbooks</strong>: Step-by-step guides for common issues</p></li>
+</ol>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="testing.html" class="btn btn-neutral float-left" title="Testing Guidelines" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../examples/index.html" class="btn btn-neutral float-right" title="Examples and Tutorials" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, GeminiSDR Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,709 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SDR AI System: Complete Technical Explanation &mdash; GeminiSDR 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            GeminiSDR
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="guides/index.html">User Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture/index.html">System Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/index.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/index.html">Examples and Tutorials</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">GeminiSDR</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">SDR AI System: Complete Technical Explanation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/explained.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="sdr-ai-system-complete-technical-explanation">
+<h1>SDR AI System: Complete Technical Explanation<a class="headerlink" href="#sdr-ai-system-complete-technical-explanation" title="Link to this heading"></a></h1>
+<section id="high-level-overview">
+<h2>High-Level Overview<a class="headerlink" href="#high-level-overview" title="Link to this heading"></a></h2>
+<p>This system creates <strong>intelligent software-defined radios</strong> that can automatically find, identify, and optimize radio signals using artificial intelligence. Think of it as giving a radio “eyes and a brain” - it can see the radio spectrum, understand what signals are present, and automatically tune itself for optimal reception.</p>
+<section id="what-makes-this-special">
+<h3>What Makes This Special?<a class="headerlink" href="#what-makes-this-special" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Automatic Signal Finding</strong>: Instead of manually tuning frequencies, the AI searches and finds signals automatically</p></li>
+<li><p><strong>Intelligent Modulation Recognition</strong>: Automatically identifies what type of signal it’s receiving (BPSK, QPSK, etc.)</p></li>
+<li><p><strong>Adversarial Robustness</strong>: Can fight against intelligent jamming and interference</p></li>
+<li><p><strong>Real-time Adaptation</strong>: Continuously learns and adapts to changing conditions</p></li>
+</ol>
+</section>
+</section>
+<hr class="docutils" />
+<section id="level-1-system-components-high-level">
+<h2>Level 1: System Components (High Level)<a class="headerlink" href="#level-1-system-components-high-level" title="Link to this heading"></a></h2>
+<section id="core-architecture">
+<h3>Core Architecture<a class="headerlink" href="#core-architecture" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Radio Waves → SDR Hardware → Signal Processing → AI/ML → Intelligent Decisions
+</pre></div>
+</div>
+<p><strong>Four Main Pillars</strong>:</p>
+<ol class="arabic simple">
+<li><p><strong>Signal Generation &amp; Interface</strong>: Creates test signals and talks to radio hardware</p></li>
+<li><p><strong>Traditional Analysis</strong>: Classical signal processing and feature extraction</p></li>
+<li><p><strong>Neural Networks</strong>: Deep learning for pattern recognition</p></li>
+<li><p><strong>Intelligent Agents</strong>: AI that makes decisions and learns from experience</p></li>
+</ol>
+</section>
+<section id="key-capabilities">
+<h3>Key Capabilities<a class="headerlink" href="#key-capabilities" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Automatic Modulation Recognition (AMR)</strong>: “What type of signal is this?”</p></li>
+<li><p><strong>Intelligent Signal Search</strong>: “Where are the interesting signals?”</p></li>
+<li><p><strong>Anti-jamming</strong>: “How do I maintain communication when someone tries to block me?”</p></li>
+<li><p><strong>Real-time Adaptation</strong>: “How do I get better over time?”</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="level-2-technical-deep-dive">
+<h2>Level 2: Technical Deep Dive<a class="headerlink" href="#level-2-technical-deep-dive" title="Link to this heading"></a></h2>
+<section id="signal-generation-system-core-signal-generator-py">
+<h3>1. Signal Generation System (<code class="docutils literal notranslate"><span class="pre">core/signal_generator.py</span></code>)<a class="headerlink" href="#signal-generation-system-core-signal-generator-py" title="Link to this heading"></a></h3>
+<p><strong>Purpose</strong>: Create realistic training data and test scenarios</p>
+<p><strong>How It Works</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate a QPSK signal with noise</span>
+<span class="n">signal</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">generate_modulated_signal</span><span class="p">(</span><span class="s1">&#39;QPSK&#39;</span><span class="p">,</span> <span class="n">num_symbols</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">snr_db</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Key Features</strong>:</p>
+<ul class="simple">
+<li><p><strong>Modulation Types</strong>: BPSK, QPSK, 8PSK, 16QAM, 64QAM</p></li>
+<li><p><strong>Channel Impairments</strong>: Adds realistic noise, frequency offsets, phase errors</p></li>
+<li><p><strong>Pulse Shaping</strong>: Makes signals look like real-world transmissions</p></li>
+</ul>
+<p><strong>Why These Parameters?</strong>:</p>
+<ul class="simple">
+<li><p><strong>256 symbols</strong>: Good balance between training speed and signal diversity</p></li>
+<li><p><strong>SNR range (0-30 dB)</strong>: Covers poor to excellent signal conditions</p></li>
+<li><p><strong>Sample rate (2 MHz)</strong>: Typical for many digital communications</p></li>
+</ul>
+</section>
+<section id="sdr-interface-core-sdr-interface-py">
+<h3>2. SDR Interface (<code class="docutils literal notranslate"><span class="pre">core/sdr_interface.py</span></code>)<a class="headerlink" href="#sdr-interface-core-sdr-interface-py" title="Link to this heading"></a></h3>
+<p><strong>Purpose</strong>: Bridge between software and radio hardware</p>
+<p><strong>Dual Mode Operation</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Try real hardware first, fall back to simulation</span>
+<span class="k">if</span> <span class="n">PLUTO_AVAILABLE</span><span class="p">:</span>
+    <span class="n">sdr</span> <span class="o">=</span> <span class="n">adi</span><span class="o">.</span><span class="n">Pluto</span><span class="p">(</span><span class="s1">&#39;ip:192.168.4.1&#39;</span><span class="p">)</span>  <span class="c1"># Real PlutoSDR</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="c1"># Use mathematical simulation</span>
+    <span class="n">signal</span> <span class="o">=</span> <span class="n">simulate_received_signal</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">gain</span><span class="p">,</span> <span class="n">snr</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Smart Features</strong>:</p>
+<ul class="simple">
+<li><p><strong>Automatic Retry</strong>: Handles connection failures gracefully</p></li>
+<li><p><strong>Simulation Fallback</strong>: Works without hardware for development</p></li>
+<li><p><strong>Real-time Streaming</strong>: Continuous data capture</p></li>
+<li><p><strong>Error Recovery</strong>: Robust against hardware glitches</p></li>
+</ul>
+</section>
+<section id="traditional-amr-ml-traditional-amr-py">
+<h3>3. Traditional AMR (<code class="docutils literal notranslate"><span class="pre">ml/traditional_amr.py</span></code>)<a class="headerlink" href="#traditional-amr-ml-traditional-amr-py" title="Link to this heading"></a></h3>
+<p><strong>Purpose</strong>: Classical approach to modulation recognition</p>
+<p><strong>Feature Extraction Pipeline</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Raw I/Q Signal → Feature Extraction → Random Forest → Classification
+</pre></div>
+</div>
+<p><strong>Features Computed</strong>:</p>
+<ol class="arabic">
+<li><p><strong>Statistical Moments</strong> (6 features):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 2nd, 3rd, 4th order moments of amplitude and phase</span>
+<span class="n">mom_amp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">signal_norm</span><span class="p">)</span><span class="o">**</span><span class="n">order</span><span class="p">)</span>
+<span class="n">mom_phase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">phase</span><span class="o">**</span><span class="n">order</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Higher-Order Cumulants</strong> (5 features):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># C20, C21, C40, C41, C42 - modulation-specific signatures</span>
+<span class="n">c20</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">signal_norm</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">c40</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">signal_norm</span><span class="o">**</span><span class="mi">4</span><span class="p">)</span> <span class="o">-</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">c20</span><span class="o">**</span><span class="mi">2</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Spectral Features</strong> (4 features):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Centroid, bandwidth, rolloff, peak-to-average power ratio</span>
+<span class="n">centroid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">freqs</span> <span class="o">*</span> <span class="n">spectrum</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">spectrum</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Cyclostationary Features</strong> (4 features):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Exploit periodic properties of digital modulations</span>
+<span class="k">for</span> <span class="n">alpha</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">]:</span>  <span class="c1"># Cycle frequencies</span>
+    <span class="n">R_alpha</span> <span class="o">=</span> <span class="n">compute_cyclic_autocorrelation</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">alpha</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Instantaneous Features</strong> (4 features):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Amplitude, phase, frequency variations</span>
+<span class="n">inst_amp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span>
+<span class="n">inst_phase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unwrap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">signal</span><span class="p">))</span>
+<span class="n">inst_freq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">inst_phase</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p><strong>Why Random Forest?</strong>:</p>
+<ul class="simple">
+<li><p><strong>Robust</strong>: Handles noisy features well</p></li>
+<li><p><strong>Interpretable</strong>: Can see which features matter most</p></li>
+<li><p><strong>Fast</strong>: Quick training and inference</p></li>
+<li><p><strong>No Overfitting</strong>: Ensemble method reduces variance</p></li>
+</ul>
+</section>
+<section id="neural-amr-ml-neural-amr-py">
+<h3>4. Neural AMR (<code class="docutils literal notranslate"><span class="pre">ml/neural_amr.py</span></code>)<a class="headerlink" href="#neural-amr-ml-neural-amr-py" title="Link to this heading"></a></h3>
+<p><strong>Purpose</strong>: Deep learning approach to modulation recognition</p>
+<p><strong>CNN Architecture</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Input</span><span class="p">:</span> <span class="n">I</span><span class="o">/</span><span class="n">Q</span> <span class="n">samples</span> <span class="p">(</span><span class="mi">2</span> <span class="n">channels</span> <span class="err">×</span> <span class="mi">1024</span> <span class="n">samples</span><span class="p">)</span>
+    <span class="err">↓</span>
+<span class="n">Conv1D</span><span class="p">(</span><span class="mi">64</span> <span class="n">filters</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span> <span class="o">+</span> <span class="n">BatchNorm</span> <span class="o">+</span> <span class="n">ReLU</span> <span class="o">+</span> <span class="n">MaxPool</span>
+    <span class="err">↓</span>
+<span class="n">Conv1D</span><span class="p">(</span><span class="mi">128</span> <span class="n">filters</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span> <span class="o">+</span> <span class="n">BatchNorm</span> <span class="o">+</span> <span class="n">ReLU</span> <span class="o">+</span> <span class="n">MaxPool</span>
+    <span class="err">↓</span>
+<span class="n">Conv1D</span><span class="p">(</span><span class="mi">256</span> <span class="n">filters</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="n">BatchNorm</span> <span class="o">+</span> <span class="n">ReLU</span> <span class="o">+</span> <span class="n">MaxPool</span>
+    <span class="err">↓</span>
+<span class="n">Flatten</span> <span class="err">→</span> <span class="n">Dense</span><span class="p">(</span><span class="mi">256</span><span class="p">)</span> <span class="err">→</span> <span class="n">Dropout</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span> <span class="err">→</span> <span class="n">Dense</span><span class="p">(</span><span class="mi">128</span><span class="p">)</span> <span class="err">→</span> <span class="n">Dropout</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="err">↓</span>
+<span class="n">Dense</span><span class="p">(</span><span class="n">num_classes</span><span class="p">)</span> <span class="err">→</span> <span class="n">Softmax</span> <span class="err">→</span> <span class="n">Classification</span>
+</pre></div>
+</div>
+<p><strong>Why This Architecture?</strong>:</p>
+<ul class="simple">
+<li><p><strong>Conv1D</strong>: Captures temporal patterns in I/Q data</p></li>
+<li><p><strong>Increasing Filters</strong>: Learn hierarchical features (simple → complex)</p></li>
+<li><p><strong>BatchNorm</strong>: Stabilizes training, allows higher learning rates</p></li>
+<li><p><strong>Dropout</strong>: Prevents overfitting to training data</p></li>
+<li><p><strong>Progressive Kernel Sizes</strong>: 7→5→3 captures different time scales</p></li>
+</ul>
+<p><strong>Training Process</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Data preparation</span>
+<span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span> <span class="o">=</span> <span class="n">prepare_data</span><span class="p">(</span><span class="n">signals</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+
+<span class="c1"># Training loop</span>
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">train_loader</span><span class="p">:</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="intelligent-receiver-ml-intelligent-receiver-py">
+<h3>5. Intelligent Receiver (<code class="docutils literal notranslate"><span class="pre">ml/intelligent_receiver.py</span></code>)<a class="headerlink" href="#intelligent-receiver-ml-intelligent-receiver-py" title="Link to this heading"></a></h3>
+<p><strong>Purpose</strong>: AI agent that automatically finds and optimizes signals</p>
+<p><strong>Deep Q-Learning Architecture</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">State</span> <span class="p">(</span><span class="mi">256</span><span class="n">D</span><span class="p">)</span> <span class="err">→</span> <span class="n">DQN</span> <span class="err">→</span> <span class="n">Q</span><span class="o">-</span><span class="n">values</span> <span class="err">→</span> <span class="n">Action</span> <span class="n">Selection</span> <span class="err">→</span> <span class="n">SDR</span> <span class="n">Control</span>
+</pre></div>
+</div>
+<p><strong>State Representation</strong>:</p>
+<ul class="simple">
+<li><p><strong>Spectrum (250 values)</strong>: FFT of received signal</p></li>
+<li><p><strong>Current Settings (6 values)</strong>: Frequency, gain, bandwidth, SNR, power, noise</p></li>
+</ul>
+<p><strong>Action Space</strong>:</p>
+<ul class="simple">
+<li><p><strong>Frequency Adjustment</strong>: -1MHz to +1MHz (21 discrete steps)</p></li>
+<li><p><strong>Gain Adjustment</strong>: -10dB to +10dB (21 discrete steps)</p></li>
+<li><p><strong>Bandwidth Factor</strong>: -0.3 to +0.3 (11 discrete steps)</p></li>
+</ul>
+<p><strong>DQN Network</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">DeepQLearningReceiver</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">512</span><span class="p">)</span>  <span class="c1"># Input layer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">512</span><span class="p">)</span>  <span class="c1"># Hidden layer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc3</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span>  <span class="c1"># Feature layer</span>
+        
+        <span class="c1"># Dueling architecture</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_head</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>           <span class="c1"># State value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">advantage_head</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="mi">11</span><span class="p">)</span>    <span class="c1"># Action advantages</span>
+</pre></div>
+</div>
+<p><strong>Why Dueling DQN?</strong>:</p>
+<ul class="simple">
+<li><p><strong>Value Stream</strong>: “How good is this state?”</p></li>
+<li><p><strong>Advantage Stream</strong>: “How much better is each action?”</p></li>
+<li><p><strong>Combined</strong>: Q(s,a) = V(s) + A(s,a) - mean(A(s,·))</p></li>
+<li><p><strong>Benefit</strong>: Better learning when many actions have similar values</p></li>
+</ul>
+<p><strong>Training Algorithm</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Experience replay</span>
+<span class="n">memory</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">maxlen</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c1"># Training step</span>
+<span class="n">batch</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">memory</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">)</span>
+<span class="n">current_q</span> <span class="o">=</span> <span class="n">q_network</span><span class="p">(</span><span class="n">states</span><span class="p">)</span>
+<span class="n">next_q</span> <span class="o">=</span> <span class="n">target_network</span><span class="p">(</span><span class="n">next_states</span><span class="p">)</span>
+<span class="n">target_q</span> <span class="o">=</span> <span class="n">rewards</span> <span class="o">+</span> <span class="n">gamma</span> <span class="o">*</span> <span class="n">next_q</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">dones</span><span class="p">)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">MSE</span><span class="p">(</span><span class="n">current_q</span><span class="p">,</span> <span class="n">target_q</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Reward Function</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">calculate_reward</span><span class="p">(</span><span class="n">snr</span><span class="p">,</span> <span class="n">freq_error</span><span class="p">):</span>
+    <span class="n">reward</span> <span class="o">=</span> <span class="n">snr</span>  <span class="c1"># Base reward on signal quality</span>
+    
+    <span class="c1"># Bonus for frequency accuracy</span>
+    <span class="k">if</span> <span class="n">freq_error</span> <span class="o">&lt;</span> <span class="mf">0.1e6</span><span class="p">:</span>  <span class="c1"># Within 100 kHz</span>
+        <span class="n">reward</span> <span class="o">+=</span> <span class="mi">30</span>
+    <span class="k">elif</span> <span class="n">freq_error</span> <span class="o">&lt;</span> <span class="mf">0.5e6</span><span class="p">:</span>  <span class="c1"># Within 500 kHz</span>
+        <span class="n">reward</span> <span class="o">+=</span> <span class="mi">10</span>
+    
+    <span class="c1"># Penalty for being far off</span>
+    <span class="k">if</span> <span class="n">freq_error</span> <span class="o">&gt;</span> <span class="mf">2e6</span><span class="p">:</span>  <span class="c1"># More than 2 MHz off</span>
+        <span class="n">reward</span> <span class="o">-=</span> <span class="mi">20</span>
+    
+    <span class="k">return</span> <span class="n">reward</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="level-3-adversarial-ai-system-advanced">
+<h2>Level 3: Adversarial AI System (Advanced)<a class="headerlink" href="#level-3-adversarial-ai-system-advanced" title="Link to this heading"></a></h2>
+<section id="the-problem-intelligent-jamming">
+<h3>The Problem: Intelligent Jamming<a class="headerlink" href="#the-problem-intelligent-jamming" title="Link to this heading"></a></h3>
+<p>Traditional jammers are “dumb” - they just blast noise. But what if the jammer is also intelligent and learns your patterns?</p>
+</section>
+<section id="smart-jammer-architecture-ml-adversarial-jamming-py">
+<h3>Smart Jammer Architecture (<code class="docutils literal notranslate"><span class="pre">ml/adversarial_jamming.py</span></code>)<a class="headerlink" href="#smart-jammer-architecture-ml-adversarial-jamming-py" title="Link to this heading"></a></h3>
+<p><strong>Multi-Strategy Jammer</strong>:</p>
+<ol class="arabic">
+<li><p><strong>Narrowband Jamming</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Concentrate power at receiver frequency</span>
+<span class="n">jamming</span> <span class="o">=</span> <span class="n">jam_power</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">rx_freq</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Wideband Jamming</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Spread noise across wide bandwidth</span>
+<span class="n">noise</span> <span class="o">=</span> <span class="n">jam_power</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">N</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">N</span><span class="p">))</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Sweep Jamming</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Frequency sweep around target</span>
+<span class="n">sweep_freq</span> <span class="o">=</span> <span class="n">rx_freq</span> <span class="o">+</span> <span class="n">sweep_range</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">sweep_rate</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span>
+<span class="n">jamming</span> <span class="o">=</span> <span class="n">jam_power</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">sweep_freq</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Pulse Jamming</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># High-power intermittent bursts</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">signal</span><span class="p">),</span> <span class="n">pulse_period</span><span class="p">):</span>
+    <span class="n">signal</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">pulse_width</span><span class="p">]</span> <span class="o">*=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">jam_power</span> <span class="o">*</span> <span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Adaptive Jamming</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Learn receiver patterns and predict next frequency</span>
+<span class="n">freq_changes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">frequency_history</span><span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">:])</span>
+<span class="n">predicted_freq</span> <span class="o">=</span> <span class="n">current_freq</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">freq_changes</span><span class="p">)</span>
+<span class="c1"># Jam both current and predicted locations</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Deceptive Jamming</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate fake signals that look real</span>
+<span class="n">fake_signal</span> <span class="o">=</span> <span class="n">generate_modulated_signal</span><span class="p">(</span><span class="s1">&#39;QPSK&#39;</span><span class="p">,</span> <span class="n">snr_db</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">fake_signal</span> <span class="o">*=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">fake_freq</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p><strong>Learning Algorithm (Multi-Armed Bandit)</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Track success rate of each strategy</span>
+<span class="n">success_rates</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;narrowband&#39;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span> <span class="s1">&#39;wideband&#39;</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">,</span> <span class="o">...</span><span class="p">}</span>
+
+<span class="c1"># Upper Confidence Bound selection</span>
+<span class="k">for</span> <span class="n">strategy</span> <span class="ow">in</span> <span class="n">strategies</span><span class="p">:</span>
+    <span class="n">confidence</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="n">total_usage</span><span class="p">)</span> <span class="o">/</span> <span class="n">strategy_usage</span><span class="p">)</span>
+    <span class="n">ucb_score</span> <span class="o">=</span> <span class="n">success_rate</span> <span class="o">+</span> <span class="n">confidence</span>
+
+<span class="c1"># Select strategy with highest UCB score</span>
+<span class="n">best_strategy</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">strategies</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">ucb_scores</span><span class="p">[</span><span class="n">s</span><span class="p">])</span>
+</pre></div>
+</div>
+</section>
+<section id="adversarial-training-environment">
+<h3>Adversarial Training Environment<a class="headerlink" href="#adversarial-training-environment" title="Link to this heading"></a></h3>
+<p><strong>Game Theory Setup</strong>:</p>
+<ul class="simple">
+<li><p><strong>Receiver Goal</strong>: Maximize SNR and signal acquisition</p></li>
+<li><p><strong>Jammer Goal</strong>: Minimize receiver performance</p></li>
+<li><p><strong>Nash Equilibrium</strong>: Both agents reach optimal strategies</p></li>
+</ul>
+<p><strong>Co-evolutionary Training</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">episode</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_episodes</span><span class="p">):</span>
+    <span class="c1"># Receiver takes action</span>
+    <span class="n">rx_action</span> <span class="o">=</span> <span class="n">receiver</span><span class="o">.</span><span class="n">choose_action</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+    
+    <span class="c1"># Jammer observes and responds</span>
+    <span class="n">jam_strategy</span> <span class="o">=</span> <span class="n">jammer</span><span class="o">.</span><span class="n">select_strategy</span><span class="p">(</span><span class="n">rx_freq</span><span class="p">,</span> <span class="n">rx_gain</span><span class="p">,</span> <span class="n">rx_snr</span><span class="p">)</span>
+    
+    <span class="c1"># Environment applies both</span>
+    <span class="n">jammed_signal</span> <span class="o">=</span> <span class="n">jammer</span><span class="o">.</span><span class="n">apply_jamming</span><span class="p">(</span><span class="n">clean_signal</span><span class="p">,</span> <span class="n">jam_strategy</span><span class="p">)</span>
+    <span class="n">final_snr</span> <span class="o">=</span> <span class="n">calculate_snr</span><span class="p">(</span><span class="n">jammed_signal</span><span class="p">)</span>
+    
+    <span class="c1"># Both agents learn</span>
+    <span class="n">receiver</span><span class="o">.</span><span class="n">learn</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">rx_action</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">next_state</span><span class="p">)</span>
+    <span class="n">jammer</span><span class="o">.</span><span class="n">update_effectiveness</span><span class="p">(</span><span class="n">jam_strategy</span><span class="p">,</span> <span class="n">jamming_success</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Progressive Difficulty</strong>:</p>
+<ol class="arabic simple">
+<li><p><strong>Random Jammer</strong>: Baseline performance</p></li>
+<li><p><strong>Adaptive Jammer</strong>: Learns patterns</p></li>
+<li><p><strong>Intelligent Jammer</strong>: Predictive strategies</p></li>
+</ol>
+</section>
+<section id="anti-jamming-techniques">
+<h3>Anti-Jamming Techniques<a class="headerlink" href="#anti-jamming-techniques" title="Link to this heading"></a></h3>
+<p><strong>Enhanced Receiver Training</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">choose_anti_jam_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">env</span><span class="p">):</span>
+    <span class="c1"># Detect jamming presence</span>
+    <span class="n">jamming_detected</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="mi">256</span><span class="p">:</span><span class="mi">259</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">jamming_detected</span><span class="p">:</span>
+        <span class="c1"># Bias toward aggressive frequency changes (frequency hopping)</span>
+        <span class="n">freq_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">extreme_freq_indices</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Normal operation</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q_network</span><span class="p">(</span><span class="n">state</span><span class="p">)</span><span class="o">.</span><span class="n">argmax</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><strong>Anti-Jamming Reward</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">calculate_anti_jam_reward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_reward</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
+    <span class="n">enhanced_reward</span> <span class="o">=</span> <span class="n">base_reward</span>
+    
+    <span class="c1"># Big bonus for maintaining SNR under jamming</span>
+    <span class="k">if</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;jamming_effectiveness&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>  <span class="c1"># Significant jamming</span>
+        <span class="k">if</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;snr&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>  <span class="c1"># But still good SNR</span>
+            <span class="n">enhanced_reward</span> <span class="o">+=</span> <span class="mi">20</span>  <span class="c1"># Anti-jam success bonus</span>
+    
+    <span class="k">return</span> <span class="n">enhanced_reward</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="level-4-implementation-details-parameter-choices">
+<h2>Level 4: Implementation Details &amp; Parameter Choices<a class="headerlink" href="#level-4-implementation-details-parameter-choices" title="Link to this heading"></a></h2>
+<section id="why-these-specific-parameters">
+<h3>Why These Specific Parameters?<a class="headerlink" href="#why-these-specific-parameters" title="Link to this heading"></a></h3>
+<p><strong>DQN Hyperparameters</strong>:</p>
+<ul class="simple">
+<li><p><strong>Learning Rate (1e-4)</strong>: Conservative to prevent instability</p></li>
+<li><p><strong>Epsilon Decay (0.995)</strong>: Gradual shift from exploration to exploitation</p></li>
+<li><p><strong>Memory Size (10k-20k)</strong>: Balance between diversity and memory usage</p></li>
+<li><p><strong>Batch Size (32-64)</strong>: Compromise between gradient noise and efficiency</p></li>
+</ul>
+<p><strong>Network Architecture</strong>:</p>
+<ul class="simple">
+<li><p><strong>Hidden Size (512)</strong>: Sufficient capacity without overfitting</p></li>
+<li><p><strong>State Size (256)</strong>: Rich enough for complex patterns, manageable computation</p></li>
+<li><p><strong>Action Discretization (11-21 steps)</strong>: Fine enough for precision, coarse enough for learning</p></li>
+</ul>
+<p><strong>Training Schedule</strong>:</p>
+<ul class="simple">
+<li><p><strong>Target Network Update (10-20 episodes)</strong>: Balance stability vs adaptation</p></li>
+<li><p><strong>Episodes (300-1500)</strong>: Enough for convergence without excessive training time</p></li>
+</ul>
+</section>
+<section id="feature-engineering-rationale">
+<h3>Feature Engineering Rationale<a class="headerlink" href="#feature-engineering-rationale" title="Link to this heading"></a></h3>
+<p><strong>Traditional AMR Features</strong>:</p>
+<ul class="simple">
+<li><p><strong>Moments</strong>: Capture basic statistical properties</p></li>
+<li><p><strong>Cumulants</strong>: Exploit modulation-specific signatures</p></li>
+<li><p><strong>Spectral</strong>: Frequency domain characteristics</p></li>
+<li><p><strong>Cyclostationary</strong>: Periodic properties unique to digital modulations</p></li>
+</ul>
+<p><strong>Neural Network Input</strong>:</p>
+<ul class="simple">
+<li><p><strong>I/Q Samples</strong>: Preserve all signal information</p></li>
+<li><p><strong>Sequence Length (1024)</strong>: Good compromise between context and computation</p></li>
+<li><p><strong>Two Channels</strong>: Real and imaginary parts of complex signal</p></li>
+</ul>
+</section>
+<section id="training-methodology">
+<h3>Training Methodology<a class="headerlink" href="#training-methodology" title="Link to this heading"></a></h3>
+<p><strong>Curriculum Learning</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">difficulty_levels</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s1">&#39;power&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Weak Jammer&#39;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s1">&#39;power&#39;</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Moderate Jammer&#39;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s1">&#39;power&#39;</span><span class="p">:</span> <span class="mi">60</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Strong Jammer&#39;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s1">&#39;power&#39;</span><span class="p">:</span> <span class="mi">80</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Powerful Jammer&#39;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s1">&#39;power&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Elite Jammer&#39;</span><span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>Benefits</strong>:</p>
+<ul class="simple">
+<li><p><strong>Gradual Complexity</strong>: Prevents overwhelming the agent</p></li>
+<li><p><strong>Skill Transfer</strong>: Each level builds on previous capabilities</p></li>
+<li><p><strong>Robust Performance</strong>: Handles wide range of scenarios</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="level-5-how-everything-works-together">
+<h2>Level 5: How Everything Works Together<a class="headerlink" href="#level-5-how-everything-works-together" title="Link to this heading"></a></h2>
+<section id="complete-system-flow">
+<h3>Complete System Flow<a class="headerlink" href="#complete-system-flow" title="Link to this heading"></a></h3>
+<ol class="arabic">
+<li><p><strong>Signal Generation</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create training data</span>
+<span class="n">signals</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">generate_dataset</span><span class="p">(</span><span class="n">modulations</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;BPSK&#39;</span><span class="p">,</span> <span class="s1">&#39;QPSK&#39;</span><span class="p">,</span> <span class="s1">&#39;8PSK&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Traditional AMR Training</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Extract features and train classifier</span>
+<span class="n">features</span> <span class="o">=</span> <span class="p">[</span><span class="n">extract_features</span><span class="p">(</span><span class="n">sig</span><span class="p">)</span> <span class="k">for</span> <span class="n">sig</span> <span class="ow">in</span> <span class="n">signals</span><span class="p">]</span>
+<span class="n">classifier</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Neural AMR Training</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># End-to-end learning</span>
+<span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">signals</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Intelligent Receiver Training</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Reinforcement learning in simulation</span>
+<span class="k">for</span> <span class="n">episode</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">500</span><span class="p">):</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">choose_action</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+        <span class="n">next_state</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">done</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+        <span class="n">agent</span><span class="o">.</span><span class="n">learn</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">next_state</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Adversarial Training</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Co-evolutionary training</span>
+<span class="k">for</span> <span class="n">level</span> <span class="ow">in</span> <span class="n">difficulty_levels</span><span class="p">:</span>
+    <span class="n">env</span> <span class="o">=</span> <span class="n">AdversarialEnvironment</span><span class="p">(</span><span class="n">jammer_power</span><span class="o">=</span><span class="n">level</span><span class="p">[</span><span class="s1">&#39;power&#39;</span><span class="p">])</span>
+    <span class="n">agent</span><span class="o">.</span><span class="n">train_against_jammer</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">episodes</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Real-World Deployment</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Use trained models with real SDR</span>
+<span class="n">sdr</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="n">samples</span> <span class="o">=</span> <span class="n">sdr</span><span class="o">.</span><span class="n">capture_batch</span><span class="p">()</span>
+    <span class="n">modulation</span> <span class="o">=</span> <span class="n">neural_amr</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
+    <span class="n">optimal_settings</span> <span class="o">=</span> <span class="n">intelligent_rx</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
+    <span class="n">sdr</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="o">**</span><span class="n">optimal_settings</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="demo-system-demo-adversarial-py">
+<h3>Demo System (<code class="docutils literal notranslate"><span class="pre">demo_adversarial.py</span></code>)<a class="headerlink" href="#demo-system-demo-adversarial-py" title="Link to this heading"></a></h3>
+<p><strong>Four Main Demonstrations</strong>:</p>
+<ol class="arabic simple">
+<li><p><strong>Jamming Strategies</strong>: Show how different jamming techniques work</p></li>
+<li><p><strong>AI vs AI Battle</strong>: Receiver vs jammer in real-time combat</p></li>
+<li><p><strong>Receiver Comparison</strong>: Regular vs adversarial-trained performance</p></li>
+<li><p><strong>Escalating Jamming</strong>: Performance against increasing jammer power</p></li>
+</ol>
+</section>
+<section id="training-scripts">
+<h3>Training Scripts<a class="headerlink" href="#training-scripts" title="Link to this heading"></a></h3>
+<p><strong><code class="docutils literal notranslate"><span class="pre">train_models.py</span></code></strong>: Complete training pipeline</p>
+<ul class="simple">
+<li><p>Traditional AMR → Neural AMR → Intelligent Receiver</p></li>
+<li><p>Automatic dataset generation</p></li>
+<li><p>Model comparison and evaluation</p></li>
+</ul>
+<p><strong><code class="docutils literal notranslate"><span class="pre">train_adversarial.py</span></code></strong>: Adversarial training</p>
+<ul class="simple">
+<li><p>Progressive difficulty levels</p></li>
+<li><p>Battle statistics tracking</p></li>
+<li><p>Anti-jamming skill development</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="what-s-left-to-be-done">
+<h2>What’s Left to Be Done<a class="headerlink" href="#what-s-left-to-be-done" title="Link to this heading"></a></h2>
+<section id="immediate-improvements">
+<h3>Immediate Improvements<a class="headerlink" href="#immediate-improvements" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Real Hardware Integration</strong>:</p>
+<ul class="simple">
+<li><p>Better PlutoSDR error handling</p></li>
+<li><p>Support for other SDR platforms (USRP, RTL-SDR)</p></li>
+<li><p>Hardware-in-the-loop testing</p></li>
+</ul>
+</li>
+<li><p><strong>Performance Optimization</strong>:</p>
+<ul class="simple">
+<li><p>GPU acceleration for real-time inference</p></li>
+<li><p>Model quantization for embedded deployment</p></li>
+<li><p>Parallel processing for multiple channels</p></li>
+</ul>
+</li>
+<li><p><strong>Advanced Features</strong>:</p>
+<ul class="simple">
+<li><p>Multi-signal detection and tracking</p></li>
+<li><p>Cooperative receiver networks</p></li>
+<li><p>Spectrum database integration</p></li>
+</ul>
+</li>
+</ol>
+</section>
+<section id="research-directions">
+<h3>Research Directions<a class="headerlink" href="#research-directions" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Advanced AI Techniques</strong>:</p>
+<ul class="simple">
+<li><p>Transformer models for sequence processing</p></li>
+<li><p>Graph neural networks for network topology</p></li>
+<li><p>Meta-learning for quick adaptation</p></li>
+<li><p>Federated learning for distributed training</p></li>
+</ul>
+</li>
+<li><p><strong>Enhanced Adversarial Systems</strong>:</p>
+<ul class="simple">
+<li><p>Multi-agent jammer coordination</p></li>
+<li><p>Sophisticated deception techniques</p></li>
+<li><p>Game-theoretic analysis</p></li>
+<li><p>Evolutionary strategies</p></li>
+</ul>
+</li>
+<li><p><strong>Real-World Applications</strong>:</p>
+<ul class="simple">
+<li><p>5G/6G integration</p></li>
+<li><p>IoT protocol optimization</p></li>
+<li><p>Satellite communication robustness</p></li>
+<li><p>Military/defense applications</p></li>
+</ul>
+</li>
+</ol>
+</section>
+<section id="system-extensions">
+<h3>System Extensions<a class="headerlink" href="#system-extensions" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Protocol Stack Integration</strong>:</p>
+<ul class="simple">
+<li><p>MAC layer adaptation</p></li>
+<li><p>Network layer optimization</p></li>
+<li><p>Cross-layer design</p></li>
+</ul>
+</li>
+<li><p><strong>Security Enhancements</strong>:</p>
+<ul class="simple">
+<li><p>Cryptographic integration</p></li>
+<li><p>Authentication mechanisms</p></li>
+<li><p>Anti-spoofing techniques</p></li>
+</ul>
+</li>
+<li><p><strong>Cognitive Radio Features</strong>:</p>
+<ul class="simple">
+<li><p>Dynamic spectrum access</p></li>
+<li><p>Interference avoidance</p></li>
+<li><p>Regulatory compliance</p></li>
+</ul>
+</li>
+</ol>
+<p>This system represents a comprehensive approach to intelligent radio communications, combining classical signal processing with cutting-edge AI to create robust, adaptive, and intelligent SDR systems that can operate effectively in challenging and adversarial environments.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, GeminiSDR Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

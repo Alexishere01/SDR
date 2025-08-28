@@ -1,0 +1,561 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>config.config_manager &mdash; GeminiSDR 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            GeminiSDR
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">User Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../architecture/index.html">System Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/index.html">Examples and Tutorials</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">GeminiSDR</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">config.config_manager</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for config.config_manager</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Configuration Management System for Dual Environment Setup</span>
+
+<span class="sd">This module provides configuration loading, validation, and management</span>
+<span class="sd">for both M1 native and Ubuntu VM environments.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="OptimizationConfig">
+<a class="viewcode-back" href="../../api/geminisdr/config.config_manager.html#config.config_manager.OptimizationConfig">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">OptimizationConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Optimization settings for the platform&quot;&quot;&quot;</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">memory_fraction</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.6</span>
+    <span class="n">mixed_precision</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">mps_fallback</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">batch_size_multiplier</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span></div>
+
+
+
+<div class="viewcode-block" id="PackageConfig">
+<a class="viewcode-back" href="../../api/geminisdr/config.config_manager.html#config.config_manager.PackageConfig">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PackageConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Package configuration for the platform&quot;&quot;&quot;</span>
+    <span class="n">pytorch_variant</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span>
+    <span class="n">numpy_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&gt;=1.20.0&quot;</span>
+    <span class="n">scipy_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&gt;=1.9.0&quot;</span>
+    <span class="n">accelerate_training</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">metal_performance_shaders</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="TrainingConfig">
+<a class="viewcode-back" href="../../api/geminisdr/config.config_manager.html#config.config_manager.TrainingConfig">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TrainingConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Training-specific configuration&quot;&quot;&quot;</span>
+    <span class="n">learning_rate_multiplier</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">gradient_checkpointing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">pin_memory</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">use_amp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="ModelConfig">
+<a class="viewcode-back" href="../../api/geminisdr/config.config_manager.html#config.config_manager.ModelConfig">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ModelConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Model-specific configuration&quot;&quot;&quot;</span>
+    <span class="n">use_metal_optimizations</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">compile_model</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">memory_efficient_attention</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="HardwareConfig">
+<a class="viewcode-back" href="../../api/geminisdr/config.config_manager.html#config.config_manager.HardwareConfig">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">HardwareConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Hardware-specific settings&quot;&quot;&quot;</span>
+    <span class="n">max_memory_gb</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span>
+    <span class="n">unified_memory</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">use_neural_engine</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">mps_available</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">sdr_simulation_fallback</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+
+<div class="viewcode-block" id="SDRConfig">
+<a class="viewcode-back" href="../../api/geminisdr/config.config_manager.html#config.config_manager.SDRConfig">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SDRConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;SDR hardware configuration&quot;&quot;&quot;</span>
+    <span class="n">simulation_mode</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">preferred_sample_rates</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="mi">1000000</span><span class="p">,</span> <span class="mi">2000000</span><span class="p">])</span>
+    <span class="n">buffer_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4096</span></div>
+
+
+
+<div class="viewcode-block" id="LoggingConfig">
+<a class="viewcode-back" href="../../api/geminisdr/config.config_manager.html#config.config_manager.LoggingConfig">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LoggingConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Logging configuration&quot;&quot;&quot;</span>
+    <span class="n">level</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;INFO&quot;</span>
+    <span class="n">enable_mps_profiling</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">track_memory_usage</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">log_device_utilization</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="PlatformConfig">
+<a class="viewcode-back" href="../../api/geminisdr/config.config_manager.html#config.config_manager.PlatformConfig">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PlatformConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Complete platform configuration&quot;&quot;&quot;</span>
+    <span class="n">platform</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>
+    <span class="n">architecture</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>
+    <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span>
+    <span class="n">optimization</span><span class="p">:</span> <span class="n">OptimizationConfig</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">OptimizationConfig</span><span class="p">)</span>
+    <span class="n">packages</span><span class="p">:</span> <span class="n">PackageConfig</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">PackageConfig</span><span class="p">)</span>
+    <span class="n">training</span><span class="p">:</span> <span class="n">TrainingConfig</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">TrainingConfig</span><span class="p">)</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">ModelConfig</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">ModelConfig</span><span class="p">)</span>
+    <span class="n">hardware</span><span class="p">:</span> <span class="n">HardwareConfig</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">HardwareConfig</span><span class="p">)</span>
+    <span class="n">sdr</span><span class="p">:</span> <span class="n">SDRConfig</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">SDRConfig</span><span class="p">)</span>
+    <span class="n">logging</span><span class="p">:</span> <span class="n">LoggingConfig</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">LoggingConfig</span><span class="p">)</span>
+    <span class="n">environment_vars</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ConfigValidationError">
+<a class="viewcode-back" href="../../api/geminisdr/config.config_manager.html#config.config_manager.ConfigValidationError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConfigValidationError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when configuration validation fails&quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="ConfigManager">
+<a class="viewcode-back" href="../../api/geminisdr/config.config_manager.html#config.config_manager.ConfigManager">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConfigManager</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Manages platform-specific configurations&quot;&quot;&quot;</span>
+    
+<div class="viewcode-block" id="ConfigManager.__init__">
+<a class="viewcode-back" href="../../api/geminisdr/config.config_manager.html#config.config_manager.ConfigManager.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;config&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_configs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PlatformConfig</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_platform</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+    
+<div class="viewcode-block" id="ConfigManager.load_config">
+<a class="viewcode-back" href="../../api/geminisdr/config.config_manager.html#config.config_manager.ConfigManager.load_config">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">platform</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlatformConfig</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load configuration for specified platform&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">platform</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_configs</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_configs</span><span class="p">[</span><span class="n">platform</span><span class="p">]</span>
+        
+        <span class="c1"># Map platform names to config file names</span>
+        <span class="n">platform_file_map</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;m1_native&#39;</span><span class="p">:</span> <span class="s1">&#39;m1_config.yaml&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;vm_ubuntu&#39;</span><span class="p">:</span> <span class="s1">&#39;vm_config.yaml&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;m1&#39;</span><span class="p">:</span> <span class="s1">&#39;m1_config.yaml&#39;</span><span class="p">,</span>  <span class="c1"># Allow short names too</span>
+            <span class="s1">&#39;vm&#39;</span><span class="p">:</span> <span class="s1">&#39;vm_config.yaml&#39;</span>
+        <span class="p">}</span>
+        
+        <span class="n">config_filename</span> <span class="o">=</span> <span class="n">platform_file_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">platform</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">platform</span><span class="si">}</span><span class="s2">_config.yaml&quot;</span><span class="p">)</span>
+        <span class="n">config_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_dir</span> <span class="o">/</span> <span class="n">config_filename</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">config_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Configuration file not found: </span><span class="si">{</span><span class="n">config_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">config_data</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            
+            <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_config</span><span class="p">(</span><span class="n">config_data</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_validate_config</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">platform</span><span class="p">)</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">_configs</span><span class="p">[</span><span class="n">platform</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded configuration for platform: </span><span class="si">{</span><span class="n">platform</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">config</span>
+            
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to load config for </span><span class="si">{</span><span class="n">platform</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ConfigValidationError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid configuration for </span><span class="si">{</span><span class="n">platform</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">PlatformConfig</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse configuration data into PlatformConfig object&quot;&quot;&quot;</span>
+        
+        <span class="c1"># Parse optimization settings</span>
+        <span class="n">opt_data</span> <span class="o">=</span> <span class="n">config_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;optimization&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">optimization</span> <span class="o">=</span> <span class="n">OptimizationConfig</span><span class="p">(</span>
+            <span class="n">threads</span><span class="o">=</span><span class="n">opt_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;threads&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+            <span class="n">memory_fraction</span><span class="o">=</span><span class="n">opt_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;memory_fraction&#39;</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">),</span>
+            <span class="n">mixed_precision</span><span class="o">=</span><span class="n">opt_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mixed_precision&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+            <span class="n">mps_fallback</span><span class="o">=</span><span class="n">opt_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mps_fallback&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+            <span class="n">batch_size_multiplier</span><span class="o">=</span><span class="n">opt_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;batch_size_multiplier&#39;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="p">)</span>
+        
+        <span class="c1"># Parse package settings</span>
+        <span class="n">pkg_data</span> <span class="o">=</span> <span class="n">config_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;packages&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">packages</span> <span class="o">=</span> <span class="n">PackageConfig</span><span class="p">(</span>
+            <span class="n">pytorch_variant</span><span class="o">=</span><span class="n">pkg_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;pytorch_variant&#39;</span><span class="p">,</span> <span class="s1">&#39;cpu&#39;</span><span class="p">),</span>
+            <span class="n">numpy_version</span><span class="o">=</span><span class="n">pkg_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;numpy_version&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;=1.20.0&#39;</span><span class="p">),</span>
+            <span class="n">scipy_version</span><span class="o">=</span><span class="n">pkg_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;scipy_version&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;=1.9.0&#39;</span><span class="p">),</span>
+            <span class="n">accelerate_training</span><span class="o">=</span><span class="n">pkg_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;accelerate_training&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+            <span class="n">metal_performance_shaders</span><span class="o">=</span><span class="n">pkg_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;metal_performance_shaders&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="p">)</span>
+        
+        <span class="c1"># Parse training settings</span>
+        <span class="n">train_data</span> <span class="o">=</span> <span class="n">config_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;training&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">training</span> <span class="o">=</span> <span class="n">TrainingConfig</span><span class="p">(</span>
+            <span class="n">learning_rate_multiplier</span><span class="o">=</span><span class="n">train_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;learning_rate_multiplier&#39;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+            <span class="n">gradient_checkpointing</span><span class="o">=</span><span class="n">train_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;gradient_checkpointing&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+            <span class="n">num_workers</span><span class="o">=</span><span class="n">train_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;num_workers&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="n">pin_memory</span><span class="o">=</span><span class="n">train_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;pin_memory&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+            <span class="n">use_amp</span><span class="o">=</span><span class="n">train_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;use_amp&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="p">)</span>
+        
+        <span class="c1"># Parse model settings</span>
+        <span class="n">model_data</span> <span class="o">=</span> <span class="n">config_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">ModelConfig</span><span class="p">(</span>
+            <span class="n">use_metal_optimizations</span><span class="o">=</span><span class="n">model_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;use_metal_optimizations&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+            <span class="n">compile_model</span><span class="o">=</span><span class="n">model_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;compile_model&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+            <span class="n">memory_efficient_attention</span><span class="o">=</span><span class="n">model_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;memory_efficient_attention&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="p">)</span>
+        
+        <span class="c1"># Parse hardware settings</span>
+        <span class="n">hw_data</span> <span class="o">=</span> <span class="n">config_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;hardware&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">hardware</span> <span class="o">=</span> <span class="n">HardwareConfig</span><span class="p">(</span>
+            <span class="n">max_memory_gb</span><span class="o">=</span><span class="n">hw_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;max_memory_gb&#39;</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+            <span class="n">unified_memory</span><span class="o">=</span><span class="n">hw_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;unified_memory&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+            <span class="n">use_neural_engine</span><span class="o">=</span><span class="n">hw_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;use_neural_engine&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+            <span class="n">mps_available</span><span class="o">=</span><span class="n">hw_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mps_available&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+            <span class="n">sdr_simulation_fallback</span><span class="o">=</span><span class="n">hw_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sdr_simulation_fallback&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="p">)</span>
+        
+        <span class="c1"># Parse SDR settings</span>
+        <span class="n">sdr_data</span> <span class="o">=</span> <span class="n">config_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sdr&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">sdr</span> <span class="o">=</span> <span class="n">SDRConfig</span><span class="p">(</span>
+            <span class="n">simulation_mode</span><span class="o">=</span><span class="n">sdr_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;simulation_mode&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+            <span class="n">preferred_sample_rates</span><span class="o">=</span><span class="n">sdr_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;preferred_sample_rates&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1000000</span><span class="p">,</span> <span class="mi">2000000</span><span class="p">]),</span>
+            <span class="n">buffer_size</span><span class="o">=</span><span class="n">sdr_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;buffer_size&#39;</span><span class="p">,</span> <span class="mi">4096</span><span class="p">)</span>
+        <span class="p">)</span>
+        
+        <span class="c1"># Parse logging settings</span>
+        <span class="n">log_data</span> <span class="o">=</span> <span class="n">config_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;logging&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">logging_config</span> <span class="o">=</span> <span class="n">LoggingConfig</span><span class="p">(</span>
+            <span class="n">level</span><span class="o">=</span><span class="n">log_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;level&#39;</span><span class="p">,</span> <span class="s1">&#39;INFO&#39;</span><span class="p">),</span>
+            <span class="n">enable_mps_profiling</span><span class="o">=</span><span class="n">log_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;enable_mps_profiling&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+            <span class="n">track_memory_usage</span><span class="o">=</span><span class="n">log_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;track_memory_usage&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+            <span class="n">log_device_utilization</span><span class="o">=</span><span class="n">log_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;log_device_utilization&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">PlatformConfig</span><span class="p">(</span>
+            <span class="n">platform</span><span class="o">=</span><span class="n">config_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;platform&#39;</span><span class="p">,</span> <span class="s1">&#39;unknown&#39;</span><span class="p">),</span>
+            <span class="n">architecture</span><span class="o">=</span><span class="n">config_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;architecture&#39;</span><span class="p">,</span> <span class="s1">&#39;unknown&#39;</span><span class="p">),</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">config_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;device&#39;</span><span class="p">,</span> <span class="s1">&#39;cpu&#39;</span><span class="p">),</span>
+            <span class="n">optimization</span><span class="o">=</span><span class="n">optimization</span><span class="p">,</span>
+            <span class="n">packages</span><span class="o">=</span><span class="n">packages</span><span class="p">,</span>
+            <span class="n">training</span><span class="o">=</span><span class="n">training</span><span class="p">,</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+            <span class="n">hardware</span><span class="o">=</span><span class="n">hardware</span><span class="p">,</span>
+            <span class="n">sdr</span><span class="o">=</span><span class="n">sdr</span><span class="p">,</span>
+            <span class="n">logging</span><span class="o">=</span><span class="n">logging_config</span><span class="p">,</span>
+            <span class="n">environment_vars</span><span class="o">=</span><span class="n">config_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;environment_vars&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="p">)</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">PlatformConfig</span><span class="p">,</span> <span class="n">platform</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate configuration for consistency and correctness&quot;&quot;&quot;</span>
+        
+        <span class="c1"># Validate platform consistency</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">platform</span> <span class="o">!=</span> <span class="n">platform</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConfigValidationError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Platform mismatch: config says </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">platform</span><span class="si">}</span><span class="s2">, expected </span><span class="si">{</span><span class="n">platform</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        
+        <span class="c1"># Validate device settings</span>
+        <span class="n">valid_devices</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cpu&#39;</span><span class="p">,</span> <span class="s1">&#39;mps&#39;</span><span class="p">,</span> <span class="s1">&#39;cuda&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">device</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_devices</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConfigValidationError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Invalid device &#39;</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">device</span><span class="si">}</span><span class="s2">&#39;. Must be one of: </span><span class="si">{</span><span class="n">valid_devices</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        
+        <span class="c1"># Validate M1-specific settings</span>
+        <span class="k">if</span> <span class="n">platform</span> <span class="o">==</span> <span class="s1">&#39;m1&#39;</span> <span class="ow">and</span> <span class="n">config</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="s1">&#39;mps&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">packages</span><span class="o">.</span><span class="n">metal_performance_shaders</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;MPS device specified but Metal Performance Shaders disabled&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># Validate VM-specific settings</span>
+        <span class="k">if</span> <span class="n">platform</span> <span class="o">==</span> <span class="s1">&#39;vm&#39;</span> <span class="ow">and</span> <span class="n">config</span><span class="o">.</span><span class="n">device</span> <span class="o">!=</span> <span class="s1">&#39;cpu&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConfigValidationError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;VM platform should use CPU device, got </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        
+        <span class="c1"># Validate memory settings</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.1</span> <span class="o">&lt;=</span> <span class="n">config</span><span class="o">.</span><span class="n">optimization</span><span class="o">.</span><span class="n">memory_fraction</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConfigValidationError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Memory fraction must be between 0.1 and 1.0, got </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">optimization</span><span class="o">.</span><span class="n">memory_fraction</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        
+        <span class="c1"># Validate thread count</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">optimization</span><span class="o">.</span><span class="n">threads</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConfigValidationError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Thread count must be positive, got </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">optimization</span><span class="o">.</span><span class="n">threads</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        
+        <span class="c1"># Validate sample rates</span>
+        <span class="k">for</span> <span class="n">rate</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">sdr</span><span class="o">.</span><span class="n">preferred_sample_rates</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">rate</span> <span class="o">&lt;</span> <span class="mi">100000</span> <span class="ow">or</span> <span class="n">rate</span> <span class="o">&gt;</span> <span class="mi">50000000</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sample rate </span><span class="si">{</span><span class="n">rate</span><span class="si">}</span><span class="s2"> may be outside typical SDR range&quot;</span><span class="p">)</span>
+        
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Configuration validation passed for platform: </span><span class="si">{</span><span class="n">platform</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="ConfigManager.get_current_config">
+<a class="viewcode-back" href="../../api/geminisdr/config.config_manager.html#config.config_manager.ConfigManager.get_current_config">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_current_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PlatformConfig</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the currently active configuration&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_platform</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_configs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_platform</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+    
+<div class="viewcode-block" id="ConfigManager.set_current_platform">
+<a class="viewcode-back" href="../../api/geminisdr/config.config_manager.html#config.config_manager.ConfigManager.set_current_platform">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_current_platform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">platform</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlatformConfig</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the current active platform and return its configuration&quot;&quot;&quot;</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">platform</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_platform</span> <span class="o">=</span> <span class="n">platform</span>
+        <span class="k">return</span> <span class="n">config</span></div>
+
+    
+<div class="viewcode-block" id="ConfigManager.apply_environment_variables">
+<a class="viewcode-back" href="../../api/geminisdr/config.config_manager.html#config.config_manager.ConfigManager.apply_environment_variables">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apply_environment_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">PlatformConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply environment variables from configuration&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">environment_vars</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Set environment variable: </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="ConfigManager.get_optimization_settings">
+<a class="viewcode-back" href="../../api/geminisdr/config.config_manager.html#config.config_manager.ConfigManager.get_optimization_settings">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_optimization_settings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">platform</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get optimization settings for the specified platform&quot;&quot;&quot;</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">platform</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;device&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+            <span class="s1">&#39;threads&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">optimization</span><span class="o">.</span><span class="n">threads</span><span class="p">,</span>
+            <span class="s1">&#39;memory_fraction&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">optimization</span><span class="o">.</span><span class="n">memory_fraction</span><span class="p">,</span>
+            <span class="s1">&#39;mixed_precision&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">optimization</span><span class="o">.</span><span class="n">mixed_precision</span><span class="p">,</span>
+            <span class="s1">&#39;batch_size_multiplier&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">optimization</span><span class="o">.</span><span class="n">batch_size_multiplier</span><span class="p">,</span>
+            <span class="s1">&#39;use_amp&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">training</span><span class="o">.</span><span class="n">use_amp</span><span class="p">,</span>
+            <span class="s1">&#39;num_workers&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">training</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span>
+            <span class="s1">&#39;pin_memory&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">training</span><span class="o">.</span><span class="n">pin_memory</span>
+        <span class="p">}</span></div>
+
+    
+<div class="viewcode-block" id="ConfigManager.get_package_requirements">
+<a class="viewcode-back" href="../../api/geminisdr/config.config_manager.html#config.config_manager.ConfigManager.get_package_requirements">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_package_requirements</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">platform</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get package requirements for the specified platform&quot;&quot;&quot;</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">platform</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;pytorch_variant&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">packages</span><span class="o">.</span><span class="n">pytorch_variant</span><span class="p">,</span>
+            <span class="s1">&#39;numpy_version&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">packages</span><span class="o">.</span><span class="n">numpy_version</span><span class="p">,</span>
+            <span class="s1">&#39;scipy_version&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">packages</span><span class="o">.</span><span class="n">scipy_version</span>
+        <span class="p">}</span></div>
+
+    
+<div class="viewcode-block" id="ConfigManager.save_config">
+<a class="viewcode-back" href="../../api/geminisdr/config.config_manager.html#config.config_manager.ConfigManager.save_config">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">platform</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">PlatformConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Save configuration to file&quot;&quot;&quot;</span>
+        <span class="n">config_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">platform</span><span class="si">}</span><span class="s2">_config.yaml&quot;</span>
+        
+        <span class="c1"># Convert config to dictionary</span>
+        <span class="n">config_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;platform&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">platform</span><span class="p">,</span>
+            <span class="s1">&#39;architecture&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">architecture</span><span class="p">,</span>
+            <span class="s1">&#39;device&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+            <span class="s1">&#39;optimization&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;threads&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">optimization</span><span class="o">.</span><span class="n">threads</span><span class="p">,</span>
+                <span class="s1">&#39;memory_fraction&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">optimization</span><span class="o">.</span><span class="n">memory_fraction</span><span class="p">,</span>
+                <span class="s1">&#39;mixed_precision&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">optimization</span><span class="o">.</span><span class="n">mixed_precision</span><span class="p">,</span>
+                <span class="s1">&#39;mps_fallback&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">optimization</span><span class="o">.</span><span class="n">mps_fallback</span><span class="p">,</span>
+                <span class="s1">&#39;batch_size_multiplier&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">optimization</span><span class="o">.</span><span class="n">batch_size_multiplier</span>
+            <span class="p">},</span>
+            <span class="s1">&#39;packages&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;pytorch_variant&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">packages</span><span class="o">.</span><span class="n">pytorch_variant</span><span class="p">,</span>
+                <span class="s1">&#39;numpy_version&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">packages</span><span class="o">.</span><span class="n">numpy_version</span><span class="p">,</span>
+                <span class="s1">&#39;scipy_version&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">packages</span><span class="o">.</span><span class="n">scipy_version</span><span class="p">,</span>
+                <span class="s1">&#39;accelerate_training&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">packages</span><span class="o">.</span><span class="n">accelerate_training</span><span class="p">,</span>
+                <span class="s1">&#39;metal_performance_shaders&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">packages</span><span class="o">.</span><span class="n">metal_performance_shaders</span>
+            <span class="p">},</span>
+            <span class="s1">&#39;training&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;learning_rate_multiplier&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">training</span><span class="o">.</span><span class="n">learning_rate_multiplier</span><span class="p">,</span>
+                <span class="s1">&#39;gradient_checkpointing&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">training</span><span class="o">.</span><span class="n">gradient_checkpointing</span><span class="p">,</span>
+                <span class="s1">&#39;num_workers&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">training</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span>
+                <span class="s1">&#39;pin_memory&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">training</span><span class="o">.</span><span class="n">pin_memory</span><span class="p">,</span>
+                <span class="s1">&#39;use_amp&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">training</span><span class="o">.</span><span class="n">use_amp</span>
+            <span class="p">},</span>
+            <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;use_metal_optimizations&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">use_metal_optimizations</span><span class="p">,</span>
+                <span class="s1">&#39;compile_model&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">compile_model</span><span class="p">,</span>
+                <span class="s1">&#39;memory_efficient_attention&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">memory_efficient_attention</span>
+            <span class="p">},</span>
+            <span class="s1">&#39;hardware&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;max_memory_gb&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">max_memory_gb</span><span class="p">,</span>
+                <span class="s1">&#39;unified_memory&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">unified_memory</span><span class="p">,</span>
+                <span class="s1">&#39;use_neural_engine&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">use_neural_engine</span><span class="p">,</span>
+                <span class="s1">&#39;mps_available&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">mps_available</span><span class="p">,</span>
+                <span class="s1">&#39;sdr_simulation_fallback&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">sdr_simulation_fallback</span>
+            <span class="p">},</span>
+            <span class="s1">&#39;sdr&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;simulation_mode&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">sdr</span><span class="o">.</span><span class="n">simulation_mode</span><span class="p">,</span>
+                <span class="s1">&#39;preferred_sample_rates&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">sdr</span><span class="o">.</span><span class="n">preferred_sample_rates</span><span class="p">,</span>
+                <span class="s1">&#39;buffer_size&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">sdr</span><span class="o">.</span><span class="n">buffer_size</span>
+            <span class="p">},</span>
+            <span class="s1">&#39;logging&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">logging</span><span class="o">.</span><span class="n">level</span><span class="p">,</span>
+                <span class="s1">&#39;enable_mps_profiling&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">logging</span><span class="o">.</span><span class="n">enable_mps_profiling</span><span class="p">,</span>
+                <span class="s1">&#39;track_memory_usage&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">logging</span><span class="o">.</span><span class="n">track_memory_usage</span><span class="p">,</span>
+                <span class="s1">&#39;log_device_utilization&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">logging</span><span class="o">.</span><span class="n">log_device_utilization</span>
+            <span class="p">},</span>
+            <span class="s1">&#39;environment_vars&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">environment_vars</span>
+        <span class="p">}</span>
+        
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">config_dict</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Saved configuration for platform: </span><span class="si">{</span><span class="n">platform</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="c1"># Global configuration manager instance</span>
+<span class="n">config_manager</span> <span class="o">=</span> <span class="n">ConfigManager</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="get_config">
+<a class="viewcode-back" href="../../api/geminisdr/config.config_manager.html#config.config_manager.get_config">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_config</span><span class="p">(</span><span class="n">platform</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlatformConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convenience function to get configuration for a platform&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">config_manager</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">platform</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_current_config">
+<a class="viewcode-back" href="../../api/geminisdr/config.config_manager.html#config.config_manager.get_current_config">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_current_config</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PlatformConfig</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convenience function to get current configuration&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">config_manager</span><span class="o">.</span><span class="n">get_current_config</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="set_platform">
+<a class="viewcode-back" href="../../api/geminisdr/config.config_manager.html#config.config_manager.set_platform">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_platform</span><span class="p">(</span><span class="n">platform</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlatformConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convenience function to set current platform&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">config_manager</span><span class="o">.</span><span class="n">set_current_platform</span><span class="p">(</span><span class="n">platform</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, GeminiSDR Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,9 @@
+numpy
+matplotlib
+torch
+scipy
+h5py
+scikit-learn
+psutil
+mlflow
+pyadi-iio

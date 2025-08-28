@@ -1,0 +1,14 @@
+artifact_uri: file:///Users/alex/Desktop/Gemini/Projects/geminisdr/mlruns/160003639697839842/657117652de3417aac87158831d69141/artifacts
+end_time: 1756213386386
+entry_point_name: ''
+experiment_id: '160003639697839842'
+lifecycle_stage: active
+run_id: 657117652de3417aac87158831d69141
+run_name: big-mouse-498
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1756213383406
+status: 3
+tags: []
+user_id: alex

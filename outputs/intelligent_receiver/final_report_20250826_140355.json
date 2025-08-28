@@ -1,0 +1,28 @@
+{
+  "timestamp": "2025-08-26T14:03:55.147257",
+  "training_summary": {
+    "training_time_hours": 0.017886759373876782,
+    "total_episodes": 200,
+    "final_avg_reward": -1198.2374335686152,
+    "best_avg_reward": -999.2736422365307,
+    "final_success_rate": 0.21,
+    "final_epsilon": 1.0
+  },
+  "test_summary": {
+    "total_episodes": 50,
+    "success_rate": 0.12,
+    "average_reward": -1202.7568817226177,
+    "average_snr_when_found": 17.68458504231457,
+    "average_convergence_time": 29.333333333333332,
+    "frequency_accuracy_khz": 171.75010349242143
+  },
+  "model_files": {
+    "best_model": "models/intelligent_receiver_best.pth",
+    "final_model": "models/intelligent_receiver_final.pth"
+  },
+  "recommendations": [
+    "Consider increasing training episodes or adjusting reward function",
+    "Training may have stopped too early - consider longer training",
+    "Frequency accuracy could be improved with finer action discretization"
+  ]
+}

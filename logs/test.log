@@ -1,0 +1,1 @@
+{"timestamp": "2025-08-26T09:27:21.389269", "level": "INFO", "message": "Test message", "logger_name": "test", "context": {}, "extra": {"exc_info": null, "exc_text": null, "stack_info": null, "taskName": null}, "thread_id": 8651694272, "process_id": 93287}

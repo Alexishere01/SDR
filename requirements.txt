@@ -1,0 +1,29 @@
+# Core scientific and ML libraries
+numpy
+matplotlib
+torch
+scipy
+h5py
+scikit-learn
+psutil
+
+# Model management and tracking
+mlflow
+
+# SDR hardware support
+pyadi-iio
+
+# GUI dependencies
+PySide6>=6.5.0
+PyQtGraph>=0.13.0
+PyOpenGL>=3.1.0
+PyOpenGL-accelerate>=3.1.0
+
+# GUI development and testing tools
+pytest-qt>=4.2.0
+qt6-tools
+
+# Optional documentation dependencies (install with: pip install -r docs/requirements.txt)
+# sphinx>=5.0.0
+# sphinx-rtd-theme>=1.0.0
+# myst-parser>=0.18.0

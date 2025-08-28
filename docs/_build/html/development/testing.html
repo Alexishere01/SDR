@@ -1,0 +1,777 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Testing Guidelines &mdash; GeminiSDR 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Debugging and Troubleshooting" href="debugging.html" />
+    <link rel="prev" title="Coding Standards" href="coding_standards.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            GeminiSDR
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">User Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/index.html">System Architecture</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="contributing.html">Contributing to GeminiSDR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coding_standards.html">Coding Standards</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Testing Guidelines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#testing-philosophy">Testing Philosophy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#test-categories">Test Categories</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#unit-tests">Unit Tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#integration-tests">Integration Tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#performance-tests">Performance Tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cross-platform-tests">Cross-Platform Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#test-configuration">Test Configuration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pytest-configuration">pytest Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#test-fixtures">Test Fixtures</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#running-tests">Running Tests</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#local-testing">Local Testing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#continuous-integration">Continuous Integration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#performance-testing">Performance Testing</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#test-data-management">Test Data Management</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#test-data-organization">Test Data Organization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mock-data-generation">Mock Data Generation</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#debugging-tests">Debugging Tests</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#test-debugging-strategies">Test Debugging Strategies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#test-isolation">Test Isolation</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#best-practices">Best Practices</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#test-writing-guidelines">Test Writing Guidelines</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#performance-considerations">Performance Considerations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#maintenance">Maintenance</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="debugging.html">Debugging and Troubleshooting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#contributing">Contributing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#coding-standards">Coding Standards</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#testing-guidelines">Testing Guidelines</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Testing Guidelines</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#testing-philosophy">Testing Philosophy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#test-categories">Test Categories</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#test-configuration">Test Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#running-tests">Running Tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#test-data-management">Test Data Management</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#debugging-tests">Debugging Tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#best-practices">Best Practices</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#debugging-and-troubleshooting">Debugging and Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples and Tutorials</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">GeminiSDR</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Developer Guide</a></li>
+      <li class="breadcrumb-item active">Testing Guidelines</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/development/testing.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="testing-guidelines">
+<h1>Testing Guidelines<a class="headerlink" href="#testing-guidelines" title="Link to this heading"></a></h1>
+<p>This document outlines the testing strategy and guidelines for GeminiSDR development.</p>
+<section id="testing-philosophy">
+<h2>Testing Philosophy<a class="headerlink" href="#testing-philosophy" title="Link to this heading"></a></h2>
+<p>GeminiSDR follows a comprehensive testing approach with multiple levels of validation:</p>
+<ul class="simple">
+<li><p><strong>Unit Tests</strong>: Test individual components in isolation</p></li>
+<li><p><strong>Integration Tests</strong>: Test component interactions and workflows</p></li>
+<li><p><strong>Performance Tests</strong>: Validate performance requirements and detect regressions</p></li>
+<li><p><strong>Cross-Platform Tests</strong>: Ensure compatibility across M1 Mac, Linux VM, and CUDA environments</p></li>
+</ul>
+</section>
+<section id="test-categories">
+<h2>Test Categories<a class="headerlink" href="#test-categories" title="Link to this heading"></a></h2>
+<section id="unit-tests">
+<h3>Unit Tests<a class="headerlink" href="#unit-tests" title="Link to this heading"></a></h3>
+<p>Unit tests focus on testing individual functions and classes in isolation.</p>
+<p><strong>Location</strong>: <code class="docutils literal notranslate"><span class="pre">tests/unit/</span></code></p>
+<p><strong>Characteristics</strong>:
+* Fast execution (&lt; 1 second per test)
+* No external dependencies
+* Mock external services and hardware
+* High code coverage (&gt;90%)</p>
+<p><strong>Example</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># tests/unit/config/test_config_manager.py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">unittest.mock</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mock</span><span class="p">,</span> <span class="n">patch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.config.config_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.core.error_handling</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigurationError</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">TestConfigManager</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Unit tests for ConfigManager class.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_load_config_with_valid_file_returns_system_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tmp_path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test loading valid configuration file.&quot;&quot;&quot;</span>
+        <span class="c1"># Arrange</span>
+        <span class="n">config_file</span> <span class="o">=</span> <span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">&quot;config.yaml&quot;</span>
+        <span class="n">config_file</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        hardware:</span>
+<span class="s2">          device_preference: &quot;auto&quot;</span>
+<span class="s2">        ml:</span>
+<span class="s2">          batch_size: 32</span>
+<span class="s2">        &quot;&quot;&quot;</span><span class="p">)</span>
+
+        <span class="n">manager</span> <span class="o">=</span> <span class="n">ConfigManager</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">))</span>
+
+        <span class="c1"># Act</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">load_config</span><span class="p">()</span>
+
+        <span class="c1"># Assert</span>
+        <span class="k">assert</span> <span class="n">config</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">device_preference</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span>
+        <span class="k">assert</span> <span class="n">config</span><span class="o">.</span><span class="n">ml</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">==</span> <span class="mi">32</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_load_config_with_missing_file_raises_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tmp_path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test that missing config file raises ConfigurationError.&quot;&quot;&quot;</span>
+        <span class="c1"># Arrange</span>
+        <span class="n">manager</span> <span class="o">=</span> <span class="n">ConfigManager</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">))</span>
+
+        <span class="c1"># Act &amp; Assert</span>
+        <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="n">ConfigurationError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc_info</span><span class="p">:</span>
+            <span class="n">manager</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="s2">&quot;nonexistent.yaml&quot;</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="s2">&quot;Configuration file not found&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc_info</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="integration-tests">
+<h3>Integration Tests<a class="headerlink" href="#integration-tests" title="Link to this heading"></a></h3>
+<p>Integration tests validate interactions between components and end-to-end workflows.</p>
+<p><strong>Location</strong>: <code class="docutils literal notranslate"><span class="pre">tests/integration/</span></code></p>
+<p><strong>Characteristics</strong>:
+* Test component interactions
+* Use real configuration files
+* May use test databases or file systems
+* Moderate execution time (1-10 seconds per test)</p>
+<p><strong>Example</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># tests/integration/test_model_lifecycle.py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.config.config_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.core.model_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.core.model_metadata</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelMetadata</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">TestModelLifecycle</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Integration tests for complete model lifecycle.&quot;&quot;&quot;</span>
+
+    <span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup_environment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tmp_path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set up test environment with config and directories.&quot;&quot;&quot;</span>
+        <span class="n">config_manager</span> <span class="o">=</span> <span class="n">ConfigManager</span><span class="p">()</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">config_manager</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="s2">&quot;test_config&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Override paths for testing</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">model_storage_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">&quot;models&quot;</span><span class="p">)</span>
+
+        <span class="n">model_manager</span> <span class="o">=</span> <span class="n">ModelManager</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">config</span><span class="p">,</span> <span class="n">model_manager</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_save_and_load_model_preserves_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">setup_environment</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test that saving and loading a model preserves all metadata.&quot;&quot;&quot;</span>
+        <span class="c1"># Arrange</span>
+        <span class="n">config</span><span class="p">,</span> <span class="n">model_manager</span> <span class="o">=</span> <span class="n">setup_environment</span>
+
+        <span class="c1"># Create a simple test model</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">ModelMetadata</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test_model&quot;</span><span class="p">,</span>
+            <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.0.0&quot;</span><span class="p">,</span>
+            <span class="n">hyperparameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;input_size&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;output_size&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+            <span class="n">performance_metrics</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;accuracy&quot;</span><span class="p">:</span> <span class="mf">0.95</span><span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Act</span>
+        <span class="n">saved_path</span> <span class="o">=</span> <span class="n">model_manager</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
+        <span class="n">loaded_model</span><span class="p">,</span> <span class="n">loaded_metadata</span> <span class="o">=</span> <span class="n">model_manager</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span>
+            <span class="s2">&quot;test_model&quot;</span><span class="p">,</span> <span class="s2">&quot;1.0.0&quot;</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Assert</span>
+        <span class="k">assert</span> <span class="n">loaded_metadata</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">metadata</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">assert</span> <span class="n">loaded_metadata</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="n">metadata</span><span class="o">.</span><span class="n">version</span>
+        <span class="k">assert</span> <span class="n">loaded_metadata</span><span class="o">.</span><span class="n">hyperparameters</span> <span class="o">==</span> <span class="n">metadata</span><span class="o">.</span><span class="n">hyperparameters</span>
+        <span class="k">assert</span> <span class="n">loaded_metadata</span><span class="o">.</span><span class="n">performance_metrics</span> <span class="o">==</span> <span class="n">metadata</span><span class="o">.</span><span class="n">performance_metrics</span>
+
+        <span class="c1"># Verify model functionality</span>
+        <span class="n">test_input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">original_output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">test_input</span><span class="p">)</span>
+        <span class="n">loaded_output</span> <span class="o">=</span> <span class="n">loaded_model</span><span class="p">(</span><span class="n">test_input</span><span class="p">)</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_close</span><span class="p">(</span><span class="n">original_output</span><span class="p">,</span> <span class="n">loaded_output</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="performance-tests">
+<h3>Performance Tests<a class="headerlink" href="#performance-tests" title="Link to this heading"></a></h3>
+<p>Performance tests validate system performance and detect regressions.</p>
+<p><strong>Location</strong>: <code class="docutils literal notranslate"><span class="pre">tests/performance/</span></code></p>
+<p><strong>Characteristics</strong>:
+* Measure execution time and memory usage
+* Compare against performance baselines
+* Run on representative datasets
+* Generate performance reports</p>
+<p><strong>Example</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># tests/performance/test_training_performance.py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.ml.neural_amr</span><span class="w"> </span><span class="kn">import</span> <span class="n">NeuralAMR</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.core.memory_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">MemoryManager</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">TestTrainingPerformance</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Performance tests for training operations.&quot;&quot;&quot;</span>
+
+    <span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">performance</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_training_speed_meets_baseline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">performance_config</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test that training speed meets performance baseline.&quot;&quot;&quot;</span>
+        <span class="c1"># Arrange</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">NeuralAMR</span><span class="p">(</span><span class="n">performance_config</span><span class="p">)</span>
+        <span class="n">memory_manager</span> <span class="o">=</span> <span class="n">MemoryManager</span><span class="p">(</span><span class="n">performance_config</span><span class="p">)</span>
+
+        <span class="c1"># Generate test data</span>
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">64</span>
+        <span class="n">sequence_length</span> <span class="o">=</span> <span class="mi">1024</span>
+        <span class="n">test_data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">sequence_length</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">test_labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,))</span>
+
+        <span class="c1"># Measure training time</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">memory_stats_before</span> <span class="o">=</span> <span class="n">memory_manager</span><span class="o">.</span><span class="n">get_memory_stats</span><span class="p">()</span>
+
+        <span class="c1"># Act</span>
+        <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">train_step</span><span class="p">(</span><span class="n">test_data</span><span class="p">,</span> <span class="n">test_labels</span><span class="p">)</span>
+
+        <span class="c1"># Measure results</span>
+        <span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">memory_stats_after</span> <span class="o">=</span> <span class="n">memory_manager</span><span class="o">.</span><span class="n">get_memory_stats</span><span class="p">()</span>
+
+        <span class="n">training_time</span> <span class="o">=</span> <span class="n">end_time</span> <span class="o">-</span> <span class="n">start_time</span>
+        <span class="n">memory_used</span> <span class="o">=</span> <span class="n">memory_stats_after</span><span class="o">.</span><span class="n">used_ram_mb</span> <span class="o">-</span> <span class="n">memory_stats_before</span><span class="o">.</span><span class="n">used_ram_mb</span>
+
+        <span class="c1"># Assert performance requirements</span>
+        <span class="k">assert</span> <span class="n">training_time</span> <span class="o">&lt;</span> <span class="mf">30.0</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Training took </span><span class="si">{</span><span class="n">training_time</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s, expected &lt; 30s&quot;</span>
+        <span class="k">assert</span> <span class="n">memory_used</span> <span class="o">&lt;</span> <span class="mi">1024</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Memory usage </span><span class="si">{</span><span class="n">memory_used</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">MB, expected &lt; 1GB&quot;</span>
+
+        <span class="c1"># Log performance metrics</span>
+        <span class="n">pytest</span><span class="o">.</span><span class="n">performance_data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;training_time_seconds&quot;</span><span class="p">:</span> <span class="n">training_time</span><span class="p">,</span>
+            <span class="s2">&quot;memory_usage_mb&quot;</span><span class="p">:</span> <span class="n">memory_used</span><span class="p">,</span>
+            <span class="s2">&quot;samples_per_second&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">batch_size</span> <span class="o">*</span> <span class="mi">10</span><span class="p">)</span> <span class="o">/</span> <span class="n">training_time</span>
+        <span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="cross-platform-tests">
+<h3>Cross-Platform Tests<a class="headerlink" href="#cross-platform-tests" title="Link to this heading"></a></h3>
+<p>Cross-platform tests ensure compatibility across different hardware and operating systems.</p>
+<p><strong>Location</strong>: <code class="docutils literal notranslate"><span class="pre">tests/cross_platform/</span></code></p>
+<p><strong>Characteristics</strong>:
+* Run on M1 Mac, Linux VM, and CUDA environments
+* Test platform-specific optimizations
+* Validate device detection and selection
+* Ensure consistent behavior across platforms</p>
+<p><strong>Example</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># tests/cross_platform/test_device_compatibility.py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.environments.hardware_abstraction</span><span class="w"> </span><span class="kn">import</span> <span class="n">HardwareAbstraction</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.config.config_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigManager</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">TestDeviceCompatibility</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Cross-platform device compatibility tests.&quot;&quot;&quot;</span>
+
+    <span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">&quot;platform&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;m1_native&quot;</span><span class="p">,</span> <span class="s2">&quot;vm_ubuntu&quot;</span><span class="p">,</span> <span class="s2">&quot;cuda&quot;</span><span class="p">])</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_device_detection_returns_valid_device</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">platform</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test device detection on different platforms.&quot;&quot;&quot;</span>
+        <span class="c1"># Arrange</span>
+        <span class="n">config_manager</span> <span class="o">=</span> <span class="n">ConfigManager</span><span class="p">()</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">config_manager</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;test_</span><span class="si">{</span><span class="n">platform</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">hw_abstraction</span> <span class="o">=</span> <span class="n">HardwareAbstraction</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+        <span class="c1"># Act</span>
+        <span class="n">detected_device</span> <span class="o">=</span> <span class="n">hw_abstraction</span><span class="o">.</span><span class="n">detect_optimal_device</span><span class="p">()</span>
+
+        <span class="c1"># Assert</span>
+        <span class="k">assert</span> <span class="n">detected_device</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="s2">&quot;mps&quot;</span><span class="p">,</span> <span class="s2">&quot;cuda&quot;</span><span class="p">]</span>
+
+        <span class="c1"># Platform-specific assertions</span>
+        <span class="k">if</span> <span class="n">platform</span> <span class="o">==</span> <span class="s2">&quot;m1_native&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+                <span class="k">assert</span> <span class="n">detected_device</span> <span class="o">==</span> <span class="s2">&quot;mps&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">detected_device</span> <span class="o">==</span> <span class="s2">&quot;cpu&quot;</span>
+        <span class="k">elif</span> <span class="n">platform</span> <span class="o">==</span> <span class="s2">&quot;cuda&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+                <span class="k">assert</span> <span class="n">detected_device</span> <span class="o">==</span> <span class="s2">&quot;cuda&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">detected_device</span> <span class="o">==</span> <span class="s2">&quot;cpu&quot;</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># vm_ubuntu</span>
+            <span class="k">assert</span> <span class="n">detected_device</span> <span class="o">==</span> <span class="s2">&quot;cpu&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_model_inference_consistent_across_platforms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test that model inference produces consistent results across platforms.&quot;&quot;&quot;</span>
+        <span class="c1"># This test would be run on multiple platforms and results compared</span>
+        <span class="k">pass</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="test-configuration">
+<h2>Test Configuration<a class="headerlink" href="#test-configuration" title="Link to this heading"></a></h2>
+<section id="pytest-configuration">
+<h3>pytest Configuration<a class="headerlink" href="#pytest-configuration" title="Link to this heading"></a></h3>
+<p>Configure pytest in <code class="docutils literal notranslate"><span class="pre">pytest.ini</span></code>:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[tool:pytest]</span>
+<span class="na">testpaths</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">tests</span>
+<span class="na">python_files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">test_*.py</span>
+<span class="na">python_classes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">Test*</span>
+<span class="na">python_functions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">test_*</span>
+<span class="na">addopts</span><span class="w"> </span><span class="o">=</span>
+<span class="w">    </span><span class="na">--strict-markers</span>
+<span class="w">    </span><span class="na">--strict-config</span>
+<span class="w">    </span><span class="na">--verbose</span>
+<span class="w">    </span><span class="na">--tb</span><span class="o">=</span><span class="s">short</span>
+<span class="w">    </span><span class="na">--cov</span><span class="o">=</span><span class="s">geminisdr</span>
+<span class="w">    </span><span class="na">--cov-report</span><span class="o">=</span><span class="s">html</span>
+<span class="w">    </span><span class="na">--cov-report</span><span class="o">=</span><span class="s">term-missing</span>
+<span class="w">    </span><span class="na">--cov-fail-under</span><span class="o">=</span><span class="s">90</span>
+<span class="na">markers</span><span class="w"> </span><span class="o">=</span>
+<span class="w">    </span><span class="na">unit</span><span class="o">:</span><span class="w"> </span><span class="s">Unit tests</span>
+<span class="w">    </span><span class="na">integration</span><span class="o">:</span><span class="w"> </span><span class="s">Integration tests</span>
+<span class="w">    </span><span class="na">performance</span><span class="o">:</span><span class="w"> </span><span class="s">Performance tests</span>
+<span class="w">    </span><span class="na">cross_platform</span><span class="o">:</span><span class="w"> </span><span class="s">Cross-platform tests</span>
+<span class="w">    </span><span class="na">slow</span><span class="o">:</span><span class="w"> </span><span class="s">Slow tests (&gt; 10 seconds)</span>
+<span class="w">    </span><span class="na">gpu</span><span class="o">:</span><span class="w"> </span><span class="s">Tests requiring GPU</span>
+<span class="w">    </span><span class="na">hardware</span><span class="o">:</span><span class="w"> </span><span class="s">Tests requiring hardware SDR</span>
+</pre></div>
+</div>
+</section>
+<section id="test-fixtures">
+<h3>Test Fixtures<a class="headerlink" href="#test-fixtures" title="Link to this heading"></a></h3>
+<p>Use fixtures for common test setup:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># tests/conftest.py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.config.config_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.config.config_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">SystemConfig</span>
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">temp_dir</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Provide a temporary directory for tests.&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp_dir</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">)</span>
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_config</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Provide a test configuration.&quot;&quot;&quot;</span>
+    <span class="n">config_manager</span> <span class="o">=</span> <span class="n">ConfigManager</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">config_manager</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="s2">&quot;test_config&quot;</span><span class="p">)</span>
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">mock_hardware</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Provide mock hardware for testing.&quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">unittest.mock</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mock</span>
+
+    <span class="n">mock_sdr</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+    <span class="n">mock_sdr</span><span class="o">.</span><span class="n">sample_rate</span> <span class="o">=</span> <span class="mf">2e6</span>
+    <span class="n">mock_sdr</span><span class="o">.</span><span class="n">center_freq</span> <span class="o">=</span> <span class="mf">100e6</span>
+    <span class="n">mock_sdr</span><span class="o">.</span><span class="n">gain</span> <span class="o">=</span> <span class="mi">20</span>
+
+    <span class="k">return</span> <span class="n">mock_sdr</span>
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s2">&quot;session&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">performance_baseline</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load performance baseline data.&quot;&quot;&quot;</span>
+    <span class="n">baseline_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;tests/data/performance_baseline.json&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">baseline_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">baseline_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{}</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="running-tests">
+<h2>Running Tests<a class="headerlink" href="#running-tests" title="Link to this heading"></a></h2>
+<section id="local-testing">
+<h3>Local Testing<a class="headerlink" href="#local-testing" title="Link to this heading"></a></h3>
+<p>Run different test categories:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run all tests</span>
+pytest
+
+<span class="c1"># Run only unit tests</span>
+pytest<span class="w"> </span>-m<span class="w"> </span>unit
+
+<span class="c1"># Run integration tests</span>
+pytest<span class="w"> </span>-m<span class="w"> </span>integration
+
+<span class="c1"># Run performance tests</span>
+pytest<span class="w"> </span>-m<span class="w"> </span>performance
+
+<span class="c1"># Run tests for specific module</span>
+pytest<span class="w"> </span>tests/unit/config/
+
+<span class="c1"># Run with coverage</span>
+pytest<span class="w"> </span>--cov<span class="o">=</span>geminisdr<span class="w"> </span>--cov-report<span class="o">=</span>html
+
+<span class="c1"># Run tests in parallel</span>
+pytest<span class="w"> </span>-n<span class="w"> </span>auto
+</pre></div>
+</div>
+</section>
+<section id="continuous-integration">
+<h3>Continuous Integration<a class="headerlink" href="#continuous-integration" title="Link to this heading"></a></h3>
+<p>The CI pipeline runs tests across multiple platforms:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># .github/workflows/test.yml</span>
+<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Test Suite</span>
+
+<span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">push</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">pull_request</span><span class="p p-Indicator">]</span>
+
+<span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">test-matrix</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">strategy</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">matrix</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">platform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">macos-latest</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">ubuntu-latest</span><span class="p p-Indicator">]</span>
+<span class="w">        </span><span class="nt">python-version</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">3.9</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">3.10</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">3.11</span><span class="p p-Indicator">]</span>
+
+<span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ matrix.platform }}</span>
+
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v3</span>
+
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Set up Python</span>
+<span class="w">        </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/setup-python@v4</span>
+<span class="w">        </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">python-version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ matrix.python-version }}</span>
+
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Install dependencies</span>
+<span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">          </span><span class="no">pip install -r requirements.txt</span>
+<span class="w">          </span><span class="no">pip install -r requirements-dev.txt</span>
+
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Run unit tests</span>
+<span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pytest -m unit</span>
+
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Run integration tests</span>
+<span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pytest -m integration</span>
+
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Upload coverage</span>
+<span class="w">        </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">codecov/codecov-action@v3</span>
+</pre></div>
+</div>
+</section>
+<section id="performance-testing">
+<h3>Performance Testing<a class="headerlink" href="#performance-testing" title="Link to this heading"></a></h3>
+<p>Performance tests run on a schedule to detect regressions:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># .github/workflows/performance.yml</span>
+<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Performance Tests</span>
+
+<span class="nt">on</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">schedule</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">cron</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;0</span><span class="nv"> </span><span class="s">2</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">*&#39;</span><span class="w">  </span><span class="c1"># Daily at 2 AM</span>
+<span class="w">  </span><span class="nt">workflow_dispatch</span><span class="p">:</span>
+
+<span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">performance</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
+
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v3</span>
+
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Set up Python</span>
+<span class="w">        </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/setup-python@v4</span>
+<span class="w">        </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">python-version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3.9</span>
+
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Install dependencies</span>
+<span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">          </span><span class="no">pip install -r requirements.txt</span>
+<span class="w">          </span><span class="no">pip install -r requirements-dev.txt</span>
+
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Run performance tests</span>
+<span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">          </span><span class="no">pytest -m performance --benchmark-json=benchmark.json</span>
+
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Compare with baseline</span>
+<span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">          </span><span class="no">python scripts/compare_benchmarks.py benchmark.json</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="test-data-management">
+<h2>Test Data Management<a class="headerlink" href="#test-data-management" title="Link to this heading"></a></h2>
+<section id="test-data-organization">
+<h3>Test Data Organization<a class="headerlink" href="#test-data-organization" title="Link to this heading"></a></h3>
+<p>Organize test data in a structured way:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>tests/
+├── data/
+│   ├── config/
+│   │   ├── valid_config.yaml
+│   │   ├── invalid_config.yaml
+│   │   └── test_environments/
+│   ├── models/
+│   │   ├── test_model_v1.pth
+│   │   └── metadata/
+│   ├── signals/
+│   │   ├── test_signal_bpsk.npy
+│   │   └── test_signal_qpsk.npy
+│   └── performance/
+│       └── baseline_metrics.json
+</pre></div>
+</div>
+</section>
+<section id="mock-data-generation">
+<h3>Mock Data Generation<a class="headerlink" href="#mock-data-generation" title="Link to this heading"></a></h3>
+<p>Generate realistic test data:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># tests/utils/data_generators.py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tuple</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_test_signal</span><span class="p">(</span>
+    <span class="n">modulation</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">,</span>
+    <span class="n">snr_db</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">20.0</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate test signal with specified modulation and SNR.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">modulation</span> <span class="o">==</span> <span class="s2">&quot;bpsk&quot;</span><span class="p">:</span>
+        <span class="c1"># Generate BPSK signal</span>
+        <span class="n">bits</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">num_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">symbols</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">bits</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># Map to {-1, 1}</span>
+
+        <span class="c1"># Add noise</span>
+        <span class="n">noise_power</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="n">snr_db</span> <span class="o">/</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">noise_power</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">symbols</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">symbols</span><span class="p">))</span>
+        <span class="p">)</span>
+
+        <span class="n">signal</span> <span class="o">=</span> <span class="n">symbols</span> <span class="o">+</span> <span class="n">noise</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">signal</span><span class="o">.</span><span class="n">real</span><span class="p">,</span> <span class="n">signal</span><span class="o">.</span><span class="n">imag</span><span class="p">])</span>
+
+    <span class="c1"># Add other modulation types as needed</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported modulation: </span><span class="si">{</span><span class="n">modulation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_test_dataset</span><span class="p">(</span>
+    <span class="n">size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
+    <span class="n">modulations</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a test dataset for training/validation.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">modulations</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">modulations</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;bpsk&quot;</span><span class="p">,</span> <span class="s2">&quot;qpsk&quot;</span><span class="p">,</span> <span class="s2">&quot;8psk&quot;</span><span class="p">,</span> <span class="s2">&quot;16qam&quot;</span><span class="p">]</span>
+
+    <span class="n">signals</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+        <span class="n">mod_idx</span> <span class="o">=</span> <span class="n">i</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">modulations</span><span class="p">)</span>
+        <span class="n">modulation</span> <span class="o">=</span> <span class="n">modulations</span><span class="p">[</span><span class="n">mod_idx</span><span class="p">]</span>
+
+        <span class="n">signal</span> <span class="o">=</span> <span class="n">generate_test_signal</span><span class="p">(</span><span class="n">modulation</span><span class="p">)</span>
+        <span class="n">signals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span>
+        <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mod_idx</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">signals</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="debugging-tests">
+<h2>Debugging Tests<a class="headerlink" href="#debugging-tests" title="Link to this heading"></a></h2>
+<section id="test-debugging-strategies">
+<h3>Test Debugging Strategies<a class="headerlink" href="#test-debugging-strategies" title="Link to this heading"></a></h3>
+<p>Use these strategies for debugging failing tests:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Add debug output</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_with_debug_output</span><span class="p">(</span><span class="n">capfd</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test with captured output for debugging.&quot;&quot;&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">my_function</span><span class="p">()</span>
+
+    <span class="c1"># Capture stdout/stderr</span>
+    <span class="n">captured</span> <span class="o">=</span> <span class="n">capfd</span><span class="o">.</span><span class="n">readouterr</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Debug output: </span><span class="si">{</span><span class="n">captured</span><span class="o">.</span><span class="n">out</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">result</span> <span class="o">==</span> <span class="n">expected</span>
+
+<span class="c1"># Use pytest fixtures for debugging</span>
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">debug_config</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration with debug logging enabled.&quot;&quot;&quot;</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">load_test_config</span><span class="p">()</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">logging</span><span class="o">.</span><span class="n">level</span> <span class="o">=</span> <span class="s2">&quot;DEBUG&quot;</span>
+    <span class="k">return</span> <span class="n">config</span>
+
+<span class="c1"># Conditional debugging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_with_conditional_debug</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test with conditional debug information.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;DEBUG_TESTS&quot;</span><span class="p">):</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pdb</span><span class="p">;</span> <span class="n">pdb</span><span class="o">.</span><span class="n">set_trace</span><span class="p">()</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">complex_function</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</section>
+<section id="test-isolation">
+<h3>Test Isolation<a class="headerlink" href="#test-isolation" title="Link to this heading"></a></h3>
+<p>Ensure tests don’t interfere with each other:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Use fresh instances</span>
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">fresh_manager</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Provide a fresh manager instance for each test.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">ModelManager</span><span class="p">(</span><span class="n">load_test_config</span><span class="p">())</span>
+
+<span class="c1"># Clean up after tests</span>
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">cleanup_files</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Clean up test files after test completion.&quot;&quot;&quot;</span>
+    <span class="n">test_files</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">yield</span> <span class="n">test_files</span>
+
+    <span class="c1"># Cleanup</span>
+    <span class="k">for</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="n">test_files</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">Path</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">Path</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="best-practices">
+<h2>Best Practices<a class="headerlink" href="#best-practices" title="Link to this heading"></a></h2>
+<section id="test-writing-guidelines">
+<h3>Test Writing Guidelines<a class="headerlink" href="#test-writing-guidelines" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Test One Thing</strong>: Each test should verify one specific behavior</p></li>
+<li><p><strong>Clear Names</strong>: Test names should describe what is being tested</p></li>
+<li><p><strong>Arrange-Act-Assert</strong>: Structure tests with clear setup, execution, and verification</p></li>
+<li><p><strong>Independent Tests</strong>: Tests should not depend on each other</p></li>
+<li><p><strong>Realistic Data</strong>: Use realistic test data that represents actual usage</p></li>
+</ol>
+</section>
+<section id="performance-considerations">
+<h3>Performance Considerations<a class="headerlink" href="#performance-considerations" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Fast Unit Tests</strong>: Keep unit tests under 1 second each</p></li>
+<li><p><strong>Parallel Execution</strong>: Design tests to run in parallel safely</p></li>
+<li><p><strong>Resource Cleanup</strong>: Always clean up resources (files, memory, connections)</p></li>
+<li><p><strong>Mock External Dependencies</strong>: Mock slow external services and hardware</p></li>
+</ol>
+</section>
+<section id="maintenance">
+<h3>Maintenance<a class="headerlink" href="#maintenance" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Regular Updates</strong>: Update tests when code changes</p></li>
+<li><p><strong>Remove Obsolete Tests</strong>: Remove tests for deprecated functionality</p></li>
+<li><p><strong>Performance Monitoring</strong>: Monitor test execution time and optimize slow tests</p></li>
+<li><p><strong>Documentation</strong>: Keep test documentation up to date</p></li>
+</ol>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="coding_standards.html" class="btn btn-neutral float-left" title="Coding Standards" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="debugging.html" class="btn btn-neutral float-right" title="Debugging and Troubleshooting" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, GeminiSDR Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

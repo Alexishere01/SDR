@@ -1,0 +1,518 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>M1 Mac Installation Guide &mdash; GeminiSDR 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Linux VM Installation Guide" href="linux_vm.html" />
+    <link rel="prev" title="Installation Guides" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            GeminiSDR
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">User Guides</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Installation Guides</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">M1 Mac Installation Guide</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#installation-steps">Installation Steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#verification">Verification</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#performance-optimization">Performance Optimization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#development-workflow">Development Workflow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#next-steps">Next Steps</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="linux_vm.html">Linux VM Installation Guide</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cuda_cluster.html">CUDA Cluster Installation Guide</a></li>
+<li class="toctree-l3"><a class="reference internal" href="index.html#quick-platform-selection">Quick Platform Selection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="index.html#detailed-installation-guides">Detailed Installation Guides</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../troubleshooting.html">Troubleshooting Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../performance_optimization.html">Performance Optimization Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#installation-guides">Installation Guides</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#essential-guides">Essential Guides</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#quick-start">Quick Start</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../architecture/index.html">System Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/index.html">Examples and Tutorials</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">GeminiSDR</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">User Guides</a></li>
+          <li class="breadcrumb-item"><a href="index.html">Installation Guides</a></li>
+      <li class="breadcrumb-item active">M1 Mac Installation Guide</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/guides/installation/m1_mac.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="m1-mac-installation-guide">
+<h1>M1 Mac Installation Guide<a class="headerlink" href="#m1-mac-installation-guide" title="Link to this heading"></a></h1>
+<p>This guide provides detailed installation instructions for GeminiSDR on Apple Silicon (M1/M2) Mac systems.</p>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading"></a></h2>
+<section id="system-requirements">
+<h3>System Requirements<a class="headerlink" href="#system-requirements" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Hardware</strong>: Apple Silicon Mac (M1, M1 Pro, M1 Max, M1 Ultra, M2, M2 Pro, M2 Max)</p></li>
+<li><p><strong>Operating System</strong>: macOS 12.0 (Monterey) or later</p></li>
+<li><p><strong>Memory</strong>: 8GB RAM minimum, 16GB recommended</p></li>
+<li><p><strong>Storage</strong>: 5GB free space for installation and models</p></li>
+</ul>
+</section>
+<section id="required-software">
+<h3>Required Software<a class="headerlink" href="#required-software" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Homebrew</strong>: Package manager for macOS</p></li>
+<li><p><strong>Python 3.9+</strong>: Python interpreter</p></li>
+<li><p><strong>Xcode Command Line Tools</strong>: Development tools</p></li>
+</ul>
+</section>
+</section>
+<section id="installation-steps">
+<h2>Installation Steps<a class="headerlink" href="#installation-steps" title="Link to this heading"></a></h2>
+<section id="install-homebrew">
+<h3>1. Install Homebrew<a class="headerlink" href="#install-homebrew" title="Link to this heading"></a></h3>
+<p>If you don’t have Homebrew installed:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>/bin/bash<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh<span class="k">)</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="install-system-dependencies">
+<h3>2. Install System Dependencies<a class="headerlink" href="#install-system-dependencies" title="Link to this heading"></a></h3>
+<p>Install required system packages:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install Python and development tools</span>
+brew<span class="w"> </span>install<span class="w"> </span>python@3.11
+brew<span class="w"> </span>install<span class="w"> </span>cmake
+brew<span class="w"> </span>install<span class="w"> </span>pkg-config
+brew<span class="w"> </span>install<span class="w"> </span>portaudio
+brew<span class="w"> </span>install<span class="w"> </span>fftw
+
+<span class="c1"># Install SDR libraries</span>
+brew<span class="w"> </span>install<span class="w"> </span>librtlsdr
+brew<span class="w"> </span>install<span class="w"> </span>hackrf
+brew<span class="w"> </span>install<span class="w"> </span>airspy
+brew<span class="w"> </span>install<span class="w"> </span>soapysdr
+
+<span class="c1"># Install optional dependencies</span>
+brew<span class="w"> </span>install<span class="w"> </span>graphviz<span class="w">  </span><span class="c1"># For documentation diagrams</span>
+</pre></div>
+</div>
+</section>
+<section id="create-virtual-environment">
+<h3>3. Create Virtual Environment<a class="headerlink" href="#create-virtual-environment" title="Link to this heading"></a></h3>
+<p>Create and activate a Python virtual environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create virtual environment</span>
+python3.11<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>geminisdr-env
+
+<span class="c1"># Activate virtual environment</span>
+<span class="nb">source</span><span class="w"> </span>geminisdr-env/bin/activate
+
+<span class="c1"># Upgrade pip</span>
+pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pip
+</pre></div>
+</div>
+</section>
+<section id="install-pytorch-with-mps-support">
+<h3>4. Install PyTorch with MPS Support<a class="headerlink" href="#install-pytorch-with-mps-support" title="Link to this heading"></a></h3>
+<p>Install PyTorch with Metal Performance Shaders (MPS) support:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install PyTorch with MPS support</span>
+pip<span class="w"> </span>install<span class="w"> </span>torch<span class="w"> </span>torchvision<span class="w"> </span>torchaudio
+
+<span class="c1"># Verify MPS availability</span>
+python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import torch; print(f&#39;MPS available: {torch.backends.mps.is_available()}&#39;)&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="install-geminisdr">
+<h3>5. Install GeminiSDR<a class="headerlink" href="#install-geminisdr" title="Link to this heading"></a></h3>
+<p>Clone and install GeminiSDR:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Clone repository</span>
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/your-org/geminisdr.git
+<span class="nb">cd</span><span class="w"> </span>geminisdr
+
+<span class="c1"># Install in development mode</span>
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+
+<span class="c1"># Install additional dependencies</span>
+pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements-dev.txt
+</pre></div>
+</div>
+</section>
+<section id="configure-for-m1-mac">
+<h3>6. Configure for M1 Mac<a class="headerlink" href="#configure-for-m1-mac" title="Link to this heading"></a></h3>
+<p>Create M1-specific configuration:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Copy M1 configuration template</span>
+cp<span class="w"> </span>conf/hardware/m1_native.yaml<span class="w"> </span>conf/local_config.yaml
+
+<span class="c1"># Edit configuration if needed</span>
+nano<span class="w"> </span>conf/local_config.yaml
+</pre></div>
+</div>
+<p>Example M1 configuration:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># M1 Mac optimized configuration</span>
+<span class="nt">hardware</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">device_preference</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mps&quot;</span><span class="w">  </span><span class="c1"># Use Metal Performance Shaders</span>
+<span class="w">  </span><span class="nt">memory_optimization</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;unified&quot;</span><span class="w">  </span><span class="c1"># Leverage unified memory</span>
+<span class="w">  </span><span class="nt">sdr_mode</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;auto&quot;</span><span class="w">  </span><span class="c1"># Auto-detect SDR hardware</span>
+
+<span class="nt">ml</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">batch_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span><span class="w">  </span><span class="c1"># Auto-optimize for unified memory</span>
+<span class="w">  </span><span class="nt">precision</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;float16&quot;</span><span class="w">  </span><span class="c1"># Use half precision for memory efficiency</span>
+<span class="w">  </span><span class="nt">model_cache_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span><span class="w">  </span><span class="c1"># Larger cache due to unified memory</span>
+
+<span class="nt">performance</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">memory_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.85</span><span class="w">  </span><span class="c1"># Higher threshold for unified memory</span>
+<span class="w">  </span><span class="nt">auto_optimize</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">  </span><span class="nt">profiling_enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="verification">
+<h2>Verification<a class="headerlink" href="#verification" title="Link to this heading"></a></h2>
+<section id="test-installation">
+<h3>Test Installation<a class="headerlink" href="#test-installation" title="Link to this heading"></a></h3>
+<p>Verify the installation works correctly:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Test basic functionality</span>
+python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;</span>
+<span class="s2">from geminisdr.config.config_manager import ConfigManager</span>
+<span class="s2">from geminisdr.environments.hardware_abstraction import HardwareAbstraction</span>
+
+<span class="s2"># Load configuration</span>
+<span class="s2">config_manager = ConfigManager()</span>
+<span class="s2">config = config_manager.load_config()</span>
+<span class="s2">print(f&#39;Configuration loaded: {config.hardware.device_preference}&#39;)</span>
+
+<span class="s2"># Test hardware detection</span>
+<span class="s2">hw_abstraction = HardwareAbstraction(config)</span>
+<span class="s2">device = hw_abstraction.detect_optimal_device()</span>
+<span class="s2">print(f&#39;Optimal device: {device}&#39;)</span>
+<span class="s2">&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="run-test-suite">
+<h3>Run Test Suite<a class="headerlink" href="#run-test-suite" title="Link to this heading"></a></h3>
+<p>Run the test suite to ensure everything works:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run unit tests</span>
+pytest<span class="w"> </span>tests/unit/<span class="w"> </span>-v
+
+<span class="c1"># Run M1-specific tests</span>
+pytest<span class="w"> </span>tests/cross_platform/<span class="w"> </span>-k<span class="w"> </span><span class="s2">&quot;m1&quot;</span><span class="w"> </span>-v
+
+<span class="c1"># Run performance tests</span>
+pytest<span class="w"> </span>tests/performance/<span class="w"> </span>-v<span class="w"> </span>--benchmark-only
+</pre></div>
+</div>
+</section>
+</section>
+<section id="performance-optimization">
+<h2>Performance Optimization<a class="headerlink" href="#performance-optimization" title="Link to this heading"></a></h2>
+<section id="m1-specific-optimizations">
+<h3>M1-Specific Optimizations<a class="headerlink" href="#m1-specific-optimizations" title="Link to this heading"></a></h3>
+<p>Enable M1-specific optimizations:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># In your training scripts</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+
+<span class="c1"># Enable MPS optimizations</span>
+<span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;mps&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Enable Metal Performance Shaders optimizations</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">allow_tf32</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="c1"># Set memory fraction for unified memory</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">set_per_process_memory_fraction</span><span class="p">(</span><span class="mf">0.8</span><span class="p">)</span>
+
+<span class="c1"># Move model to MPS device</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="memory-management">
+<h3>Memory Management<a class="headerlink" href="#memory-management" title="Link to this heading"></a></h3>
+<p>Optimize memory usage for unified memory architecture:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.core.memory_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">MemoryManager</span>
+
+<span class="c1"># Initialize memory manager</span>
+<span class="n">memory_manager</span> <span class="o">=</span> <span class="n">MemoryManager</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+<span class="c1"># Use memory-efficient context for large operations</span>
+<span class="k">with</span> <span class="n">memory_manager</span><span class="o">.</span><span class="n">memory_efficient_context</span><span class="p">():</span>
+    <span class="c1"># Training or inference code</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">large_batch</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="batch-size-optimization">
+<h3>Batch Size Optimization<a class="headerlink" href="#batch-size-optimization" title="Link to this heading"></a></h3>
+<p>Let the system automatically optimize batch sizes:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Automatic batch size optimization</span>
+<span class="n">optimal_batch_size</span> <span class="o">=</span> <span class="n">memory_manager</span><span class="o">.</span><span class="n">optimize_batch_size</span><span class="p">(</span>
+    <span class="n">base_batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+    <span class="n">model_size_mb</span><span class="o">=</span><span class="mi">500</span>  <span class="c1"># Estimated model size</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Optimal batch size for M1: </span><span class="si">{</span><span class="n">optimal_batch_size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading"></a></h2>
+<section id="common-issues">
+<h3>Common Issues<a class="headerlink" href="#common-issues" title="Link to this heading"></a></h3>
+<p><strong>Issue</strong>: MPS not available</p>
+<blockquote>
+<div><p><strong>Solution</strong>: Ensure you have macOS 12.3+ and PyTorch 1.12+:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Check macOS version</span>
+sw_vers
+
+<span class="c1"># Check PyTorch version</span>
+python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import torch; print(torch.__version__)&quot;</span>
+
+<span class="c1"># Reinstall PyTorch if needed</span>
+pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>torch<span class="w"> </span>torchvision<span class="w"> </span>torchaudio
+</pre></div>
+</div>
+</div></blockquote>
+<p><strong>Issue</strong>: SDR device not detected</p>
+<blockquote>
+<div><p><strong>Solution</strong>: Check USB permissions and drivers:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Check connected USB devices</span>
+system_profiler<span class="w"> </span>SPUSBDataType
+
+<span class="c1"># Test RTL-SDR specifically</span>
+rtl_test
+
+<span class="c1"># Check SoapySDR modules</span>
+SoapySDRUtil<span class="w"> </span>--find
+</pre></div>
+</div>
+</div></blockquote>
+<p><strong>Issue</strong>: Memory errors during training</p>
+<blockquote>
+<div><p><strong>Solution</strong>: Reduce batch size or enable memory optimization:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># In configuration file</span>
+<span class="nt">ml</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">batch_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">32</span><span class="w">  </span><span class="c1"># Reduce from default</span>
+
+<span class="nt">performance</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">memory_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.7</span><span class="w">  </span><span class="c1"># Lower threshold</span>
+<span class="w">  </span><span class="nt">auto_optimize</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p><strong>Issue</strong>: Slow training performance</p>
+<blockquote>
+<div><p><strong>Solution</strong>: Verify MPS is being used and optimize settings:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Check device usage</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Current device: </span><span class="si">{</span><span class="nb">next</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span><span class="o">.</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Enable optimizations</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">allow_tf32</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+</div></blockquote>
+</section>
+<section id="performance-benchmarks">
+<h3>Performance Benchmarks<a class="headerlink" href="#performance-benchmarks" title="Link to this heading"></a></h3>
+<p>Expected performance on different M1 variants:</p>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">M1 Performance Benchmarks</span><a class="headerlink" href="#id1" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Model</p></th>
+<th class="head"><p>M1 (8-core)</p></th>
+<th class="head"><p>M1 Pro (10-core)</p></th>
+<th class="head"><p>M1 Max (32-core)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Neural AMR Training</p></td>
+<td><p>45 samples/sec</p></td>
+<td><p>65 samples/sec</p></td>
+<td><p>120 samples/sec</p></td>
+</tr>
+<tr class="row-odd"><td><p>Inference Latency</p></td>
+<td><p>15ms</p></td>
+<td><p>12ms</p></td>
+<td><p>8ms</p></td>
+</tr>
+<tr class="row-even"><td><p>Memory Usage</p></td>
+<td><p>4-6GB</p></td>
+<td><p>6-8GB</p></td>
+<td><p>8-12GB</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="development-workflow">
+<h2>Development Workflow<a class="headerlink" href="#development-workflow" title="Link to this heading"></a></h2>
+<section id="recommended-setup">
+<h3>Recommended Setup<a class="headerlink" href="#recommended-setup" title="Link to this heading"></a></h3>
+<p>For development on M1 Mac:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install development tools</span>
+brew<span class="w"> </span>install<span class="w"> </span>git-lfs
+brew<span class="w"> </span>install<span class="w"> </span>pre-commit
+
+<span class="c1"># Set up pre-commit hooks</span>
+pre-commit<span class="w"> </span>install
+
+<span class="c1"># Configure Git for large files</span>
+git<span class="w"> </span>lfs<span class="w"> </span>track<span class="w"> </span><span class="s2">&quot;*.pth&quot;</span>
+git<span class="w"> </span>lfs<span class="w"> </span>track<span class="w"> </span><span class="s2">&quot;*.model&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="ide-configuration">
+<h3>IDE Configuration<a class="headerlink" href="#ide-configuration" title="Link to this heading"></a></h3>
+<p><strong>VS Code Setup</strong>:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;python.defaultInterpreterPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;./geminisdr-env/bin/python&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;python.terminal.activateEnvironment&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;python.testing.pytestEnabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;python.testing.pytestArgs&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;tests/&quot;</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;python.linting.enabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;python.linting.flake8Enabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;python.formatting.provider&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;black&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>PyCharm Setup</strong>:</p>
+<ol class="arabic simple">
+<li><p>Set Python interpreter to <code class="docutils literal notranslate"><span class="pre">./geminisdr-env/bin/python</span></code></p></li>
+<li><p>Enable pytest as test runner</p></li>
+<li><p>Configure code style to use Black formatter</p></li>
+<li><p>Set up run configurations for common tasks</p></li>
+</ol>
+</section>
+<section id="monitoring-and-profiling">
+<h3>Monitoring and Profiling<a class="headerlink" href="#monitoring-and-profiling" title="Link to this heading"></a></h3>
+<p>Monitor system performance during development:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Monitor GPU usage</span>
+sudo<span class="w"> </span>powermetrics<span class="w"> </span>--samplers<span class="w"> </span>gpu_power<span class="w"> </span>-n<span class="w"> </span><span class="m">1</span><span class="w"> </span>-i<span class="w"> </span><span class="m">1000</span>
+
+<span class="c1"># Monitor memory usage</span>
+memory_pressure
+
+<span class="c1"># Profile Python code</span>
+python<span class="w"> </span>-m<span class="w"> </span>cProfile<span class="w"> </span>-o<span class="w"> </span>profile.stats<span class="w"> </span>your_script.py
+python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import pstats; pstats.Stats(&#39;profile.stats&#39;).sort_stats(&#39;cumulative&#39;).print_stats(10)&quot;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="next-steps">
+<h2>Next Steps<a class="headerlink" href="#next-steps" title="Link to this heading"></a></h2>
+<p>After successful installation:</p>
+<ol class="arabic simple">
+<li><p><strong>Read the Quick Start Guide</strong>: <a class="reference internal" href="../quickstart/getting_started.html"><span class="doc">Getting Started</span></a></p></li>
+<li><p><strong>Explore Examples</strong>: <a class="reference internal" href="../../examples/index.html"><span class="doc">Examples and Tutorials</span></a></p></li>
+<li><p><strong>Review API Documentation</strong>: <a class="reference internal" href="../../api/index.html"><span class="doc">API Reference</span></a></p></li>
+<li><p><strong>Join the Community</strong>: Check GitHub discussions and issues</p></li>
+</ol>
+<p>For advanced usage and optimization, see:</p>
+<ul class="simple">
+<li><p><span class="xref std std-doc">../advanced/performance_tuning</span></p></li>
+<li><p><span class="xref std std-doc">../advanced/ml_optimization</span></p></li>
+<li><p><a class="reference internal" href="../../development/index.html"><span class="doc">Developer Guide</span></a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Installation Guides" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="linux_vm.html" class="btn btn-neutral float-right" title="Linux VM Installation Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, GeminiSDR Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

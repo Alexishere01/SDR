@@ -1,0 +1,555 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>environments.platform_detector &mdash; GeminiSDR 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            GeminiSDR
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">User Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../architecture/index.html">System Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/index.html">Examples and Tutorials</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">GeminiSDR</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">environments.platform_detector</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for environments.platform_detector</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Platform detection system for dual environment setup.</span>
+
+<span class="sd">This module provides automatic platform detection, hardware capability detection,</span>
+<span class="sd">and platform validation functions for M1 Mac and Ubuntu VM environments.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">platform</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">psutil</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">importlib.util</span>
+
+
+<div class="viewcode-block" id="PlatformInfo">
+<a class="viewcode-back" href="../../api/environments/environments.platform_detector.html#environments.platform_detector.PlatformInfo">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PlatformInfo</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Information about the detected platform.&quot;&quot;&quot;</span>
+    <span class="n">platform</span><span class="p">:</span> <span class="nb">str</span>           <span class="c1"># &#39;m1_native&#39; | &#39;vm_ubuntu&#39; | &#39;unknown&#39;</span>
+    <span class="n">architecture</span><span class="p">:</span> <span class="nb">str</span>       <span class="c1"># &#39;arm64&#39; | &#39;x86_64&#39;</span>
+    <span class="n">has_mps</span><span class="p">:</span> <span class="nb">bool</span>          <span class="c1"># Metal Performance Shaders available</span>
+    <span class="n">has_sdr</span><span class="p">:</span> <span class="nb">bool</span>          <span class="c1"># Physical SDR hardware available</span>
+    <span class="n">python_version</span><span class="p">:</span> <span class="nb">str</span>    <span class="c1"># Python version string</span>
+    <span class="n">recommended_packages</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>  <span class="c1"># Platform-specific packages</span></div>
+
+
+
+<div class="viewcode-block" id="PlatformCapabilities">
+<a class="viewcode-back" href="../../api/environments/environments.platform_detector.html#environments.platform_detector.PlatformCapabilities">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PlatformCapabilities</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Hardware capabilities of the detected platform.&quot;&quot;&quot;</span>
+    <span class="n">compute_devices</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>   <span class="c1"># Available compute devices</span>
+    <span class="n">max_memory</span><span class="p">:</span> <span class="nb">int</span>             <span class="c1"># Maximum available memory in MB</span>
+    <span class="n">cpu_cores</span><span class="p">:</span> <span class="nb">int</span>              <span class="c1"># Number of CPU cores</span>
+    <span class="n">gpu_memory</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>   <span class="c1"># GPU memory if available in MB</span>
+    <span class="n">sdr_hardware</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>     <span class="c1"># Available SDR devices</span>
+    <span class="n">supported_sample_rates</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>  <span class="c1"># Supported sample rates</span></div>
+
+
+
+<div class="viewcode-block" id="PlatformDetector">
+<a class="viewcode-back" href="../../api/environments/environments.platform_detector.html#environments.platform_detector.PlatformDetector">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PlatformDetector</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Platform detection and validation system.</span>
+<span class="sd">    </span>
+<span class="sd">    Automatically detects M1 Mac vs Ubuntu VM environments and provides</span>
+<span class="sd">    hardware capability information for optimal environment setup.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+<div class="viewcode-block" id="PlatformDetector.__init__">
+<a class="viewcode-back" href="../../api/environments/environments.platform_detector.html#environments.platform_detector.PlatformDetector.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_platform_info</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_capabilities</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+    
+<div class="viewcode-block" id="PlatformDetector.detect_platform">
+<a class="viewcode-back" href="../../api/environments/environments.platform_detector.html#environments.platform_detector.PlatformDetector.detect_platform">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">detect_platform</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Detect the current platform.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str: &#39;m1_native&#39;, &#39;vm_ubuntu&#39;, or &#39;unknown&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">system</span> <span class="o">=</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span>
+        <span class="n">machine</span> <span class="o">=</span> <span class="n">platform</span><span class="o">.</span><span class="n">machine</span><span class="p">()</span>
+        
+        <span class="k">if</span> <span class="n">system</span> <span class="o">==</span> <span class="s2">&quot;Darwin&quot;</span> <span class="ow">and</span> <span class="n">machine</span> <span class="o">==</span> <span class="s2">&quot;arm64&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;m1_native&quot;</span>
+        <span class="k">elif</span> <span class="n">system</span> <span class="o">==</span> <span class="s2">&quot;Linux&quot;</span> <span class="ow">and</span> <span class="n">machine</span> <span class="o">==</span> <span class="s2">&quot;x86_64&quot;</span><span class="p">:</span>
+            <span class="c1"># Additional check to distinguish VM from native Linux</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_vm_environment</span><span class="p">():</span>
+                <span class="k">return</span> <span class="s2">&quot;vm_ubuntu&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s2">&quot;vm_ubuntu&quot;</span>  <span class="c1"># Treat all Linux x86_64 as VM for this project</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;unknown&quot;</span></div>
+
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_is_vm_environment</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if running in a virtual machine environment.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if running in VM</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Check for common VM indicators</span>
+            <span class="n">vm_indicators</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s2">&quot;/proc/cpuinfo&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;/sys/class/dmi/id/product_name&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;/sys/class/dmi/id/sys_vendor&quot;</span>
+            <span class="p">]</span>
+            
+            <span class="k">for</span> <span class="n">indicator_file</span> <span class="ow">in</span> <span class="n">vm_indicators</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">indicator_file</span><span class="p">):</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">indicator_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                            <span class="n">content</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">vm_name</span> <span class="ow">in</span> <span class="n">content</span> <span class="k">for</span> <span class="n">vm_name</span> <span class="ow">in</span> 
+                                   <span class="p">[</span><span class="s1">&#39;vmware&#39;</span><span class="p">,</span> <span class="s1">&#39;virtualbox&#39;</span><span class="p">,</span> <span class="s1">&#39;qemu&#39;</span><span class="p">,</span> <span class="s1">&#39;kvm&#39;</span><span class="p">,</span> <span class="s1">&#39;xen&#39;</span><span class="p">,</span> <span class="s1">&#39;hyperv&#39;</span><span class="p">]):</span>
+                                <span class="k">return</span> <span class="kc">True</span>
+                    <span class="k">except</span> <span class="p">(</span><span class="ne">IOError</span><span class="p">,</span> <span class="ne">PermissionError</span><span class="p">):</span>
+                        <span class="k">continue</span>
+            
+            <span class="c1"># Check for VM-specific environment variables</span>
+            <span class="n">vm_env_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;VIRTUAL_ENV&#39;</span><span class="p">,</span> <span class="s1">&#39;VM_NAME&#39;</span><span class="p">,</span> <span class="s1">&#39;VMWARE_TOOLS&#39;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">vm_env_vars</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">var</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+                    
+            <span class="k">return</span> <span class="kc">False</span>
+            
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="c1"># If we can&#39;t determine, assume VM for safety</span>
+            <span class="k">return</span> <span class="kc">True</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_mps_availability</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if Metal Performance Shaders (MPS) is available.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if MPS is available</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Check if PyTorch is available and has MPS support</span>
+            <span class="n">torch_spec</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="s2">&quot;torch&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">torch_spec</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+                
+            <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+            <span class="k">return</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="p">,</span> <span class="s1">&#39;mps&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span>
+            
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ImportError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
+            <span class="c1"># If PyTorch not installed or no MPS support, check system</span>
+            <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;Darwin&quot;</span> <span class="ow">and</span> <span class="n">platform</span><span class="o">.</span><span class="n">machine</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;arm64&quot;</span><span class="p">:</span>
+                <span class="c1"># M1 Macs should support MPS, but we can&#39;t verify without PyTorch</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_detect_sdr_hardware</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Detect available SDR hardware.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple[bool, List[str]]: (has_sdr, list_of_devices)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sdr_devices</span> <span class="o">=</span> <span class="p">[]</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Check for common SDR devices via USB</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s1">&#39;/dev&#39;</span><span class="p">):</span>
+                <span class="c1"># Look for common SDR device patterns</span>
+                <span class="kn">import</span><span class="w"> </span><span class="nn">glob</span>
+                
+                <span class="c1"># RTL-SDR devices</span>
+                <span class="n">rtl_devices</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;/dev/bus/usb/*/*&#39;</span><span class="p">)</span>
+                <span class="c1"># This is a simplified check - in practice, you&#39;d check USB vendor/product IDs</span>
+                
+                <span class="c1"># PlutoSDR devices (if connected via USB)</span>
+                <span class="n">pluto_devices</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;/dev/ttyACM*&#39;</span><span class="p">)</span>
+                
+                <span class="c1"># HackRF devices</span>
+                <span class="n">hackrf_devices</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;/dev/ttyUSB*&#39;</span><span class="p">)</span>
+                
+                <span class="k">if</span> <span class="n">rtl_devices</span><span class="p">:</span>
+                    <span class="n">sdr_devices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;RTL-SDR&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">pluto_devices</span><span class="p">:</span>
+                    <span class="n">sdr_devices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;PlutoSDR&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">hackrf_devices</span><span class="p">:</span>
+                    <span class="n">sdr_devices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;HackRF&#39;</span><span class="p">)</span>
+            
+            <span class="c1"># Try to detect via software libraries if available</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Check if SoapySDR is available</span>
+                <span class="n">soapy_spec</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="s2">&quot;SoapySDR&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">soapy_spec</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="kn">import</span><span class="w"> </span><span class="nn">SoapySDR</span>
+                    <span class="n">devices</span> <span class="o">=</span> <span class="n">SoapySDR</span><span class="o">.</span><span class="n">Device</span><span class="o">.</span><span class="n">enumerate</span><span class="p">()</span>
+                    <span class="k">for</span> <span class="n">device</span> <span class="ow">in</span> <span class="n">devices</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="s1">&#39;driver&#39;</span> <span class="ow">in</span> <span class="n">device</span><span class="p">:</span>
+                            <span class="n">sdr_devices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">device</span><span class="p">[</span><span class="s1">&#39;driver&#39;</span><span class="p">])</span>
+            <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+                <span class="k">pass</span>
+                
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="c1"># If detection fails, assume no hardware</span>
+            <span class="k">pass</span>
+        
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">sdr_devices</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sdr_devices</span>
+    
+<div class="viewcode-block" id="PlatformDetector.get_hardware_capabilities">
+<a class="viewcode-back" href="../../api/environments/environments.platform_detector.html#environments.platform_detector.PlatformDetector.get_hardware_capabilities">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_hardware_capabilities</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlatformCapabilities</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get detailed hardware capabilities.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            PlatformCapabilities: Hardware capability information</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_capabilities</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_capabilities</span>
+        
+        <span class="c1"># Get basic system info</span>
+        <span class="n">cpu_cores</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">(</span><span class="n">logical</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">1</span>
+        <span class="n">memory_mb</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">psutil</span><span class="o">.</span><span class="n">virtual_memory</span><span class="p">()</span><span class="o">.</span><span class="n">total</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">))</span>
+        
+        <span class="c1"># Detect compute devices</span>
+        <span class="n">compute_devices</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cpu&#39;</span><span class="p">]</span>
+        <span class="n">gpu_memory</span> <span class="o">=</span> <span class="kc">None</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_mps_availability</span><span class="p">():</span>
+            <span class="n">compute_devices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;mps&#39;</span><span class="p">)</span>
+            <span class="c1"># M1 Macs have unified memory, so GPU memory is shared with system</span>
+            <span class="n">gpu_memory</span> <span class="o">=</span> <span class="n">memory_mb</span>
+        
+        <span class="c1"># Check for CUDA (unlikely in our target environments but good to check)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">cuda_spec</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="s2">&quot;torch&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">cuda_spec</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+                <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+                    <span class="n">compute_devices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span>
+                    <span class="n">gpu_memory</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_device_properties</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">total_memory</span> <span class="o">//</span> <span class="p">(</span><span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ImportError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
+            <span class="k">pass</span>
+        
+        <span class="c1"># Detect SDR hardware</span>
+        <span class="n">has_sdr</span><span class="p">,</span> <span class="n">sdr_devices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_detect_sdr_hardware</span><span class="p">()</span>
+        
+        <span class="c1"># Determine supported sample rates based on platform</span>
+        <span class="k">if</span> <span class="n">has_sdr</span><span class="p">:</span>
+            <span class="c1"># Real hardware - typical SDR sample rates</span>
+            <span class="n">sample_rates</span> <span class="o">=</span> <span class="p">[</span><span class="mi">250000</span><span class="p">,</span> <span class="mi">1000000</span><span class="p">,</span> <span class="mi">2000000</span><span class="p">,</span> <span class="mi">2400000</span><span class="p">,</span> <span class="mi">3200000</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Simulation mode - flexible sample rates</span>
+            <span class="n">sample_rates</span> <span class="o">=</span> <span class="p">[</span><span class="mi">250000</span><span class="p">,</span> <span class="mi">1000000</span><span class="p">,</span> <span class="mi">2000000</span><span class="p">]</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_capabilities</span> <span class="o">=</span> <span class="n">PlatformCapabilities</span><span class="p">(</span>
+            <span class="n">compute_devices</span><span class="o">=</span><span class="n">compute_devices</span><span class="p">,</span>
+            <span class="n">max_memory</span><span class="o">=</span><span class="n">memory_mb</span><span class="p">,</span>
+            <span class="n">cpu_cores</span><span class="o">=</span><span class="n">cpu_cores</span><span class="p">,</span>
+            <span class="n">gpu_memory</span><span class="o">=</span><span class="n">gpu_memory</span><span class="p">,</span>
+            <span class="n">sdr_hardware</span><span class="o">=</span><span class="n">sdr_devices</span><span class="p">,</span>
+            <span class="n">supported_sample_rates</span><span class="o">=</span><span class="n">sample_rates</span>
+        <span class="p">)</span>
+        
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_capabilities</span></div>
+
+    
+<div class="viewcode-block" id="PlatformDetector.get_platform_info">
+<a class="viewcode-back" href="../../api/environments/environments.platform_detector.html#environments.platform_detector.PlatformDetector.get_platform_info">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_platform_info</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlatformInfo</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get comprehensive platform information.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            PlatformInfo: Complete platform information</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_platform_info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_platform_info</span>
+        
+        <span class="n">platform_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">detect_platform</span><span class="p">()</span>
+        <span class="n">architecture</span> <span class="o">=</span> <span class="n">platform</span><span class="o">.</span><span class="n">machine</span><span class="p">()</span>
+        <span class="n">has_mps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_mps_availability</span><span class="p">()</span>
+        <span class="n">has_sdr</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_detect_sdr_hardware</span><span class="p">()</span>
+        <span class="n">python_version</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="o">.</span><span class="n">major</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="o">.</span><span class="n">minor</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="o">.</span><span class="n">micro</span><span class="si">}</span><span class="s2">&quot;</span>
+        
+        <span class="c1"># Get platform-specific package recommendations</span>
+        <span class="n">recommended_packages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_recommended_packages</span><span class="p">(</span><span class="n">platform_type</span><span class="p">,</span> <span class="n">has_mps</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_platform_info</span> <span class="o">=</span> <span class="n">PlatformInfo</span><span class="p">(</span>
+            <span class="n">platform</span><span class="o">=</span><span class="n">platform_type</span><span class="p">,</span>
+            <span class="n">architecture</span><span class="o">=</span><span class="n">architecture</span><span class="p">,</span>
+            <span class="n">has_mps</span><span class="o">=</span><span class="n">has_mps</span><span class="p">,</span>
+            <span class="n">has_sdr</span><span class="o">=</span><span class="n">has_sdr</span><span class="p">,</span>
+            <span class="n">python_version</span><span class="o">=</span><span class="n">python_version</span><span class="p">,</span>
+            <span class="n">recommended_packages</span><span class="o">=</span><span class="n">recommended_packages</span>
+        <span class="p">)</span>
+        
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_platform_info</span></div>
+
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_recommended_packages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">platform_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">has_mps</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get recommended packages for the platform.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            platform_type: The detected platform type</span>
+<span class="sd">            has_mps: Whether MPS is available</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            List[str]: Recommended package specifications</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">platform_type</span> <span class="o">==</span> <span class="s2">&quot;m1_native&quot;</span><span class="p">:</span>
+            <span class="n">packages</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s2">&quot;torch&gt;=2.0.0&quot;</span><span class="p">,</span>  <span class="c1"># MPS-enabled PyTorch</span>
+                <span class="s2">&quot;numpy&gt;=1.24.0&quot;</span><span class="p">,</span>  <span class="c1"># Apple Silicon optimized</span>
+                <span class="s2">&quot;scipy&gt;=1.10.0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;scikit-learn&gt;=1.2.0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;matplotlib&gt;=3.6.0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;psutil&gt;=5.9.0&quot;</span>
+            <span class="p">]</span>
+            <span class="k">if</span> <span class="n">has_mps</span><span class="p">:</span>
+                <span class="n">packages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;accelerate&gt;=0.20.0&quot;</span><span class="p">)</span>  <span class="c1"># Hugging Face accelerate for MPS</span>
+        <span class="k">elif</span> <span class="n">platform_type</span> <span class="o">==</span> <span class="s2">&quot;vm_ubuntu&quot;</span><span class="p">:</span>
+            <span class="n">packages</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s2">&quot;torch&gt;=2.0.0+cpu&quot;</span><span class="p">,</span>  <span class="c1"># CPU-only PyTorch</span>
+                <span class="s2">&quot;numpy&lt;2.0&quot;</span><span class="p">,</span>  <span class="c1"># Stable NumPy for Ubuntu</span>
+                <span class="s2">&quot;scipy&gt;=1.9.0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;scikit-learn&gt;=1.1.0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;matplotlib&gt;=3.5.0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;psutil&gt;=5.8.0&quot;</span>
+            <span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Unknown platform - conservative package list</span>
+            <span class="n">packages</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s2">&quot;torch&gt;=2.0.0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;numpy&gt;=1.21.0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;scipy&gt;=1.8.0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;scikit-learn&gt;=1.0.0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;matplotlib&gt;=3.4.0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;psutil&gt;=5.7.0&quot;</span>
+            <span class="p">]</span>
+        
+        <span class="k">return</span> <span class="n">packages</span>
+    
+<div class="viewcode-block" id="PlatformDetector.validate_environment">
+<a class="viewcode-back" href="../../api/environments/environments.platform_detector.html#environments.platform_detector.PlatformDetector.validate_environment">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_environment</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validate the current environment for compatibility.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str, bool]: Validation results for different aspects</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">validation_results</span> <span class="o">=</span> <span class="p">{}</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Check Python version compatibility</span>
+            <span class="n">python_version</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span>
+            <span class="n">validation_results</span><span class="p">[</span><span class="s1">&#39;python_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">python_version</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+            
+            <span class="c1"># Check platform detection</span>
+            <span class="n">platform_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">detect_platform</span><span class="p">()</span>
+            <span class="n">validation_results</span><span class="p">[</span><span class="s1">&#39;platform_detected&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">platform_type</span> <span class="o">!=</span> <span class="s2">&quot;unknown&quot;</span>
+            
+            <span class="c1"># Check memory availability (minimum 4GB)</span>
+            <span class="n">memory_mb</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">virtual_memory</span><span class="p">()</span><span class="o">.</span><span class="n">total</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">)</span>
+            <span class="n">validation_results</span><span class="p">[</span><span class="s1">&#39;sufficient_memory&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">memory_mb</span> <span class="o">&gt;=</span> <span class="mi">4096</span>
+            
+            <span class="c1"># Check CPU cores (minimum 2)</span>
+            <span class="n">cpu_cores</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">(</span><span class="n">logical</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">1</span>
+            <span class="n">validation_results</span><span class="p">[</span><span class="s1">&#39;sufficient_cpu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cpu_cores</span> <span class="o">&gt;=</span> <span class="mi">2</span>
+            
+            <span class="c1"># Check disk space (minimum 2GB free)</span>
+            <span class="n">disk_usage</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">disk_usage</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+            <span class="n">free_gb</span> <span class="o">=</span> <span class="n">disk_usage</span><span class="o">.</span><span class="n">free</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">)</span>
+            <span class="n">validation_results</span><span class="p">[</span><span class="s1">&#39;sufficient_disk&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">free_gb</span> <span class="o">&gt;=</span> <span class="mf">2.0</span>
+            
+            <span class="c1"># Platform-specific validations</span>
+            <span class="k">if</span> <span class="n">platform_type</span> <span class="o">==</span> <span class="s2">&quot;m1_native&quot;</span><span class="p">:</span>
+                <span class="n">validation_results</span><span class="p">[</span><span class="s1">&#39;mps_available&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_mps_availability</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">platform_type</span> <span class="o">==</span> <span class="s2">&quot;vm_ubuntu&quot;</span><span class="p">:</span>
+                <span class="n">validation_results</span><span class="p">[</span><span class="s1">&#39;vm_environment&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_vm_environment</span><span class="p">()</span>
+            
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># If validation fails, mark as invalid</span>
+            <span class="n">validation_results</span><span class="p">[</span><span class="s1">&#39;validation_error&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">validation_results</span></div>
+
+    
+<div class="viewcode-block" id="PlatformDetector.get_optimal_config">
+<a class="viewcode-back" href="../../api/environments/environments.platform_detector.html#environments.platform_detector.PlatformDetector.get_optimal_config">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_optimal_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get optimal configuration for the detected platform.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str, any]: Platform-specific configuration</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">platform_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_platform_info</span><span class="p">()</span>
+        <span class="n">capabilities</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_hardware_capabilities</span><span class="p">()</span>
+        
+        <span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;platform&#39;</span><span class="p">:</span> <span class="n">platform_info</span><span class="o">.</span><span class="n">platform</span><span class="p">,</span>
+            <span class="s1">&#39;device&#39;</span><span class="p">:</span> <span class="s1">&#39;mps&#39;</span> <span class="k">if</span> <span class="n">platform_info</span><span class="o">.</span><span class="n">has_mps</span> <span class="k">else</span> <span class="s1">&#39;cpu&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;threads&#39;</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">capabilities</span><span class="o">.</span><span class="n">cpu_cores</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>  <span class="c1"># Cap at 8 threads</span>
+            <span class="s1">&#39;memory_fraction&#39;</span><span class="p">:</span> <span class="mf">0.8</span> <span class="k">if</span> <span class="n">platform_info</span><span class="o">.</span><span class="n">platform</span> <span class="o">==</span> <span class="s2">&quot;m1_native&quot;</span> <span class="k">else</span> <span class="mf">0.6</span><span class="p">,</span>
+            <span class="s1">&#39;batch_size_multiplier&#39;</span><span class="p">:</span> <span class="mi">2</span> <span class="k">if</span> <span class="n">platform_info</span><span class="o">.</span><span class="n">has_mps</span> <span class="k">else</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s1">&#39;mixed_precision&#39;</span><span class="p">:</span> <span class="n">platform_info</span><span class="o">.</span><span class="n">has_mps</span><span class="p">,</span>
+            <span class="s1">&#39;simulation_mode&#39;</span><span class="p">:</span> <span class="ow">not</span> <span class="n">platform_info</span><span class="o">.</span><span class="n">has_sdr</span>
+        <span class="p">}</span>
+        
+        <span class="k">return</span> <span class="n">config</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../api/environments/environments.platform_detector.html#environments.platform_detector.main">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main function for testing platform detection.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">detector</span> <span class="o">=</span> <span class="n">PlatformDetector</span><span class="p">()</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== Platform Detection Results ===&quot;</span><span class="p">)</span>
+    <span class="n">platform_info</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">get_platform_info</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Platform: </span><span class="si">{</span><span class="n">platform_info</span><span class="o">.</span><span class="n">platform</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Architecture: </span><span class="si">{</span><span class="n">platform_info</span><span class="o">.</span><span class="n">architecture</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;MPS Available: </span><span class="si">{</span><span class="n">platform_info</span><span class="o">.</span><span class="n">has_mps</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SDR Hardware: </span><span class="si">{</span><span class="n">platform_info</span><span class="o">.</span><span class="n">has_sdr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Python Version: </span><span class="si">{</span><span class="n">platform_info</span><span class="o">.</span><span class="n">python_version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== Hardware Capabilities ===&quot;</span><span class="p">)</span>
+    <span class="n">capabilities</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">get_hardware_capabilities</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Compute Devices: </span><span class="si">{</span><span class="n">capabilities</span><span class="o">.</span><span class="n">compute_devices</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;CPU Cores: </span><span class="si">{</span><span class="n">capabilities</span><span class="o">.</span><span class="n">cpu_cores</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Memory: </span><span class="si">{</span><span class="n">capabilities</span><span class="o">.</span><span class="n">max_memory</span><span class="si">}</span><span class="s2"> MB&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GPU Memory: </span><span class="si">{</span><span class="n">capabilities</span><span class="o">.</span><span class="n">gpu_memory</span><span class="si">}</span><span class="s2"> MB&quot;</span> <span class="k">if</span> <span class="n">capabilities</span><span class="o">.</span><span class="n">gpu_memory</span> <span class="k">else</span> <span class="s2">&quot;GPU Memory: N/A&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SDR Devices: </span><span class="si">{</span><span class="n">capabilities</span><span class="o">.</span><span class="n">sdr_hardware</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== Environment Validation ===&quot;</span><span class="p">)</span>
+    <span class="n">validation</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">validate_environment</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">check</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">validation</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;✓&quot;</span> <span class="k">if</span> <span class="n">result</span> <span class="k">else</span> <span class="s2">&quot;✗&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">check</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== Optimal Configuration ===&quot;</span><span class="p">)</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">get_optimal_config</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== Recommended Packages ===&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">package</span> <span class="ow">in</span> <span class="n">platform_info</span><span class="o">.</span><span class="n">recommended_packages</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  - </span><span class="si">{</span><span class="n">package</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, GeminiSDR Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

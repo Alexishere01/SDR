@@ -1,0 +1,10 @@
+# @package hardware
+# Auto-detection hardware configuration
+# System will automatically detect and configure optimal hardware settings
+
+device_preference: auto
+sdr_mode: auto
+memory_limit_gb: null  # Auto-detect available memory
+max_threads: null      # Auto-detect CPU cores
+gpu_memory_fraction: 0.8
+enable_mixed_precision: false  # Will be enabled if supported

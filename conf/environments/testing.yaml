@@ -1,0 +1,36 @@
+# @package _global_
+# Testing environment configuration
+# Settings optimized for automated testing and CI/CD
+
+environment: testing
+debug_mode: false
+
+hardware:
+  device_preference: cpu  # Consistent testing environment
+  sdr_mode: simulation   # No hardware dependencies
+  memory_limit_gb: 4.0   # Limited resources for testing
+  enable_mixed_precision: false
+
+ml:
+  batch_size: 16         # Fixed small batch for consistent tests
+  model_cache_size: 1    # Minimal caching for tests
+  checkpoint_frequency: 10  # Frequent checkpoints for test validation
+
+logging:
+  level: INFO
+  format: simple
+  output: [console]
+  rotation: daily
+  max_file_size_mb: 25
+  backup_count: 1
+  log_dir: logs/test
+  enable_performance_logging: false
+
+performance:
+  memory_threshold: 0.6
+  auto_optimize: false   # Predictable behavior for tests
+  profiling_enabled: false
+  gc_frequency: 25
+  memory_cleanup_threshold: 0.7
+  batch_size_auto_tune: false  # Fixed batch sizes for tests
+  model_compilation: false

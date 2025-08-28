@@ -1,0 +1,436 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Frequency Hopping Synchronization with Intelligent Receiver &mdash; GeminiSDR 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            GeminiSDR
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="guides/index.html">User Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture/index.html">System Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/index.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/index.html">Examples and Tutorials</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">GeminiSDR</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Frequency Hopping Synchronization with Intelligent Receiver</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/frequency_hopping_sync_analysis.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="frequency-hopping-synchronization-with-intelligent-receiver">
+<h1>Frequency Hopping Synchronization with Intelligent Receiver<a class="headerlink" href="#frequency-hopping-synchronization-with-intelligent-receiver" title="Link to this heading"></a></h1>
+<section id="current-system-capabilities">
+<h2>Current System Capabilities<a class="headerlink" href="#current-system-capabilities" title="Link to this heading"></a></h2>
+<section id="existing-pattern-learning">
+<h3>Existing Pattern Learning<a class="headerlink" href="#existing-pattern-learning" title="Link to this heading"></a></h3>
+<p>The system already has basic frequency pattern recognition:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># In adversarial_jamming.py - Jammer learns receiver patterns</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">frequency_memory</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">maxlen</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>  <span class="c1"># Remember where receiver goes</span>
+<span class="n">freq_changes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frequency_memory</span><span class="p">)[</span><span class="o">-</span><span class="mi">10</span><span class="p">:])</span>
+<span class="n">predicted_change</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">freq_changes</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">freq_changes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
+<span class="n">predicted_freq</span> <span class="o">=</span> <span class="n">rx_freq</span> <span class="o">+</span> <span class="n">predicted_change</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># In train_adversarial.py - Receiver learns jamming patterns</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">jamming_memory</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">maxlen</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">recent_freqs</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jamming_memory</span><span class="p">)[</span><span class="o">-</span><span class="mi">5</span><span class="p">:]]</span>
+<span class="n">freq_variance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">recent_freqs</span><span class="p">)</span>  <span class="c1"># Measures frequency agility</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="frequency-hopping-synchronization-challenge">
+<h2>Frequency Hopping Synchronization Challenge<a class="headerlink" href="#frequency-hopping-synchronization-challenge" title="Link to this heading"></a></h2>
+<section id="the-problem">
+<h3>The Problem<a class="headerlink" href="#the-problem" title="Link to this heading"></a></h3>
+<p><strong>Frequency Hopping Spread Spectrum (FHSS)</strong> transmitters:</p>
+<ul class="simple">
+<li><p>Jump between frequencies rapidly (e.g., 1600 hops/second for Bluetooth)</p></li>
+<li><p>Follow a pseudo-random sequence</p></li>
+<li><p>Require synchronization to the hopping pattern</p></li>
+<li><p>Use the entire available spectrum</p></li>
+</ul>
+</section>
+<section id="current-system-limitations">
+<h3>Current System Limitations<a class="headerlink" href="#current-system-limitations" title="Link to this heading"></a></h3>
+<p><strong>Hop Rate vs AI Response Time:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Current AI decision time</span>
+<span class="n">ai_decision_time</span> <span class="o">=</span> <span class="o">~</span><span class="mi">10</span><span class="o">-</span><span class="mi">50</span><span class="n">ms</span>  <span class="c1"># Q-learning inference + SDR reconfiguration</span>
+
+<span class="c1"># Typical frequency hopping rates</span>
+<span class="n">bluetooth_hop_rate</span> <span class="o">=</span> <span class="mi">1600</span><span class="o">/</span><span class="n">second</span>  <span class="c1"># 0.625ms per hop</span>
+<span class="n">military_fhss</span> <span class="o">=</span> <span class="mi">10000</span><span class="o">/</span><span class="n">second</span>      <span class="c1"># 0.1ms per hop</span>
+<span class="n">wifi_fhss</span> <span class="o">=</span> <span class="mf">2.5</span><span class="o">/</span><span class="n">second</span>           <span class="c1"># 400ms per hop (slow)</span>
+</pre></div>
+</div>
+<p><strong>The AI is too slow for fast hoppers like Bluetooth/military, but could sync with slower systems.</strong></p>
+</section>
+</section>
+<section id="enhanced-frequency-hopping-synchronization">
+<h2>Enhanced Frequency Hopping Synchronization<a class="headerlink" href="#enhanced-frequency-hopping-synchronization" title="Link to this heading"></a></h2>
+<section id="approach-1-pattern-prediction-with-lstm">
+<h3>Approach 1: Pattern Prediction with LSTM<a class="headerlink" href="#approach-1-pattern-prediction-with-lstm" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">FrequencyHoppingPredictor</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;LSTM-based frequency hopping pattern predictor.&quot;&quot;&quot;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">hidden_size</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">num_layers</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lstm</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LSTM</span><span class="p">(</span><span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">num_layers</span><span class="p">,</span> <span class="n">batch_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">predictor</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frequency_history</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">maxlen</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">freq_sequence</span><span class="p">):</span>
+        <span class="n">lstm_out</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lstm</span><span class="p">(</span><span class="n">freq_sequence</span><span class="p">)</span>
+        <span class="n">prediction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predictor</span><span class="p">(</span><span class="n">lstm_out</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:])</span>
+        <span class="k">return</span> <span class="n">prediction</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict_next_hop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_freq_history</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Predict next frequency in hopping sequence.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">current_freq_history</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        
+        <span class="c1"># Convert to tensor</span>
+        <span class="n">seq</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">(</span><span class="n">current_freq_history</span><span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">:])</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="n">next_freq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">next_freq</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="approach-2-multi-receiver-parallel-tracking">
+<h3>Approach 2: Multi-Receiver Parallel Tracking<a class="headerlink" href="#approach-2-multi-receiver-parallel-tracking" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ParallelHoppingReceiver</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Multiple receivers for frequency hopping synchronization.&quot;&quot;&quot;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_receivers</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_receivers</span> <span class="o">=</span> <span class="n">num_receivers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">receivers</span> <span class="o">=</span> <span class="p">[</span><span class="n">IntelligentReceiverML</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_receivers</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hop_detector</span> <span class="o">=</span> <span class="n">FrequencyHoppingDetector</span><span class="p">()</span>
+        
+    <span class="k">def</span><span class="w"> </span><span class="nf">sync_to_hopper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_freq</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Synchronize to frequency hopping transmitter.&quot;&quot;&quot;</span>
+        
+        <span class="c1"># Phase 1: Detect hopping pattern</span>
+        <span class="n">hop_pattern</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">detect_hopping_pattern</span><span class="p">(</span><span class="n">initial_freq</span><span class="p">)</span>
+        
+        <span class="c1"># Phase 2: Predict future hops</span>
+        <span class="n">future_hops</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_hop_sequence</span><span class="p">(</span><span class="n">hop_pattern</span><span class="p">)</span>
+        
+        <span class="c1"># Phase 3: Pre-position receivers</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">receiver</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">receivers</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">future_hops</span><span class="p">):</span>
+                <span class="n">receiver</span><span class="o">.</span><span class="n">set_frequency</span><span class="p">(</span><span class="n">future_hops</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        
+        <span class="k">return</span> <span class="n">hop_pattern</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">detect_hopping_pattern</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_freq</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Detect the frequency hopping pattern.&quot;&quot;&quot;</span>
+        <span class="n">hop_history</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">current_freq</span> <span class="o">=</span> <span class="n">start_freq</span>
+        
+        <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">):</span>  <span class="c1"># Observe 50 hops</span>
+            <span class="c1"># Use fastest receiver to track current hop</span>
+            <span class="n">signal_found</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">track_current_hop</span><span class="p">(</span><span class="n">current_freq</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="n">signal_found</span><span class="p">:</span>
+                <span class="n">hop_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_freq</span><span class="p">)</span>
+                
+                <span class="c1"># Predict next hop location</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">hop_history</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="n">next_freq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_next_frequency</span><span class="p">(</span><span class="n">hop_history</span><span class="p">)</span>
+                    <span class="n">current_freq</span> <span class="o">=</span> <span class="n">next_freq</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Search for next hop</span>
+                    <span class="n">current_freq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">search_next_hop</span><span class="p">(</span><span class="n">current_freq</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyze_hop_pattern</span><span class="p">(</span><span class="n">hop_history</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="approach-3-wideband-capture-ai-analysis">
+<h3>Approach 3: Wideband Capture + AI Analysis<a class="headerlink" href="#approach-3-wideband-capture-ai-analysis" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">WidebandHoppingSync</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wideband capture approach for frequency hopping sync.&quot;&quot;&quot;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_rate</span><span class="o">=</span><span class="mf">61.44e6</span><span class="p">):</span>  <span class="c1"># Max PlutoSDR rate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span> <span class="o">=</span> <span class="n">sample_rate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span> <span class="o">=</span> <span class="n">sample_rate</span> <span class="o">*</span> <span class="mf">0.8</span>  <span class="c1"># 49.15 MHz instantaneous BW</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hop_detector</span> <span class="o">=</span> <span class="n">HopDetectionCNN</span><span class="p">()</span>
+        
+    <span class="k">def</span><span class="w"> </span><span class="nf">capture_hopping_spectrum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center_freq</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Capture wideband spectrum containing frequency hops.&quot;&quot;&quot;</span>
+        
+        <span class="c1"># Capture wide bandwidth</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sdr</span><span class="o">.</span><span class="n">capture_batch</span><span class="p">(</span><span class="n">duration</span><span class="p">)</span>
+        
+        <span class="c1"># Create spectrogram</span>
+        <span class="n">spectrogram</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_spectrogram</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
+        
+        <span class="c1"># Detect frequency hops in spectrogram</span>
+        <span class="n">hop_events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">detect_hops_in_spectrogram</span><span class="p">(</span><span class="n">spectrogram</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">hop_events</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">detect_hops_in_spectrogram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spectrogram</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Use CNN to detect frequency hopping patterns.&quot;&quot;&quot;</span>
+        
+        <span class="c1"># CNN looks for characteristic hop signatures</span>
+        <span class="n">hop_predictions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hop_detector</span><span class="p">(</span><span class="n">spectrogram</span><span class="p">)</span>
+        
+        <span class="c1"># Extract hop times and frequencies</span>
+        <span class="n">hop_events</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">prediction</span> <span class="ow">in</span> <span class="n">hop_predictions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">prediction</span><span class="o">.</span><span class="n">confidence</span> <span class="o">&gt;</span> <span class="mf">0.8</span><span class="p">:</span>
+                <span class="n">hop_events</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                    <span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="n">prediction</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+                    <span class="s1">&#39;frequency&#39;</span><span class="p">:</span> <span class="n">prediction</span><span class="o">.</span><span class="n">frequency</span><span class="p">,</span>
+                    <span class="s1">&#39;duration&#39;</span><span class="p">:</span> <span class="n">prediction</span><span class="o">.</span><span class="n">duration</span>
+                <span class="p">})</span>
+        
+        <span class="k">return</span> <span class="n">hop_events</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="practical-frequency-hopping-scenarios">
+<h2>Practical Frequency Hopping Scenarios<a class="headerlink" href="#practical-frequency-hopping-scenarios" title="Link to this heading"></a></h2>
+<section id="scenario-1-bluetooth-1600-hops-second">
+<h3>Scenario 1: Bluetooth (1600 hops/second)<a class="headerlink" href="#scenario-1-bluetooth-1600-hops-second" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Bluetooth FHSS parameters</span>
+<span class="n">hop_rate</span> <span class="o">=</span> <span class="mi">1600</span>  <span class="c1"># hops/second</span>
+<span class="n">hop_period</span> <span class="o">=</span> <span class="mf">0.625e-3</span>  <span class="c1"># 625 microseconds</span>
+<span class="n">frequency_range</span> <span class="o">=</span> <span class="p">(</span><span class="mf">2402e6</span><span class="p">,</span> <span class="mf">2480e6</span><span class="p">)</span>  <span class="c1"># 2.4 GHz ISM band</span>
+<span class="n">num_channels</span> <span class="o">=</span> <span class="mi">79</span>
+
+<span class="c1"># AI synchronization approach</span>
+<span class="n">approach</span> <span class="o">=</span> <span class="s2">&quot;wideband_capture&quot;</span>  <span class="c1"># Only viable approach for this speed</span>
+<span class="n">required_bandwidth</span> <span class="o">=</span> <span class="mf">78e6</span>  <span class="c1"># Cover entire ISM band</span>
+<span class="n">success_probability</span> <span class="o">=</span> <span class="mf">0.7</span>  <span class="c1"># Moderate success due to speed</span>
+</pre></div>
+</div>
+</section>
+<section id="scenario-2-military-fhss-100-hops-second">
+<h3>Scenario 2: Military FHSS (100 hops/second)<a class="headerlink" href="#scenario-2-military-fhss-100-hops-second" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Military FHSS parameters</span>
+<span class="n">hop_rate</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1"># hops/second</span>
+<span class="n">hop_period</span> <span class="o">=</span> <span class="mf">10e-3</span>  <span class="c1"># 10 milliseconds</span>
+<span class="n">frequency_range</span> <span class="o">=</span> <span class="p">(</span><span class="mf">30e6</span><span class="p">,</span> <span class="mf">512e6</span><span class="p">)</span>  <span class="c1"># VHF/UHF</span>
+<span class="n">num_channels</span> <span class="o">=</span> <span class="mi">1000</span>
+
+<span class="c1"># AI synchronization approach</span>
+<span class="n">approach</span> <span class="o">=</span> <span class="s2">&quot;pattern_prediction&quot;</span>  <span class="c1"># AI can learn and predict</span>
+<span class="n">required_bandwidth</span> <span class="o">=</span> <span class="mf">1.6e6</span>  <span class="c1"># Standard bandwidth</span>
+<span class="n">success_probability</span> <span class="o">=</span> <span class="mf">0.9</span>  <span class="c1"># High success - AI has time to learn</span>
+</pre></div>
+</div>
+</section>
+<section id="scenario-3-wifi-fhss-2-5-hops-second">
+<h3>Scenario 3: WiFi FHSS (2.5 hops/second)<a class="headerlink" href="#scenario-3-wifi-fhss-2-5-hops-second" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># WiFi FHSS parameters (older 802.11)</span>
+<span class="n">hop_rate</span> <span class="o">=</span> <span class="mf">2.5</span>  <span class="c1"># hops/second</span>
+<span class="n">hop_period</span> <span class="o">=</span> <span class="mf">400e-3</span>  <span class="c1"># 400 milliseconds</span>
+<span class="n">frequency_range</span> <span class="o">=</span> <span class="p">(</span><span class="mf">2402e6</span><span class="p">,</span> <span class="mf">2480e6</span><span class="p">)</span>  <span class="c1"># 2.4 GHz ISM band</span>
+<span class="n">num_channels</span> <span class="o">=</span> <span class="mi">79</span>
+
+<span class="c1"># AI synchronization approach</span>
+<span class="n">approach</span> <span class="o">=</span> <span class="s2">&quot;single_receiver_tracking&quot;</span>  <span class="c1"># AI easily keeps up</span>
+<span class="n">required_bandwidth</span> <span class="o">=</span> <span class="mf">1.6e6</span>  <span class="c1"># Standard bandwidth</span>
+<span class="n">success_probability</span> <span class="o">=</span> <span class="mf">0.95</span>  <span class="c1"># Very high success - plenty of time</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="enhanced-ai-architecture-for-hopping-sync">
+<h2>Enhanced AI Architecture for Hopping Sync<a class="headerlink" href="#enhanced-ai-architecture-for-hopping-sync" title="Link to this heading"></a></h2>
+<section id="multi-scale-temporal-learning">
+<h3>Multi-Scale Temporal Learning<a class="headerlink" href="#multi-scale-temporal-learning" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">HoppingSyncDQN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enhanced DQN for frequency hopping synchronization.&quot;&quot;&quot;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_size</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">hop_history_size</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        
+        <span class="c1"># Standard spectrum analysis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spectrum_encoder</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">128</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">64</span><span class="p">)</span>
+        <span class="p">)</span>
+        
+        <span class="c1"># Frequency hopping pattern analysis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hop_lstm</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LSTM</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">batch_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        
+        <span class="c1"># Combined decision network</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decision_network</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">256</span><span class="p">),</span>  <span class="c1"># 64 + 64 = 128 combined features</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">128</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">3</span> <span class="o">*</span> <span class="mi">21</span><span class="p">)</span>  <span class="c1"># 3 actions × 21 discrete levels</span>
+        <span class="p">)</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spectrum</span><span class="p">,</span> <span class="n">hop_history</span><span class="p">):</span>
+        <span class="c1"># Process current spectrum</span>
+        <span class="n">spectrum_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectrum_encoder</span><span class="p">(</span><span class="n">spectrum</span><span class="p">)</span>
+        
+        <span class="c1"># Process hopping history</span>
+        <span class="n">hop_features</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hop_lstm</span><span class="p">(</span><span class="n">hop_history</span><span class="p">)</span>
+        <span class="n">hop_features</span> <span class="o">=</span> <span class="n">hop_features</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>  <span class="c1"># Last timestep</span>
+        
+        <span class="c1"># Combine features</span>
+        <span class="n">combined</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">spectrum_features</span><span class="p">,</span> <span class="n">hop_features</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        
+        <span class="c1"># Make decision</span>
+        <span class="n">q_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decision_network</span><span class="p">(</span><span class="n">combined</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">q_values</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">21</span><span class="p">)</span>  <span class="c1"># [batch, actions, levels]</span>
+</pre></div>
+</div>
+</section>
+<section id="synchronization-success-metrics">
+<h3>Synchronization Success Metrics<a class="headerlink" href="#synchronization-success-metrics" title="Link to this heading"></a></h3>
+<p><strong>Sync Acquisition Time:</strong></p>
+<ul class="simple">
+<li><p><strong>Fast Hoppers</strong> (&gt;1000 hops/sec): 1-5 seconds</p></li>
+<li><p><strong>Medium Hoppers</strong> (10-1000 hops/sec): 0.1-1 seconds</p></li>
+<li><p><strong>Slow Hoppers</strong> (&lt;10 hops/sec): 0.01-0.1 seconds</p></li>
+</ul>
+<p><strong>Sync Maintenance:</strong></p>
+<ul class="simple">
+<li><p><strong>Pattern Prediction Accuracy</strong>: 85-95%</p></li>
+<li><p><strong>Hop Tracking Success</strong>: 90-98%</p></li>
+<li><p><strong>Re-sync Time</strong> (after loss): 0.1-2 seconds</p></li>
+</ul>
+</section>
+</section>
+<section id="real-world-applications">
+<h2>Real-World Applications<a class="headerlink" href="#real-world-applications" title="Link to this heading"></a></h2>
+<section id="military-communications">
+<h3>Military Communications<a class="headerlink" href="#military-communications" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Challenge</strong>: Fast, encrypted hopping patterns</p></li>
+<li><p><strong>AI Advantage</strong>: Pattern learning, prediction</p></li>
+<li><p><strong>Success Rate</strong>: 70-90% depending on pattern complexity</p></li>
+</ul>
+</section>
+<section id="bluetooth-device-tracking">
+<h3>Bluetooth Device Tracking<a class="headerlink" href="#bluetooth-device-tracking" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Challenge</strong>: 1600 hops/second, 79 channels</p></li>
+<li><p><strong>AI Advantage</strong>: Wideband capture, hop detection</p></li>
+<li><p><strong>Success Rate</strong>: 60-80% with wideband approach</p></li>
+</ul>
+</section>
+<section id="emergency-communications">
+<h3>Emergency Communications<a class="headerlink" href="#emergency-communications" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Challenge</strong>: Unknown hopping parameters</p></li>
+<li><p><strong>AI Advantage</strong>: Adaptive learning, no prior knowledge needed</p></li>
+<li><p><strong>Success Rate</strong>: 80-95% for moderate hop rates</p></li>
+</ul>
+</section>
+</section>
+<section id="conclusion">
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Link to this heading"></a></h2>
+<p><strong>Current System</strong>: Basic frequency pattern learning exists
+<strong>Enhancement Needed</strong>: Multi-scale temporal learning, wideband capture
+<strong>Feasible Sync Rates</strong>: Up to ~1000 hops/second with enhancements
+<strong>Key Innovation</strong>: AI learns hopping patterns without prior knowledge</p>
+<p>The intelligent receiver can potentially synchronize with frequency hopping transmitters by:</p>
+<ol class="arabic simple">
+<li><p><strong>Learning hop patterns</strong> through observation</p></li>
+<li><p><strong>Predicting future hops</strong> using LSTM networks</p></li>
+<li><p><strong>Pre-positioning</strong> the 1.6 MHz “flashlight” at predicted frequencies</p></li>
+<li><p><strong>Adapting</strong> to pattern changes in real-time</p></li>
+</ol>
+<p>This would make it incredibly powerful for both legitimate communications and signal intelligence applications!</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, GeminiSDR Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

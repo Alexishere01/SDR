@@ -1,0 +1,13 @@
+# @package ml
+# Inference-optimized ML configuration
+# Settings optimized for model inference and deployment
+
+batch_size: 32      # Fixed batch size for consistent inference
+learning_rate: 1e-4 # Not used in inference but kept for compatibility
+model_cache_size: 5 # Cache more models for inference
+checkpoint_frequency: 1000  # Infrequent checkpointing
+gradient_accumulation_steps: 1  # No accumulation needed
+max_grad_norm: 1.0
+warmup_steps: 0     # No warmup for inference
+weight_decay: 0.01
+enable_gradient_checkpointing: false  # Optimize for speed over memory

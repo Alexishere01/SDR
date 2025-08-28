@@ -1,0 +1,13 @@
+# @package ml
+# Training-optimized ML configuration
+# Settings optimized for model training workflows
+
+batch_size: null  # Auto-tune for training
+learning_rate: 2e-4  # Slightly higher for training
+model_cache_size: 2   # Fewer models cached during training
+checkpoint_frequency: 50  # More frequent checkpoints
+gradient_accumulation_steps: 4  # Simulate larger batches
+max_grad_norm: 0.5   # Tighter gradient clipping
+warmup_steps: 100    # Learning rate warmup
+weight_decay: 0.01
+enable_gradient_checkpointing: true  # Memory efficiency for training

@@ -1,0 +1,485 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>geminisdr.config.config_models &mdash; GeminiSDR 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            GeminiSDR
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../guides/index.html">User Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../architecture/index.html">System Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/index.html">Examples and Tutorials</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">GeminiSDR</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">geminisdr.config.config_models</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for geminisdr.config.config_models</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Configuration data models and validation for GeminiSDR system.</span>
+
+<span class="sd">This module defines the configuration data structures using dataclasses</span>
+<span class="sd">with proper typing and validation logic.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="DeviceType">
+<a class="viewcode-back" href="../../../api/geminisdr/config/config_models.html#geminisdr.config.config_models.DeviceType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DeviceType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Supported device types for computation.&quot;&quot;&quot;</span>
+    <span class="n">AUTO</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span>
+    <span class="n">CPU</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span>
+    <span class="n">MPS</span> <span class="o">=</span> <span class="s2">&quot;mps&quot;</span>  <span class="c1"># Apple Metal Performance Shaders</span>
+    <span class="n">CUDA</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="SDRMode">
+<a class="viewcode-back" href="../../../api/geminisdr/config/config_models.html#geminisdr.config.config_models.SDRMode">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SDRMode</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;SDR operation modes.&quot;&quot;&quot;</span>
+    <span class="n">AUTO</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span>
+    <span class="n">HARDWARE</span> <span class="o">=</span> <span class="s2">&quot;hardware&quot;</span>
+    <span class="n">SIMULATION</span> <span class="o">=</span> <span class="s2">&quot;simulation&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="LogLevel">
+<a class="viewcode-back" href="../../../api/geminisdr/config/config_models.html#geminisdr.config.config_models.LogLevel">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LogLevel</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Logging levels.&quot;&quot;&quot;</span>
+    <span class="n">DEBUG</span> <span class="o">=</span> <span class="s2">&quot;DEBUG&quot;</span>
+    <span class="n">INFO</span> <span class="o">=</span> <span class="s2">&quot;INFO&quot;</span>
+    <span class="n">WARNING</span> <span class="o">=</span> <span class="s2">&quot;WARNING&quot;</span>
+    <span class="n">ERROR</span> <span class="o">=</span> <span class="s2">&quot;ERROR&quot;</span>
+    <span class="n">CRITICAL</span> <span class="o">=</span> <span class="s2">&quot;CRITICAL&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="LogFormat">
+<a class="viewcode-back" href="../../../api/geminisdr/config/config_models.html#geminisdr.config.config_models.LogFormat">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LogFormat</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Log output formats.&quot;&quot;&quot;</span>
+    <span class="n">STRUCTURED</span> <span class="o">=</span> <span class="s2">&quot;structured&quot;</span>
+    <span class="n">SIMPLE</span> <span class="o">=</span> <span class="s2">&quot;simple&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="HardwareConfig">
+<a class="viewcode-back" href="../../../api/geminisdr/config/config_models.html#geminisdr.config.config_models.HardwareConfig">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">HardwareConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Hardware-specific configuration.&quot;&quot;&quot;</span>
+    <span class="n">device_preference</span><span class="p">:</span> <span class="n">DeviceType</span> <span class="o">=</span> <span class="n">DeviceType</span><span class="o">.</span><span class="n">AUTO</span>
+    <span class="n">sdr_mode</span><span class="p">:</span> <span class="n">SDRMode</span> <span class="o">=</span> <span class="n">SDRMode</span><span class="o">.</span><span class="n">AUTO</span>
+    <span class="n">memory_limit_gb</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">max_threads</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">gpu_memory_fraction</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.8</span>
+    <span class="n">enable_mixed_precision</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    
+<div class="viewcode-block" id="HardwareConfig.__post_init__">
+<a class="viewcode-back" href="../../../api/geminisdr/config/config_models.html#geminisdr.config.config_models.HardwareConfig.__post_init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate hardware configuration after initialization.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device_preference</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">device_preference</span> <span class="o">=</span> <span class="n">DeviceType</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device_preference</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sdr_mode</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sdr_mode</span> <span class="o">=</span> <span class="n">SDRMode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sdr_mode</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">memory_limit_gb</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">memory_limit_gb</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;memory_limit_gb must be positive&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_threads</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_threads</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;max_threads must be positive&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.1</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gpu_memory_fraction</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;gpu_memory_fraction must be between 0.1 and 1.0&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="MLConfig">
+<a class="viewcode-back" href="../../../api/geminisdr/config/config_models.html#geminisdr.config.config_models.MLConfig">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MLConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;ML training and inference configuration.&quot;&quot;&quot;</span>
+    <span class="n">batch_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Auto-determined if None</span>
+    <span class="n">learning_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-4</span>
+    <span class="n">model_cache_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">checkpoint_frequency</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">gradient_accumulation_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">max_grad_norm</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">warmup_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">weight_decay</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span>
+    <span class="n">enable_gradient_checkpointing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    
+<div class="viewcode-block" id="MLConfig.__post_init__">
+<a class="viewcode-back" href="../../../api/geminisdr/config/config_models.html#geminisdr.config.config_models.MLConfig.__post_init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate ML configuration after initialization.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;batch_size must be positive&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">learning_rate</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;learning_rate must be positive&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_cache_size</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;model_cache_size must be positive&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkpoint_frequency</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;checkpoint_frequency must be positive&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradient_accumulation_steps</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;gradient_accumulation_steps must be positive&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_grad_norm</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;max_grad_norm must be positive&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">warmup_steps</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;warmup_steps must be non-negative&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_decay</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;weight_decay must be non-negative&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="LoggingConfig">
+<a class="viewcode-back" href="../../../api/geminisdr/config/config_models.html#geminisdr.config.config_models.LoggingConfig">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LoggingConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Logging system configuration.&quot;&quot;&quot;</span>
+    <span class="n">level</span><span class="p">:</span> <span class="n">LogLevel</span> <span class="o">=</span> <span class="n">LogLevel</span><span class="o">.</span><span class="n">INFO</span>
+    <span class="nb">format</span><span class="p">:</span> <span class="n">LogFormat</span> <span class="o">=</span> <span class="n">LogFormat</span><span class="o">.</span><span class="n">STRUCTURED</span>
+    <span class="n">output</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;console&quot;</span><span class="p">,</span> <span class="s2">&quot;file&quot;</span><span class="p">])</span>
+    <span class="n">rotation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;daily&quot;</span>
+    <span class="n">max_file_size_mb</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">backup_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">log_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;logs&quot;</span>
+    <span class="n">enable_performance_logging</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    
+<div class="viewcode-block" id="LoggingConfig.__post_init__">
+<a class="viewcode-back" href="../../../api/geminisdr/config/config_models.html#geminisdr.config.config_models.LoggingConfig.__post_init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate logging configuration after initialization.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">level</span> <span class="o">=</span> <span class="n">LogLevel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">format</span> <span class="o">=</span> <span class="n">LogFormat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format</span><span class="p">)</span>
+            
+        <span class="n">valid_outputs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;console&quot;</span><span class="p">,</span> <span class="s2">&quot;file&quot;</span><span class="p">,</span> <span class="s2">&quot;syslog&quot;</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">output</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">output</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_outputs</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid log output &#39;</span><span class="si">{</span><span class="n">output</span><span class="si">}</span><span class="s2">&#39;. Must be one of: </span><span class="si">{</span><span class="n">valid_outputs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                
+        <span class="n">valid_rotations</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;daily&quot;</span><span class="p">,</span> <span class="s2">&quot;weekly&quot;</span><span class="p">,</span> <span class="s2">&quot;monthly&quot;</span><span class="p">,</span> <span class="s2">&quot;size&quot;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_rotations</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid rotation &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation</span><span class="si">}</span><span class="s2">&#39;. Must be one of: </span><span class="si">{</span><span class="n">valid_rotations</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_file_size_mb</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;max_file_size_mb must be positive&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backup_count</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;backup_count must be non-negative&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="PerformanceConfig">
+<a class="viewcode-back" href="../../../api/geminisdr/config/config_models.html#geminisdr.config.config_models.PerformanceConfig">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PerformanceConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Performance optimization configuration.&quot;&quot;&quot;</span>
+    <span class="n">memory_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.8</span>
+    <span class="n">auto_optimize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">profiling_enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">gc_frequency</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">memory_cleanup_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.9</span>
+    <span class="n">batch_size_auto_tune</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">model_compilation</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    
+<div class="viewcode-block" id="PerformanceConfig.__post_init__">
+<a class="viewcode-back" href="../../../api/geminisdr/config/config_models.html#geminisdr.config.config_models.PerformanceConfig.__post_init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate performance configuration after initialization.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.1</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">memory_threshold</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;memory_threshold must be between 0.1 and 1.0&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.1</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">memory_cleanup_threshold</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;memory_cleanup_threshold must be between 0.1 and 1.0&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gc_frequency</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;gc_frequency must be positive&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SystemConfig">
+<a class="viewcode-back" href="../../../api/geminisdr/config/config_models.html#geminisdr.config.config_models.SystemConfig">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SystemConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Main system configuration containing all subsystem configs.&quot;&quot;&quot;</span>
+    <span class="n">hardware</span><span class="p">:</span> <span class="n">HardwareConfig</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">HardwareConfig</span><span class="p">)</span>
+    <span class="n">ml</span><span class="p">:</span> <span class="n">MLConfig</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">MLConfig</span><span class="p">)</span>
+    <span class="n">logging</span><span class="p">:</span> <span class="n">LoggingConfig</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">LoggingConfig</span><span class="p">)</span>
+    <span class="n">performance</span><span class="p">:</span> <span class="n">PerformanceConfig</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">PerformanceConfig</span><span class="p">)</span>
+    <span class="n">environment</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;development&quot;</span>
+    <span class="n">debug_mode</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">config_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;1.0&quot;</span>
+    
+<div class="viewcode-block" id="SystemConfig.__post_init__">
+<a class="viewcode-back" href="../../../api/geminisdr/config/config_models.html#geminisdr.config.config_models.SystemConfig.__post_init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate system configuration after initialization.&quot;&quot;&quot;</span>
+        <span class="n">valid_environments</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;development&quot;</span><span class="p">,</span> <span class="s2">&quot;testing&quot;</span><span class="p">,</span> <span class="s2">&quot;production&quot;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">environment</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_environments</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid environment &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">environment</span><span class="si">}</span><span class="s2">&#39;. Must be one of: </span><span class="si">{</span><span class="n">valid_environments</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ConfigValidationError">
+<a class="viewcode-back" href="../../../api/geminisdr/config/config_models.html#geminisdr.config.config_models.ConfigValidationError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConfigValidationError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when configuration validation fails.&quot;&quot;&quot;</span>
+    
+<div class="viewcode-block" id="ConfigValidationError.__init__">
+<a class="viewcode-back" href="../../../api/geminisdr/config/config_models.html#geminisdr.config.config_models.ConfigValidationError.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">field</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="n">field</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span></div>
+
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">field</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Configuration validation error in field &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">field</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Configuration validation error: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="validate_config">
+<a class="viewcode-back" href="../../../api/geminisdr/config/config_models.html#geminisdr.config.config_models.validate_config">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">validate_config</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">SystemConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validate a complete system configuration and return list of validation errors.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        config: SystemConfig instance to validate</span>
+<span class="sd">        </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        List of validation error messages (empty if valid)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Validate hardware config</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">device_preference</span> <span class="o">==</span> <span class="n">DeviceType</span><span class="o">.</span><span class="n">MPS</span><span class="p">:</span>
+            <span class="c1"># Check if MPS is actually available (this would be done at runtime)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;MPS device preference set - runtime availability will be checked&quot;</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">sdr_mode</span> <span class="o">==</span> <span class="n">SDRMode</span><span class="o">.</span><span class="n">HARDWARE</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Hardware SDR mode set - hardware availability will be checked at runtime&quot;</span><span class="p">)</span>
+            
+        <span class="c1"># Validate ML config compatibility</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">ml</span><span class="o">.</span><span class="n">batch_size</span> <span class="ow">and</span> <span class="n">config</span><span class="o">.</span><span class="n">performance</span><span class="o">.</span><span class="n">batch_size_auto_tune</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Fixed batch_size set with auto_tune enabled - auto_tune will be ignored&quot;</span><span class="p">)</span>
+            
+        <span class="c1"># Validate performance settings</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">performance</span><span class="o">.</span><span class="n">memory_threshold</span> <span class="o">&gt;=</span> <span class="n">config</span><span class="o">.</span><span class="n">performance</span><span class="o">.</span><span class="n">memory_cleanup_threshold</span><span class="p">:</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;memory_threshold should be less than memory_cleanup_threshold&quot;</span><span class="p">)</span>
+            
+        <span class="c1"># Cross-component validation</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">enable_mixed_precision</span> <span class="ow">and</span> <span class="n">config</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">device_preference</span> <span class="o">==</span> <span class="n">DeviceType</span><span class="o">.</span><span class="n">CPU</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Mixed precision enabled with CPU device - may not provide benefits&quot;</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">debug_mode</span> <span class="ow">and</span> <span class="n">config</span><span class="o">.</span><span class="n">logging</span><span class="o">.</span><span class="n">level</span> <span class="o">!=</span> <span class="n">LogLevel</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Debug mode enabled but log level is not DEBUG - consider setting log level to DEBUG&quot;</span><span class="p">)</span>
+            
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Validation error: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">errors</span></div>
+
+
+
+<div class="viewcode-block" id="create_default_config">
+<a class="viewcode-back" href="../../../api/geminisdr/config/config_models.html#geminisdr.config.config_models.create_default_config">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_default_config</span><span class="p">(</span><span class="n">environment</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;development&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SystemConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a default system configuration for the specified environment.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        environment: Target environment (development, testing, production)</span>
+<span class="sd">        </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        SystemConfig with environment-appropriate defaults</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">environment</span> <span class="o">==</span> <span class="s2">&quot;development&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">SystemConfig</span><span class="p">(</span>
+            <span class="n">hardware</span><span class="o">=</span><span class="n">HardwareConfig</span><span class="p">(</span>
+                <span class="n">device_preference</span><span class="o">=</span><span class="n">DeviceType</span><span class="o">.</span><span class="n">AUTO</span><span class="p">,</span>
+                <span class="n">sdr_mode</span><span class="o">=</span><span class="n">SDRMode</span><span class="o">.</span><span class="n">SIMULATION</span><span class="p">,</span>
+                <span class="n">memory_limit_gb</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">enable_mixed_precision</span><span class="o">=</span><span class="kc">False</span>
+            <span class="p">),</span>
+            <span class="n">ml</span><span class="o">=</span><span class="n">MLConfig</span><span class="p">(</span>
+                <span class="n">batch_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">learning_rate</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span>
+                <span class="n">model_cache_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">checkpoint_frequency</span><span class="o">=</span><span class="mi">50</span>
+            <span class="p">),</span>
+            <span class="n">logging</span><span class="o">=</span><span class="n">LoggingConfig</span><span class="p">(</span>
+                <span class="n">level</span><span class="o">=</span><span class="n">LogLevel</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span>
+                <span class="nb">format</span><span class="o">=</span><span class="n">LogFormat</span><span class="o">.</span><span class="n">STRUCTURED</span><span class="p">,</span>
+                <span class="n">output</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;console&quot;</span><span class="p">,</span> <span class="s2">&quot;file&quot;</span><span class="p">]</span>
+            <span class="p">),</span>
+            <span class="n">performance</span><span class="o">=</span><span class="n">PerformanceConfig</span><span class="p">(</span>
+                <span class="n">memory_threshold</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+                <span class="n">auto_optimize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">profiling_enabled</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">),</span>
+            <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span>
+            <span class="n">debug_mode</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">environment</span> <span class="o">==</span> <span class="s2">&quot;testing&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">SystemConfig</span><span class="p">(</span>
+            <span class="n">hardware</span><span class="o">=</span><span class="n">HardwareConfig</span><span class="p">(</span>
+                <span class="n">device_preference</span><span class="o">=</span><span class="n">DeviceType</span><span class="o">.</span><span class="n">CPU</span><span class="p">,</span>
+                <span class="n">sdr_mode</span><span class="o">=</span><span class="n">SDRMode</span><span class="o">.</span><span class="n">SIMULATION</span><span class="p">,</span>
+                <span class="n">memory_limit_gb</span><span class="o">=</span><span class="mf">4.0</span><span class="p">,</span>
+                <span class="n">enable_mixed_precision</span><span class="o">=</span><span class="kc">False</span>
+            <span class="p">),</span>
+            <span class="n">ml</span><span class="o">=</span><span class="n">MLConfig</span><span class="p">(</span>
+                <span class="n">batch_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+                <span class="n">learning_rate</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span>
+                <span class="n">model_cache_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">checkpoint_frequency</span><span class="o">=</span><span class="mi">10</span>
+            <span class="p">),</span>
+            <span class="n">logging</span><span class="o">=</span><span class="n">LoggingConfig</span><span class="p">(</span>
+                <span class="n">level</span><span class="o">=</span><span class="n">LogLevel</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
+                <span class="nb">format</span><span class="o">=</span><span class="n">LogFormat</span><span class="o">.</span><span class="n">SIMPLE</span><span class="p">,</span>
+                <span class="n">output</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;console&quot;</span><span class="p">]</span>
+            <span class="p">),</span>
+            <span class="n">performance</span><span class="o">=</span><span class="n">PerformanceConfig</span><span class="p">(</span>
+                <span class="n">memory_threshold</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>
+                <span class="n">auto_optimize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">profiling_enabled</span><span class="o">=</span><span class="kc">False</span>
+            <span class="p">),</span>
+            <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span>
+            <span class="n">debug_mode</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">environment</span> <span class="o">==</span> <span class="s2">&quot;production&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">SystemConfig</span><span class="p">(</span>
+            <span class="n">hardware</span><span class="o">=</span><span class="n">HardwareConfig</span><span class="p">(</span>
+                <span class="n">device_preference</span><span class="o">=</span><span class="n">DeviceType</span><span class="o">.</span><span class="n">AUTO</span><span class="p">,</span>
+                <span class="n">sdr_mode</span><span class="o">=</span><span class="n">SDRMode</span><span class="o">.</span><span class="n">AUTO</span><span class="p">,</span>
+                <span class="n">memory_limit_gb</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">enable_mixed_precision</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">),</span>
+            <span class="n">ml</span><span class="o">=</span><span class="n">MLConfig</span><span class="p">(</span>
+                <span class="n">batch_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">learning_rate</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span>
+                <span class="n">model_cache_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                <span class="n">checkpoint_frequency</span><span class="o">=</span><span class="mi">1000</span>
+            <span class="p">),</span>
+            <span class="n">logging</span><span class="o">=</span><span class="n">LoggingConfig</span><span class="p">(</span>
+                <span class="n">level</span><span class="o">=</span><span class="n">LogLevel</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
+                <span class="nb">format</span><span class="o">=</span><span class="n">LogFormat</span><span class="o">.</span><span class="n">STRUCTURED</span><span class="p">,</span>
+                <span class="n">output</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">,</span> <span class="s2">&quot;syslog&quot;</span><span class="p">]</span>
+            <span class="p">),</span>
+            <span class="n">performance</span><span class="o">=</span><span class="n">PerformanceConfig</span><span class="p">(</span>
+                <span class="n">memory_threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+                <span class="n">auto_optimize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">profiling_enabled</span><span class="o">=</span><span class="kc">False</span>
+            <span class="p">),</span>
+            <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span>
+            <span class="n">debug_mode</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown environment: </span><span class="si">{</span><span class="n">environment</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, GeminiSDR Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

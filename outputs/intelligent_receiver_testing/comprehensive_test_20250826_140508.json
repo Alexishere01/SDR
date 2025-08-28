@@ -1,0 +1,937 @@
+{
+  "basic_scenarios": {
+    "episodes": [
+      {
+        "episode": 0,
+        "target_freq": 156054107.95206898,
+        "target_snr": 12.801639978015551,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -1889.8917382970574
+      },
+      {
+        "episode": 1,
+        "target_freq": 88903678.46947245,
+        "target_snr": 24.194539171447406,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -450.902521118067
+      },
+      {
+        "episode": 2,
+        "target_freq": 80942098.29433419,
+        "target_snr": 15.168866971440028,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": 976.5949449367498
+      },
+      {
+        "episode": 3,
+        "target_freq": 113348529.96300861,
+        "target_snr": 24.718496748705974,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -2000.0
+      },
+      {
+        "episode": 4,
+        "target_freq": 90373158.780531,
+        "target_snr": 21.277726152919623,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": 631.613697511247
+      },
+      {
+        "episode": 5,
+        "target_freq": 165494965.97072965,
+        "target_snr": 23.048333246615094,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -1962.2701203150045
+      },
+      {
+        "episode": 6,
+        "target_freq": 145569377.7735137,
+        "target_snr": 23.11327635221788,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -2000.0
+      },
+      {
+        "episode": 7,
+        "target_freq": 84929665.21768051,
+        "target_snr": 22.33654608307036,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -167.13149947743747
+      },
+      {
+        "episode": 8,
+        "target_freq": 147651077.08473384,
+        "target_snr": 18.969139139726646,
+        "found_signal": true,
+        "convergence_time": 47,
+        "final_snr": 18.41228439877123,
+        "frequency_error": 10480.626827329397,
+        "total_reward": -985.4009376451867
+      },
+      {
+        "episode": 9,
+        "target_freq": 96560558.55386941,
+        "target_snr": 22.190347267638092,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -2000.0
+      },
+      {
+        "episode": 10,
+        "target_freq": 108949678.71003702,
+        "target_snr": 16.487578983562802,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -874.7371906776156
+      },
+      {
+        "episode": 11,
+        "target_freq": 173148553.58392093,
+        "target_snr": 14.055753195081998,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -2000.0
+      },
+      {
+        "episode": 12,
+        "target_freq": 93718610.78691518,
+        "target_snr": 16.86030789389932,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -1452.7847941024097
+      },
+      {
+        "episode": 13,
+        "target_freq": 131600373.56214078,
+        "target_snr": 15.594122633855658,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -1410.9541290245013
+      },
+      {
+        "episode": 14,
+        "target_freq": 101039982.8750854,
+        "target_snr": 19.583365085034046,
+        "found_signal": true,
+        "convergence_time": 50,
+        "final_snr": 16.376819591726985,
+        "frequency_error": 736716.6633653343,
+        "total_reward": 426.5121987994812
+      },
+      {
+        "episode": 15,
+        "target_freq": 130848887.14452663,
+        "target_snr": 15.336067779425052,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -1785.5854980497359
+      },
+      {
+        "episode": 16,
+        "target_freq": 103167594.19994666,
+        "target_snr": 16.913976260577865,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": 566.5702679022946
+      },
+      {
+        "episode": 17,
+        "target_freq": 179561964.34535515,
+        "target_snr": 10.920299696036922,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -1500.7809665104946
+      },
+      {
+        "episode": 18,
+        "target_freq": 82801456.9881131,
+        "target_snr": 17.73652295833465,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -2000.0
+      },
+      {
+        "episode": 19,
+        "target_freq": 170574457.8375356,
+        "target_snr": 19.976756228591,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -1852.7912465666911
+      },
+      {
+        "episode": 20,
+        "target_freq": 133034374.21926704,
+        "target_snr": 15.799413564054564,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -1467.83054866174
+      },
+      {
+        "episode": 21,
+        "target_freq": 84100069.48670042,
+        "target_snr": 12.563338949696764,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -1450.8925715526648
+      },
+      {
+        "episode": 22,
+        "target_freq": 152722636.71511555,
+        "target_snr": 18.237316810055543,
+        "found_signal": true,
+        "convergence_time": 1,
+        "final_snr": 19.179222332200904,
+        "frequency_error": 73949.74508795142,
+        "total_reward": 57.6496550271453
+      },
+      {
+        "episode": 23,
+        "target_freq": 115270443.7280872,
+        "target_snr": 11.674608436422464,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -1946.9911367648374
+      },
+      {
+        "episode": 24,
+        "target_freq": 156717471.5933614,
+        "target_snr": 19.76268566395496,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -166.31281769052947
+      },
+      {
+        "episode": 25,
+        "target_freq": 133172957.0135987,
+        "target_snr": 12.937918878401083,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -1478.898209964413
+      },
+      {
+        "episode": 26,
+        "target_freq": 159656133.27554938,
+        "target_snr": 23.4993048307596,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": 69.36037849679869
+      },
+      {
+        "episode": 27,
+        "target_freq": 167323820.81768158,
+        "target_snr": 22.477662762202545,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": 536.6410131682843
+      },
+      {
+        "episode": 28,
+        "target_freq": 121026856.65813835,
+        "target_snr": 17.716772696860684,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -2000.0
+      },
+      {
+        "episode": 29,
+        "target_freq": 131702636.21054658,
+        "target_snr": 23.767819372682922,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": 560.9207466306118
+      },
+      {
+        "episode": 30,
+        "target_freq": 118343801.0299128,
+        "target_snr": 20.84014620144624,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -1572.0743222665913
+      },
+      {
+        "episode": 31,
+        "target_freq": 143574788.29536435,
+        "target_snr": 13.75779404453612,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -2000.0
+      },
+      {
+        "episode": 32,
+        "target_freq": 91043501.2980077,
+        "target_snr": 24.755906106961856,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -2000.0
+      },
+      {
+        "episode": 33,
+        "target_freq": 138101030.50634745,
+        "target_snr": 17.974452304927855,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -2000.0
+      },
+      {
+        "episode": 34,
+        "target_freq": 110555255.5601788,
+        "target_snr": 18.59233474623098,
+        "found_signal": true,
+        "convergence_time": 13,
+        "final_snr": 21.758104226784056,
+        "frequency_error": 70611.44155709445,
+        "total_reward": 253.16978536156807
+      },
+      {
+        "episode": 35,
+        "target_freq": 178553290.92418733,
+        "target_snr": 24.341711364523622,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -2000.0
+      },
+      {
+        "episode": 36,
+        "target_freq": 169160066.18042853,
+        "target_snr": 17.5544679696017,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": 609.2910054075636
+      },
+      {
+        "episode": 37,
+        "target_freq": 179420331.1637126,
+        "target_snr": 20.076153741292835,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -2000.0
+      },
+      {
+        "episode": 38,
+        "target_freq": 148016716.491163,
+        "target_snr": 22.832127400151727,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -2000.0
+      },
+      {
+        "episode": 39,
+        "target_freq": 113876532.07222334,
+        "target_snr": 17.170813805647803,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -2000.0
+      },
+      {
+        "episode": 40,
+        "target_freq": 116016367.78937958,
+        "target_snr": 20.679753443957306,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -1794.2761074918567
+      },
+      {
+        "episode": 41,
+        "target_freq": 151087464.5691676,
+        "target_snr": 15.853284729157917,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -1996.692393535857
+      },
+      {
+        "episode": 42,
+        "target_freq": 151677290.7847154,
+        "target_snr": 24.125843740691995,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -2000.0
+      },
+      {
+        "episode": 43,
+        "target_freq": 111012898.55745164,
+        "target_snr": 19.06397518351512,
+        "found_signal": true,
+        "convergence_time": 17,
+        "final_snr": 15.386700103573471,
+        "frequency_error": 63052.72280703485,
+        "total_reward": 344.8410898000364
+      },
+      {
+        "episode": 44,
+        "target_freq": 131717541.89699079,
+        "target_snr": 21.642245047928625,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -1984.8307745055909
+      },
+      {
+        "episode": 45,
+        "target_freq": 113953007.04606509,
+        "target_snr": 12.510208251122188,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -1213.241154672915
+      },
+      {
+        "episode": 46,
+        "target_freq": 110875536.76868814,
+        "target_snr": 15.931659979854134,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -2000.0
+      },
+      {
+        "episode": 47,
+        "target_freq": 108398011.17415294,
+        "target_snr": 24.83384033129568,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -1812.6109253681566
+      },
+      {
+        "episode": 48,
+        "target_freq": 167403261.750094,
+        "target_snr": 14.671476769663968,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -1858.8910359162924
+      },
+      {
+        "episode": 49,
+        "target_freq": 144967560.3365022,
+        "target_snr": 17.695686113760868,
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0,
+        "frequency_error": 0,
+        "total_reward": -2000.0
+      }
+    ],
+    "success_count": 5,
+    "total_episodes": 50,
+    "avg_convergence_time": 25.6,
+    "avg_snr_found": 18.22262613061133,
+    "avg_frequency_error": 190962.23992894887,
+    "success_rate": 0.1
+  },
+  "interference_scenarios": {
+    "episodes": [
+      {
+        "episode": 0,
+        "target_freq": 111649392.16769245,
+        "target_snr": 15.031667864431544,
+        "interference_type": "narrowband",
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0
+      },
+      {
+        "episode": 1,
+        "target_freq": 90910270.52739869,
+        "target_snr": 13.60780343751906,
+        "interference_type": "narrowband",
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0
+      },
+      {
+        "episode": 2,
+        "target_freq": 113484919.14774165,
+        "target_snr": 13.089393420703978,
+        "interference_type": "wideband",
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0
+      },
+      {
+        "episode": 3,
+        "target_freq": 156020192.22078753,
+        "target_snr": 19.51486114570047,
+        "interference_type": "pulsed",
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0
+      },
+      {
+        "episode": 4,
+        "target_freq": 127463401.43226655,
+        "target_snr": 8.677575726599436,
+        "interference_type": "narrowband",
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0
+      },
+      {
+        "episode": 5,
+        "target_freq": 156461762.31761542,
+        "target_snr": 19.643201903845757,
+        "interference_type": "narrowband",
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0
+      },
+      {
+        "episode": 6,
+        "target_freq": 155647134.21514726,
+        "target_snr": 11.204603989983436,
+        "interference_type": "wideband",
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0
+      },
+      {
+        "episode": 7,
+        "target_freq": 94821305.9415426,
+        "target_snr": 10.866165022550252,
+        "interference_type": "wideband",
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0
+      },
+      {
+        "episode": 8,
+        "target_freq": 120428820.1269489,
+        "target_snr": 10.5911792651894,
+        "interference_type": "pulsed",
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0
+      },
+      {
+        "episode": 9,
+        "target_freq": 162514570.50642988,
+        "target_snr": 14.433620232914839,
+        "interference_type": "narrowband",
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0
+      },
+      {
+        "episode": 10,
+        "target_freq": 113172434.17645566,
+        "target_snr": 6.502372087961682,
+        "interference_type": "wideband",
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0
+      },
+      {
+        "episode": 11,
+        "target_freq": 162314509.45351946,
+        "target_snr": 5.303788030198172,
+        "interference_type": "narrowband",
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0
+      },
+      {
+        "episode": 12,
+        "target_freq": 119058630.93935649,
+        "target_snr": 12.276737249154483,
+        "interference_type": "narrowband",
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0
+      },
+      {
+        "episode": 13,
+        "target_freq": 91549512.68337005,
+        "target_snr": 9.15254080229699,
+        "interference_type": "wideband",
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0
+      },
+      {
+        "episode": 14,
+        "target_freq": 147571358.1832962,
+        "target_snr": 18.540246762503795,
+        "interference_type": "pulsed",
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0
+      },
+      {
+        "episode": 15,
+        "target_freq": 155828797.38477632,
+        "target_snr": 10.363675504463124,
+        "interference_type": "narrowband",
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0
+      },
+      {
+        "episode": 16,
+        "target_freq": 122042289.13753301,
+        "target_snr": 15.803323524306503,
+        "interference_type": "narrowband",
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0
+      },
+      {
+        "episode": 17,
+        "target_freq": 98072709.75567861,
+        "target_snr": 9.25452346036224,
+        "interference_type": "wideband",
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0
+      },
+      {
+        "episode": 18,
+        "target_freq": 140306517.15875208,
+        "target_snr": 5.212890600532353,
+        "interference_type": "pulsed",
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0
+      },
+      {
+        "episode": 19,
+        "target_freq": 101109509.94046323,
+        "target_snr": 14.9410328334248,
+        "interference_type": "pulsed",
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0
+      },
+      {
+        "episode": 20,
+        "target_freq": 123765777.25071949,
+        "target_snr": 18.350990176486086,
+        "interference_type": "wideband",
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0
+      },
+      {
+        "episode": 21,
+        "target_freq": 151791317.21704882,
+        "target_snr": 8.5508713301233,
+        "interference_type": "narrowband",
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0
+      },
+      {
+        "episode": 22,
+        "target_freq": 148193990.13924,
+        "target_snr": 10.138646407187291,
+        "interference_type": "pulsed",
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0
+      },
+      {
+        "episode": 23,
+        "target_freq": 122038534.20315614,
+        "target_snr": 18.611119163048354,
+        "interference_type": "pulsed",
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0
+      },
+      {
+        "episode": 24,
+        "target_freq": 135983354.15086344,
+        "target_snr": 15.3234435513393,
+        "interference_type": "narrowband",
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0
+      },
+      {
+        "episode": 25,
+        "target_freq": 123608787.31092043,
+        "target_snr": 13.364810585034279,
+        "interference_type": "pulsed",
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0
+      },
+      {
+        "episode": 26,
+        "target_freq": 99915184.43161224,
+        "target_snr": 15.661808228169615,
+        "interference_type": "narrowband",
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0
+      },
+      {
+        "episode": 27,
+        "target_freq": 114336537.99645783,
+        "target_snr": 11.707974177322738,
+        "interference_type": "narrowband",
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0
+      },
+      {
+        "episode": 28,
+        "target_freq": 101790221.43928877,
+        "target_snr": 5.112269455268942,
+        "interference_type": "narrowband",
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0
+      },
+      {
+        "episode": 29,
+        "target_freq": 134581558.34780708,
+        "target_snr": 5.160422635370328,
+        "interference_type": "narrowband",
+        "found_signal": false,
+        "convergence_time": 0,
+        "final_snr": 0
+      }
+    ],
+    "success_count": 0,
+    "total_episodes": 30,
+    "interference_types": [
+      "narrowband",
+      "wideband",
+      "pulsed"
+    ],
+    "success_rate": 0.0
+  },
+  "frequency_sweep": {
+    "frequencies": [
+      70000000.0,
+      76842105.26315789,
+      83684210.5263158,
+      90526315.78947368,
+      97368421.05263159,
+      104210526.31578948,
+      111052631.57894737,
+      117894736.84210527,
+      124736842.10526316,
+      131578947.36842105,
+      138421052.63157895,
+      145263157.89473683,
+      152105263.15789473,
+      158947368.42105263,
+      165789473.68421054,
+      172631578.94736844,
+      179473684.21052632,
+      186315789.4736842,
+      193157894.7368421,
+      200000000.0
+    ],
+    "success_rates": [
+      0.4,
+      0.3,
+      0.1,
+      0.1,
+      0.2,
+      0.1,
+      0.2,
+      0.3,
+      0.4,
+      0.3,
+      0.1,
+      0.1,
+      0.2,
+      0.2,
+      0.2,
+      0.5,
+      0.0,
+      0.3,
+      0.3,
+      0.6
+    ],
+    "avg_convergence_times": [
+      2.0,
+      28.333333333333332,
+      1.0,
+      47.0,
+      22.5,
+      50.0,
+      28.5,
+      14.333333333333334,
+      37.5,
+      28.0,
+      50.0,
+      35.0,
+      36.5,
+      43.0,
+      15.5,
+      23.4,
+      0,
+      48.333333333333336,
+      35.333333333333336,
+      1.0
+    ],
+    "avg_snrs_found": [
+      19.14831806647932,
+      17.755887079540116,
+      17.511164227254323,
+      19.15315574894378,
+      19.815086753269693,
+      15.8205185198408,
+      18.40151787788215,
+      19.873953589901763,
+      17.248700023745894,
+      17.46081577314253,
+      15.085457331006038,
+      21.036063708350433,
+      19.132064676285758,
+      16.94148908002458,
+      19.160125404498967,
+      18.022145971078,
+      0,
+      17.16540464560074,
+      17.33601526884008,
+      18.97918756662865
+    ]
+  },
+  "snr_performance": {
+    "snr_levels": [
+      -10.0,
+      -7.142857142857142,
+      -4.285714285714286,
+      -1.4285714285714288,
+      1.4285714285714288,
+      4.2857142857142865,
+      7.142857142857142,
+      10.0,
+      12.857142857142858,
+      15.714285714285715,
+      18.571428571428573,
+      21.42857142857143,
+      24.285714285714285,
+      27.142857142857146,
+      30.0
+    ],
+    "success_rates": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.1,
+      0.5,
+      0.3,
+      0.0,
+      0.1,
+      0.1
+    ],
+    "avg_convergence_times": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1.0,
+      19.6,
+      47.666666666666664,
+      0,
+      50.0,
+      50.0
+    ]
+  }
+}

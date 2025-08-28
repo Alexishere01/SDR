@@ -1,0 +1,366 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>core.signal_generator &mdash; GeminiSDR 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            GeminiSDR
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">User Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../architecture/index.html">System Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/index.html">Examples and Tutorials</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">GeminiSDR</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">core.signal_generator</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for core.signal_generator</h1><div class="highlight"><pre>
+<span></span><span class="c1"># core/signal_generator.py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">h5py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<div class="viewcode-block" id="SDRSignalGenerator">
+<a class="viewcode-back" href="../../api/core/core.signal_generator.html#core.signal_generator.SDRSignalGenerator">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SDRSignalGenerator</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Advanced signal generator for AMR and other SDR applications.&quot;&quot;&quot;</span>
+    
+<div class="viewcode-block" id="SDRSignalGenerator.__init__">
+<a class="viewcode-back" href="../../api/core/core.signal_generator.html#core.signal_generator.SDRSignalGenerator.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_rate</span><span class="o">=</span><span class="mf">1e6</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span> <span class="o">=</span> <span class="n">sample_rate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modulation_types</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;BPSK&#39;</span><span class="p">,</span> <span class="s1">&#39;QPSK&#39;</span><span class="p">,</span> <span class="s1">&#39;8PSK&#39;</span><span class="p">,</span> <span class="s1">&#39;16QAM&#39;</span><span class="p">,</span> <span class="s1">&#39;64QAM&#39;</span><span class="p">]</span></div>
+
+    
+<div class="viewcode-block" id="SDRSignalGenerator.generate_complex_noise">
+<a class="viewcode-back" href="../../api/core/core.signal_generator.html#core.signal_generator.SDRSignalGenerator.generate_complex_noise">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_complex_noise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">noise_power</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate complex Gaussian noise.&quot;&quot;&quot;</span>
+        <span class="n">noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">noise_power</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">num_samples</span><span class="p">)</span> <span class="o">+</span> 
+                                           <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">num_samples</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">noise</span></div>
+
+    
+<div class="viewcode-block" id="SDRSignalGenerator.add_channel_effects">
+<a class="viewcode-back" href="../../api/core/core.signal_generator.html#core.signal_generator.SDRSignalGenerator.add_channel_effects">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_channel_effects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signal</span><span class="p">,</span> <span class="n">snr_db</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">freq_offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">phase_offset</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add realistic channel impairments.&quot;&quot;&quot;</span>
+        <span class="c1"># Add frequency offset</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">signal</span><span class="p">))</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span>
+        <span class="n">signal</span> <span class="o">=</span> <span class="n">signal</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">freq_offset</span> <span class="o">*</span> <span class="n">time</span><span class="p">)</span>
+        
+        <span class="c1"># Add phase offset</span>
+        <span class="n">signal</span> <span class="o">=</span> <span class="n">signal</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">phase_offset</span><span class="p">)</span>
+        
+        <span class="c1"># Add noise based on SNR</span>
+        <span class="n">signal_power</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">noise_power</span> <span class="o">=</span> <span class="n">signal_power</span> <span class="o">/</span> <span class="p">(</span><span class="mi">10</span><span class="o">**</span><span class="p">(</span><span class="n">snr_db</span><span class="o">/</span><span class="mi">10</span><span class="p">))</span>
+        <span class="n">noise</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_complex_noise</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">signal</span><span class="p">),</span> <span class="n">noise_power</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">signal</span> <span class="o">+</span> <span class="n">noise</span></div>
+
+    
+<div class="viewcode-block" id="SDRSignalGenerator.generate_bpsk">
+<a class="viewcode-back" href="../../api/core/core.signal_generator.html#core.signal_generator.SDRSignalGenerator.generate_bpsk">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_bpsk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_symbols</span><span class="p">,</span> <span class="n">samples_per_symbol</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate BPSK modulated signal.&quot;&quot;&quot;</span>
+        <span class="c1"># Random binary data</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">num_symbols</span><span class="p">)</span>
+        
+        <span class="c1"># Map to phase: 0 -&gt; 0, 1 -&gt; π</span>
+        <span class="n">symbols</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">data</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># Maps to -1, +1</span>
+        
+        <span class="c1"># Upsample and apply pulse shaping</span>
+        <span class="n">upsampled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">symbols</span><span class="p">,</span> <span class="n">samples_per_symbol</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_pulse_shaping</span><span class="p">(</span><span class="n">upsampled</span><span class="p">,</span> <span class="n">samples_per_symbol</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="SDRSignalGenerator.generate_qpsk">
+<a class="viewcode-back" href="../../api/core/core.signal_generator.html#core.signal_generator.SDRSignalGenerator.generate_qpsk">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_qpsk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_symbols</span><span class="p">,</span> <span class="n">samples_per_symbol</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate QPSK modulated signal.&quot;&quot;&quot;</span>
+        <span class="c1"># Random data (2 bits per symbol)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">num_symbols</span><span class="p">)</span>
+        
+        <span class="c1"># Map to constellation points</span>
+        <span class="n">constellation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="o">+</span><span class="mi">1</span><span class="n">j</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="o">+</span><span class="mi">1</span><span class="n">j</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="p">])</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">symbols</span> <span class="o">=</span> <span class="n">constellation</span><span class="p">[</span><span class="n">data</span><span class="p">]</span>
+        
+        <span class="c1"># Upsample</span>
+        <span class="n">upsampled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">symbols</span><span class="p">,</span> <span class="n">samples_per_symbol</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_pulse_shaping</span><span class="p">(</span><span class="n">upsampled</span><span class="p">,</span> <span class="n">samples_per_symbol</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="SDRSignalGenerator.generate_qam">
+<a class="viewcode-back" href="../../api/core/core.signal_generator.html#core.signal_generator.SDRSignalGenerator.generate_qam">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_qam</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_symbols</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">samples_per_symbol</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate QAM modulated signal (16-QAM or 64-QAM).&quot;&quot;&quot;</span>
+        <span class="c1"># Generate random data</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">num_symbols</span><span class="p">)</span>
+        
+        <span class="c1"># Create QAM constellation</span>
+        <span class="k">if</span> <span class="n">order</span> <span class="o">==</span> <span class="mi">16</span><span class="p">:</span>
+            <span class="c1"># 16-QAM constellation</span>
+            <span class="n">levels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+            <span class="n">constellation</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">levels</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">levels</span><span class="p">:</span>
+                    <span class="n">constellation</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">q</span><span class="p">)</span>
+            <span class="n">constellation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">constellation</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">order</span> <span class="o">==</span> <span class="mi">64</span><span class="p">:</span>
+            <span class="c1"># 64-QAM constellation</span>
+            <span class="n">levels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">7</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">])</span>
+            <span class="n">constellation</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">levels</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">levels</span><span class="p">:</span>
+                    <span class="n">constellation</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">q</span><span class="p">)</span>
+            <span class="n">constellation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">constellation</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported QAM order: </span><span class="si">{</span><span class="n">order</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># Map data to constellation</span>
+        <span class="n">symbols</span> <span class="o">=</span> <span class="n">constellation</span><span class="p">[</span><span class="n">data</span><span class="p">]</span>
+        
+        <span class="c1"># Upsample</span>
+        <span class="n">upsampled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">symbols</span><span class="p">,</span> <span class="n">samples_per_symbol</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_pulse_shaping</span><span class="p">(</span><span class="n">upsampled</span><span class="p">,</span> <span class="n">samples_per_symbol</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="SDRSignalGenerator.generate_8psk">
+<a class="viewcode-back" href="../../api/core/core.signal_generator.html#core.signal_generator.SDRSignalGenerator.generate_8psk">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_8psk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_symbols</span><span class="p">,</span> <span class="n">samples_per_symbol</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate 8-PSK modulated signal.&quot;&quot;&quot;</span>
+        <span class="c1"># Random data (3 bits per symbol)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="n">num_symbols</span><span class="p">)</span>
+        
+        <span class="c1"># 8-PSK constellation points</span>
+        <span class="n">angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="o">/</span> <span class="mi">4</span>
+        <span class="n">constellation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">angles</span><span class="p">)</span>
+        <span class="n">symbols</span> <span class="o">=</span> <span class="n">constellation</span><span class="p">[</span><span class="n">data</span><span class="p">]</span>
+        
+        <span class="c1"># Upsample</span>
+        <span class="n">upsampled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">symbols</span><span class="p">,</span> <span class="n">samples_per_symbol</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_pulse_shaping</span><span class="p">(</span><span class="n">upsampled</span><span class="p">,</span> <span class="n">samples_per_symbol</span><span class="p">)</span></div>
+
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_pulse_shaping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signal</span><span class="p">,</span> <span class="n">samples_per_symbol</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.35</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply root raised cosine pulse shaping.&quot;&quot;&quot;</span>
+        <span class="c1"># Simple approximation of RRC filter</span>
+        <span class="n">filter_length</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">samples_per_symbol</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">filter_length</span><span class="p">)</span> <span class="o">-</span> <span class="n">filter_length</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">t</span> <span class="o">/</span> <span class="n">samples_per_symbol</span>
+        
+        <span class="c1"># Root raised cosine impulse response</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ti</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">ti</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">h</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="n">alpha</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+            <span class="k">elif</span> <span class="nb">abs</span><span class="p">(</span><span class="n">ti</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="n">alpha</span><span class="p">):</span>
+                <span class="n">h</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">alpha</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="p">((</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="n">alpha</span><span class="p">))</span> <span class="o">+</span>
+                                               <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="mi">2</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="n">alpha</span><span class="p">)))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">h</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">ti</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">alpha</span><span class="p">))</span> <span class="o">+</span>
+                        <span class="mi">4</span><span class="o">*</span><span class="n">alpha</span><span class="o">*</span><span class="n">ti</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">ti</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">alpha</span><span class="p">)))</span> <span class="o">/</span> \
+                       <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">ti</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="n">alpha</span><span class="o">*</span><span class="n">ti</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+        
+        <span class="c1"># Normalize filter</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">h</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">h</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+        
+        <span class="c1"># Apply filter</span>
+        <span class="n">filtered</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;same&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">filtered</span>
+    
+<div class="viewcode-block" id="SDRSignalGenerator.generate_modulated_signal">
+<a class="viewcode-back" href="../../api/core/core.signal_generator.html#core.signal_generator.SDRSignalGenerator.generate_modulated_signal">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_modulated_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modulation_type</span><span class="p">,</span> <span class="n">num_symbols</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+                                  <span class="n">samples_per_symbol</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">snr_db</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate modulated signal with specified parameters.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">modulation_type</span> <span class="o">==</span> <span class="s1">&#39;BPSK&#39;</span><span class="p">:</span>
+            <span class="n">signal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_bpsk</span><span class="p">(</span><span class="n">num_symbols</span><span class="p">,</span> <span class="n">samples_per_symbol</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">modulation_type</span> <span class="o">==</span> <span class="s1">&#39;QPSK&#39;</span><span class="p">:</span>
+            <span class="n">signal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_qpsk</span><span class="p">(</span><span class="n">num_symbols</span><span class="p">,</span> <span class="n">samples_per_symbol</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">modulation_type</span> <span class="o">==</span> <span class="s1">&#39;8PSK&#39;</span><span class="p">:</span>
+            <span class="n">signal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_8psk</span><span class="p">(</span><span class="n">num_symbols</span><span class="p">,</span> <span class="n">samples_per_symbol</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">modulation_type</span> <span class="o">==</span> <span class="s1">&#39;16QAM&#39;</span><span class="p">:</span>
+            <span class="n">signal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_qam</span><span class="p">(</span><span class="n">num_symbols</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="n">samples_per_symbol</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">modulation_type</span> <span class="o">==</span> <span class="s1">&#39;64QAM&#39;</span><span class="p">:</span>
+            <span class="n">signal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_qam</span><span class="p">(</span><span class="n">num_symbols</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="n">samples_per_symbol</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported modulation type: </span><span class="si">{</span><span class="n">modulation_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># Add channel effects</span>
+        <span class="n">signal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_channel_effects</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">snr_db</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">signal</span></div>
+</div>
+
+
+<div class="viewcode-block" id="SDRDatasetManager">
+<a class="viewcode-back" href="../../api/core/core.signal_generator.html#core.signal_generator.SDRDatasetManager">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SDRDatasetManager</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Manage datasets for training and testing.&quot;&quot;&quot;</span>
+    
+<div class="viewcode-block" id="SDRDatasetManager.__init__">
+<a class="viewcode-back" href="../../api/core/core.signal_generator.html#core.signal_generator.SDRDatasetManager.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_path</span><span class="o">=</span><span class="s1">&#39;./datasets&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_path</span> <span class="o">=</span> <span class="n">base_path</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="SDRDatasetManager.generate_dataset">
+<a class="viewcode-back" href="../../api/core/core.signal_generator.html#core.signal_generator.SDRDatasetManager.generate_dataset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_samples_per_class</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">snr_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">30</span><span class="p">),</span>
+                         <span class="n">signal_length</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">modulations</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate comprehensive dataset for AMR.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">modulations</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">modulations</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;BPSK&#39;</span><span class="p">,</span> <span class="s1">&#39;QPSK&#39;</span><span class="p">,</span> <span class="s1">&#39;8PSK&#39;</span><span class="p">,</span> <span class="s1">&#39;16QAM&#39;</span><span class="p">,</span> <span class="s1">&#39;64QAM&#39;</span><span class="p">]</span>
+        
+        <span class="n">generator</span> <span class="o">=</span> <span class="n">SDRSignalGenerator</span><span class="p">()</span>
+        <span class="n">timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">_%H%M%S&quot;</span><span class="p">)</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_path</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;amr_dataset_</span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="s1">.h5&#39;</span><span class="p">)</span>
+        
+        <span class="c1"># Calculate total samples</span>
+        <span class="n">snr_steps</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">snr_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">snr_range</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">5</span><span class="p">))</span>
+        <span class="n">num_total</span> <span class="o">=</span> <span class="n">num_samples_per_class</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">modulations</span><span class="p">)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">snr_steps</span><span class="p">)</span>
+        
+        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="c1"># Pre-allocate arrays</span>
+            <span class="n">signals</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;signals&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">num_total</span><span class="p">,</span> <span class="n">signal_length</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex64</span><span class="p">)</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;labels&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">num_total</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;S10&#39;</span><span class="p">)</span>
+            <span class="n">snrs</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;snrs&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">num_total</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+            
+            <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="n">modulations</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generating </span><span class="si">{</span><span class="n">mod</span><span class="si">}</span><span class="s2"> signals...&quot;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">snr</span> <span class="ow">in</span> <span class="n">snr_steps</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_samples_per_class</span><span class="p">):</span>
+                        <span class="c1"># Generate signal</span>
+                        <span class="n">sig</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">generate_modulated_signal</span><span class="p">(</span>
+                            <span class="n">mod</span><span class="p">,</span> 
+                            <span class="n">num_symbols</span><span class="o">=</span><span class="n">signal_length</span><span class="o">//</span><span class="mi">8</span><span class="p">,</span>
+                            <span class="n">snr_db</span><span class="o">=</span><span class="n">snr</span>
+                        <span class="p">)</span>
+                        
+                        <span class="c1"># Store in dataset</span>
+                        <span class="n">signals</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">sig</span><span class="p">[:</span><span class="n">signal_length</span><span class="p">]</span>
+                        <span class="n">labels</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
+                        <span class="n">snrs</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">snr</span>
+                        <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
+            
+            <span class="c1"># Store metadata</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;modulations&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">modulations</span><span class="p">]</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;sample_rate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">sample_rate</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;creation_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timestamp</span>
+        
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset saved to </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">filename</span></div>
+
+    
+<div class="viewcode-block" id="SDRDatasetManager.load_dataset">
+<a class="viewcode-back" href="../../api/core/core.signal_generator.html#core.signal_generator.SDRDatasetManager.load_dataset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load dataset from HDF5 file.&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">signals</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;signals&#39;</span><span class="p">][:]</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">][:]</span>
+            <span class="n">snrs</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;snrs&#39;</span><span class="p">][:]</span>
+            
+            <span class="c1"># Decode labels</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">l</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">])</span>
+            
+            <span class="k">return</span> <span class="n">signals</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">snrs</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, GeminiSDR Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

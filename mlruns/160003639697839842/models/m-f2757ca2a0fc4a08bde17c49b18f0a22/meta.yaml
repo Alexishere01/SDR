@@ -1,0 +1,10 @@
+artifact_location: file:///Users/alex/Desktop/Gemini/Projects/geminisdr/mlruns/160003639697839842/models/m-f2757ca2a0fc4a08bde17c49b18f0a22/artifacts
+creation_timestamp: 1756213383421
+experiment_id: '160003639697839842'
+last_updated_timestamp: 1756213386365
+model_id: m-f2757ca2a0fc4a08bde17c49b18f0a22
+model_type: null
+name: model
+source_run_id: 657117652de3417aac87158831d69141
+status: 2
+status_message: null

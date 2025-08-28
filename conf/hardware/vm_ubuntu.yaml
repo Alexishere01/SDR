@@ -1,0 +1,10 @@
+# @package hardware
+# Ubuntu VM hardware configuration
+# Optimized for virtualized Linux environment
+
+device_preference: cpu
+sdr_mode: simulation  # VMs typically don't have SDR hardware access
+memory_limit_gb: 4.0  # Conservative for VM environment
+max_threads: 4        # Typical VM allocation
+gpu_memory_fraction: 0.8  # Not applicable for CPU-only
+enable_mixed_precision: false  # CPU mixed precision has limited benefits

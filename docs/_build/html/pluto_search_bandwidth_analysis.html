@@ -1,0 +1,416 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PlutoSDR Full Search Bandwidth Analysis &mdash; GeminiSDR 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            GeminiSDR
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="guides/index.html">User Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture/index.html">System Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/index.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/index.html">Examples and Tutorials</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">GeminiSDR</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">PlutoSDR Full Search Bandwidth Analysis</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/pluto_search_bandwidth_analysis.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="plutosdr-full-search-bandwidth-analysis">
+<h1>PlutoSDR Full Search Bandwidth Analysis<a class="headerlink" href="#plutosdr-full-search-bandwidth-analysis" title="Link to this heading"></a></h1>
+<section id="plutosdr-hardware-specifications">
+<h2>PlutoSDR Hardware Specifications<a class="headerlink" href="#plutosdr-hardware-specifications" title="Link to this heading"></a></h2>
+<section id="frequency-range">
+<h3>Frequency Range<a class="headerlink" href="#frequency-range" title="Link to this heading"></a></h3>
+<p><strong>PlutoSDR Native Range</strong>: 325 MHz - 3.8 GHz
+<strong>Extended Range (with modifications)</strong>: 70 MHz - 6 GHz</p>
+</section>
+<section id="current-implementation-limits">
+<h3>Current Implementation Limits<a class="headerlink" href="#current-implementation-limits" title="Link to this heading"></a></h3>
+<section id="simulation-mode-training">
+<h4>Simulation Mode (Training)<a class="headerlink" href="#simulation-mode-training" title="Link to this heading"></a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># In intelligent_receiver.py (simulation)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">current_freq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">current_freq</span> <span class="o">+</span> <span class="n">freq_adjust</span><span class="p">,</span>
+    <span class="mf">70e6</span><span class="p">,</span> <span class="mf">200e6</span>  <span class="c1"># 70 MHz - 200 MHz</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Search Range</strong>: 130 MHz bandwidth (70-200 MHz)</p>
+</section>
+<section id="real-hardware-mode">
+<h4>Real Hardware Mode<a class="headerlink" href="#real-hardware-mode" title="Link to this heading"></a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># In intelligent_receiver.py (real SDR)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">current_freq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">current_freq</span> <span class="o">+</span> <span class="n">freq_adjust</span><span class="p">,</span>
+    <span class="mf">70e6</span><span class="p">,</span> <span class="mf">6e9</span>  <span class="c1"># 70 MHz - 6 GHz</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Search Range</strong>: 5.93 GHz bandwidth (70 MHz - 6 GHz)</p>
+</section>
+</section>
+</section>
+<section id="full-search-capabilities">
+<h2>Full Search Capabilities<a class="headerlink" href="#full-search-capabilities" title="Link to this heading"></a></h2>
+<section id="maximum-theoretical-search-space">
+<h3>Maximum Theoretical Search Space<a class="headerlink" href="#maximum-theoretical-search-space" title="Link to this heading"></a></h3>
+<p><strong>Frequency Coverage</strong>: 70 MHz - 6 GHz = <strong>5.93 GHz total bandwidth</strong></p>
+<p><strong>Instantaneous Bandwidth</strong>: Up to 61.44 MHz (PlutoSDR max sample rate)</p>
+<p><strong>Search Resolution</strong>: 100 kHz steps (current Q-learning configuration)</p>
+<p><strong>Total Frequency Steps</strong>: (6e9 - 70e6) / 100e3 = <strong>59,300 possible frequency positions</strong></p>
+</section>
+<section id="practical-search-scenarios">
+<h3>Practical Search Scenarios<a class="headerlink" href="#practical-search-scenarios" title="Link to this heading"></a></h3>
+<section id="scenario-1-vhf-band-search-70-300-mhz">
+<h4>Scenario 1: VHF Band Search (70-300 MHz)<a class="headerlink" href="#scenario-1-vhf-band-search-70-300-mhz" title="Link to this heading"></a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># VHF communications, FM radio, amateur radio</span>
+<span class="n">frequency_range</span> <span class="o">=</span> <span class="p">(</span><span class="mf">70e6</span><span class="p">,</span> <span class="mf">300e6</span><span class="p">)</span>
+<span class="n">bandwidth</span> <span class="o">=</span> <span class="mf">230e6</span>  <span class="c1"># 230 MHz</span>
+<span class="n">search_steps</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span><span class="mi">300</span>  <span class="c1"># 100 kHz resolution</span>
+<span class="n">search_time</span> <span class="o">=</span> <span class="o">~</span><span class="mi">38</span> <span class="n">minutes</span>  <span class="c1"># At 1 second per step</span>
+</pre></div>
+</div>
+<p><strong>Applications</strong>:</p>
+<ul class="simple">
+<li><p>FM radio (88-108 MHz)</p></li>
+<li><p>VHF aircraft (118-137 MHz)</p></li>
+<li><p>Amateur radio (144-148 MHz)</p></li>
+<li><p>Marine VHF (156-174 MHz)</p></li>
+</ul>
+</section>
+<section id="scenario-2-uhf-band-search-300-mhz-1-ghz">
+<h4>Scenario 2: UHF Band Search (300 MHz - 1 GHz)<a class="headerlink" href="#scenario-2-uhf-band-search-300-mhz-1-ghz" title="Link to this heading"></a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># UHF communications, cellular, GPS</span>
+<span class="n">frequency_range</span> <span class="o">=</span> <span class="p">(</span><span class="mf">300e6</span><span class="p">,</span> <span class="mf">1e9</span><span class="p">)</span>
+<span class="n">bandwidth</span> <span class="o">=</span> <span class="mf">700e6</span>  <span class="c1"># 700 MHz</span>
+<span class="n">search_steps</span> <span class="o">=</span> <span class="mi">7</span><span class="p">,</span><span class="mi">000</span>  <span class="c1"># 100 kHz resolution</span>
+<span class="n">search_time</span> <span class="o">=</span> <span class="o">~</span><span class="mf">1.9</span> <span class="n">hours</span>  <span class="c1"># At 1 second per step</span>
+</pre></div>
+</div>
+<p><strong>Applications</strong>:</p>
+<ul class="simple">
+<li><p>UHF amateur radio (420-450 MHz)</p></li>
+<li><p>Cellular bands (700-900 MHz)</p></li>
+<li><p>GPS L1 (1575.42 MHz)</p></li>
+<li><p>ISM band (902-928 MHz)</p></li>
+</ul>
+</section>
+<section id="scenario-3-l-band-search-1-2-ghz">
+<h4>Scenario 3: L-Band Search (1-2 GHz)<a class="headerlink" href="#scenario-3-l-band-search-1-2-ghz" title="Link to this heading"></a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># GPS, satellite communications</span>
+<span class="n">frequency_range</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1e9</span><span class="p">,</span> <span class="mf">2e9</span><span class="p">)</span>
+<span class="n">bandwidth</span> <span class="o">=</span> <span class="mf">1e9</span>  <span class="c1"># 1 GHz</span>
+<span class="n">search_steps</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span><span class="mi">000</span>  <span class="c1"># 100 kHz resolution</span>
+<span class="n">search_time</span> <span class="o">=</span> <span class="o">~</span><span class="mf">2.8</span> <span class="n">hours</span>  <span class="c1"># At 1 second per step</span>
+</pre></div>
+</div>
+<p><strong>Applications</strong>:</p>
+<ul class="simple">
+<li><p>GPS L1/L2 (1575/1227 MHz)</p></li>
+<li><p>Satellite communications</p></li>
+<li><p>WiFi 2.4 GHz (2400-2485 MHz)</p></li>
+</ul>
+</section>
+<section id="scenario-4-s-band-search-2-4-ghz">
+<h4>Scenario 4: S-Band Search (2-4 GHz)<a class="headerlink" href="#scenario-4-s-band-search-2-4-ghz" title="Link to this heading"></a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># WiFi, Bluetooth, radar</span>
+<span class="n">frequency_range</span> <span class="o">=</span> <span class="p">(</span><span class="mf">2e9</span><span class="p">,</span> <span class="mf">4e9</span><span class="p">)</span>
+<span class="n">bandwidth</span> <span class="o">=</span> <span class="mf">2e9</span>  <span class="c1"># 2 GHz</span>
+<span class="n">search_steps</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span><span class="mi">000</span>  <span class="c1"># 100 kHz resolution</span>
+<span class="n">search_time</span> <span class="o">=</span> <span class="o">~</span><span class="mf">5.6</span> <span class="n">hours</span>  <span class="c1"># At 1 second per step</span>
+</pre></div>
+</div>
+<p><strong>Applications</strong>:</p>
+<ul class="simple">
+<li><p>WiFi 2.4 GHz (2400-2485 MHz)</p></li>
+<li><p>Bluetooth (2400-2485 MHz)</p></li>
+<li><p>S-band radar (2-4 GHz)</p></li>
+</ul>
+</section>
+<section id="scenario-5-full-range-search-70-mhz-6-ghz">
+<h4>Scenario 5: Full Range Search (70 MHz - 6 GHz)<a class="headerlink" href="#scenario-5-full-range-search-70-mhz-6-ghz" title="Link to this heading"></a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Complete spectrum survey</span>
+<span class="n">frequency_range</span> <span class="o">=</span> <span class="p">(</span><span class="mf">70e6</span><span class="p">,</span> <span class="mf">6e9</span><span class="p">)</span>
+<span class="n">bandwidth</span> <span class="o">=</span> <span class="mf">5.93e9</span>  <span class="c1"># 5.93 GHz</span>
+<span class="n">search_steps</span> <span class="o">=</span> <span class="mi">59</span><span class="p">,</span><span class="mi">300</span>  <span class="c1"># 100 kHz resolution</span>
+<span class="n">search_time</span> <span class="o">=</span> <span class="o">~</span><span class="mf">16.5</span> <span class="n">hours</span>  <span class="c1"># At 1 second per step</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="intelligent-search-optimization">
+<h2>Intelligent Search Optimization<a class="headerlink" href="#intelligent-search-optimization" title="Link to this heading"></a></h2>
+<section id="current-q-learning-approach">
+<h3>Current Q-Learning Approach<a class="headerlink" href="#current-q-learning-approach" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Step Size</strong>: 100 kHz per action</p></li>
+<li><p><strong>Search Pattern</strong>: Reinforcement learning guided</p></li>
+<li><p><strong>Convergence</strong>: Typically 10-50 steps to find signal</p></li>
+<li><p><strong>Efficiency</strong>: Much faster than brute force</p></li>
+</ul>
+</section>
+<section id="search-time-comparison">
+<h3>Search Time Comparison<a class="headerlink" href="#search-time-comparison" title="Link to this heading"></a></h3>
+<section id="brute-force-vs-ai-search">
+<h4>Brute Force vs AI Search<a class="headerlink" href="#brute-force-vs-ai-search" title="Link to this heading"></a></h4>
+<p><strong>Brute Force Search (70 MHz - 6 GHz)</strong>:</p>
+<ul class="simple">
+<li><p><strong>Time</strong>: 59,300 steps × 1 second = 16.5 hours</p></li>
+<li><p><strong>Pattern</strong>: Sequential frequency scanning</p></li>
+<li><p><strong>Efficiency</strong>: 100% coverage, very slow</p></li>
+</ul>
+<p><strong>AI Q-Learning Search</strong>:</p>
+<ul class="simple">
+<li><p><strong>Time</strong>: Typically 10-50 steps = 10-50 seconds</p></li>
+<li><p><strong>Pattern</strong>: Intelligent, reward-guided</p></li>
+<li><p><strong>Efficiency</strong>: Finds signals 600-3000× faster</p></li>
+</ul>
+</section>
+</section>
+<section id="multi-scale-search-strategy">
+<h3>Multi-Scale Search Strategy<a class="headerlink" href="#multi-scale-search-strategy" title="Link to this heading"></a></h3>
+<section id="coarse-fine-search-approach">
+<h4>Coarse-Fine Search Approach<a class="headerlink" href="#coarse-fine-search-approach" title="Link to this heading"></a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Phase 1: Coarse search (1 MHz steps)</span>
+<span class="n">coarse_range</span> <span class="o">=</span> <span class="p">(</span><span class="mf">70e6</span><span class="p">,</span> <span class="mf">6e9</span><span class="p">)</span>
+<span class="n">coarse_steps</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span><span class="mi">930</span>  <span class="c1"># 1 MHz resolution</span>
+<span class="n">coarse_time</span> <span class="o">=</span> <span class="o">~</span><span class="mf">1.6</span> <span class="n">hours</span>
+
+<span class="c1"># Phase 2: Fine search around detected signals (10 kHz steps)</span>
+<span class="n">fine_range</span> <span class="o">=</span> <span class="err">±</span><span class="mi">5</span> <span class="n">MHz</span> <span class="n">around</span> <span class="n">detection</span>
+<span class="n">fine_steps</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span><span class="mi">000</span>  <span class="c1"># 10 kHz resolution</span>
+<span class="n">fine_time</span> <span class="o">=</span> <span class="o">~</span><span class="mi">17</span> <span class="n">minutes</span>
+</pre></div>
+</div>
+<p><strong>Total Time</strong>: ~2 hours for complete spectrum survey with fine resolution</p>
+</section>
+</section>
+</section>
+<section id="sample-rate-and-instantaneous-bandwidth">
+<h2>Sample Rate and Instantaneous Bandwidth<a class="headerlink" href="#sample-rate-and-instantaneous-bandwidth" title="Link to this heading"></a></h2>
+<section id="plutosdr-sample-rate-capabilities">
+<h3>PlutoSDR Sample Rate Capabilities<a class="headerlink" href="#plutosdr-sample-rate-capabilities" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Sample rate options</span>
+<span class="n">sample_rates</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="mf">0.52e6</span><span class="p">,</span>   <span class="c1"># 520 kHz</span>
+    <span class="mf">1.04e6</span><span class="p">,</span>   <span class="c1"># 1.04 MHz</span>
+    <span class="mf">2.08e6</span><span class="p">,</span>   <span class="c1"># 2.08 MHz (common)</span>
+    <span class="mf">4.16e6</span><span class="p">,</span>   <span class="c1"># 4.16 MHz</span>
+    <span class="mf">8.32e6</span><span class="p">,</span>   <span class="c1"># 8.32 MHz</span>
+    <span class="mf">16.64e6</span><span class="p">,</span>  <span class="c1"># 16.64 MHz</span>
+    <span class="mf">33.28e6</span><span class="p">,</span>  <span class="c1"># 33.28 MHz</span>
+    <span class="mf">61.44e6</span>   <span class="c1"># 61.44 MHz (maximum)</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="instantaneous-bandwidth-vs-search-range">
+<h3>Instantaneous Bandwidth vs Search Range<a class="headerlink" href="#instantaneous-bandwidth-vs-search-range" title="Link to this heading"></a></h3>
+<p><strong>At 2.08 MHz Sample Rate</strong> (current default):</p>
+<ul class="simple">
+<li><p><strong>Instantaneous BW</strong>: 2.08 MHz</p></li>
+<li><p><strong>Search positions</strong>: 59,300</p></li>
+<li><p><strong>Coverage per position</strong>: 2.08 MHz</p></li>
+<li><p><strong>Overlap strategy</strong>: 50% overlap for complete coverage</p></li>
+</ul>
+<p><strong>At 61.44 MHz Sample Rate</strong> (maximum):</p>
+<ul class="simple">
+<li><p><strong>Instantaneous BW</strong>: 61.44 MHz</p></li>
+<li><p><strong>Search positions</strong>: 2,010 (with 50% overlap)</p></li>
+<li><p><strong>Coverage per position</strong>: 61.44 MHz</p></li>
+<li><p><strong>Total search time</strong>: 33 minutes (brute force)</p></li>
+</ul>
+</section>
+</section>
+<section id="practical-search-examples">
+<h2>Practical Search Examples<a class="headerlink" href="#practical-search-examples" title="Link to this heading"></a></h2>
+<section id="example-1-find-fm-radio-station">
+<h3>Example 1: Find FM Radio Station<a class="headerlink" href="#example-1-find-fm-radio-station" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Target: FM radio (88-108 MHz)</span>
+<span class="n">search_range</span> <span class="o">=</span> <span class="p">(</span><span class="mf">88e6</span><span class="p">,</span> <span class="mf">108e6</span><span class="p">)</span>
+<span class="n">bandwidth</span> <span class="o">=</span> <span class="mf">20e6</span>
+<span class="n">ai_search_time</span> <span class="o">=</span> <span class="o">~</span><span class="mi">5</span><span class="o">-</span><span class="mi">15</span> <span class="n">seconds</span>  <span class="c1"># Q-learning</span>
+<span class="n">brute_force_time</span> <span class="o">=</span> <span class="mi">200</span> <span class="n">seconds</span>  <span class="c1"># Sequential</span>
+<span class="n">speedup</span> <span class="o">=</span> <span class="mi">13</span><span class="o">-</span><span class="mi">40</span><span class="err">×</span>
+</pre></div>
+</div>
+</section>
+<section id="example-2-find-gps-signal">
+<h3>Example 2: Find GPS Signal<a class="headerlink" href="#example-2-find-gps-signal" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Target: GPS L1 (1575.42 MHz)</span>
+<span class="n">search_range</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1570e6</span><span class="p">,</span> <span class="mf">1580e6</span><span class="p">)</span>  <span class="c1"># ±5 MHz uncertainty</span>
+<span class="n">bandwidth</span> <span class="o">=</span> <span class="mf">10e6</span>
+<span class="n">ai_search_time</span> <span class="o">=</span> <span class="o">~</span><span class="mi">3</span><span class="o">-</span><span class="mi">10</span> <span class="n">seconds</span>  <span class="c1"># Q-learning</span>
+<span class="n">brute_force_time</span> <span class="o">=</span> <span class="mi">100</span> <span class="n">seconds</span>  <span class="c1"># Sequential</span>
+<span class="n">speedup</span> <span class="o">=</span> <span class="mi">10</span><span class="o">-</span><span class="mi">33</span><span class="err">×</span>
+</pre></div>
+</div>
+</section>
+<section id="example-3-find-unknown-signal-in-ism-band">
+<h3>Example 3: Find Unknown Signal in ISM Band<a class="headerlink" href="#example-3-find-unknown-signal-in-ism-band" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Target: Unknown signal in 2.4 GHz ISM</span>
+<span class="n">search_range</span> <span class="o">=</span> <span class="p">(</span><span class="mf">2400e6</span><span class="p">,</span> <span class="mf">2485e6</span><span class="p">)</span>  <span class="c1"># ISM band</span>
+<span class="n">bandwidth</span> <span class="o">=</span> <span class="mf">85e6</span>
+<span class="n">ai_search_time</span> <span class="o">=</span> <span class="o">~</span><span class="mi">8</span><span class="o">-</span><span class="mi">25</span> <span class="n">seconds</span>  <span class="c1"># Q-learning</span>
+<span class="n">brute_force_time</span> <span class="o">=</span> <span class="mi">850</span> <span class="n">seconds</span>  <span class="c1"># Sequential</span>
+<span class="n">speedup</span> <span class="o">=</span> <span class="mi">34</span><span class="o">-</span><span class="mi">106</span><span class="err">×</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="advanced-search-strategies">
+<h2>Advanced Search Strategies<a class="headerlink" href="#advanced-search-strategies" title="Link to this heading"></a></h2>
+<section id="hierarchical-search">
+<h3>Hierarchical Search<a class="headerlink" href="#hierarchical-search" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Band Survey</strong>: Search major bands (VHF, UHF, L, S, C)</p></li>
+<li><p><strong>Activity Detection</strong>: Identify active frequency ranges</p></li>
+<li><p><strong>Fine Tuning</strong>: Optimize within active ranges</p></li>
+<li><p><strong>Signal Classification</strong>: Identify signal types</p></li>
+</ol>
+</section>
+<section id="parallel-search-future-enhancement">
+<h3>Parallel Search (Future Enhancement)<a class="headerlink" href="#parallel-search-future-enhancement" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Multiple PlutoSDRs for parallel search</span>
+<span class="n">num_sdrs</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">frequency_per_sdr</span> <span class="o">=</span> <span class="mf">5.93e9</span> <span class="o">/</span> <span class="mi">4</span> <span class="o">=</span> <span class="mf">1.48</span> <span class="n">GHz</span>
+<span class="n">parallel_search_time</span> <span class="o">=</span> <span class="mf">16.5</span> <span class="n">hours</span> <span class="o">/</span> <span class="mi">4</span> <span class="o">=</span> <span class="mf">4.1</span> <span class="n">hours</span>
+</pre></div>
+</div>
+</section>
+<section id="adaptive-search-resolution">
+<h3>Adaptive Search Resolution<a class="headerlink" href="#adaptive-search-resolution" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Dynamic step size based on signal environment</span>
+<span class="k">if</span> <span class="n">signal_density_high</span><span class="p">:</span>
+    <span class="n">step_size</span> <span class="o">=</span> <span class="mf">10e3</span>   <span class="c1"># 10 kHz steps</span>
+<span class="k">elif</span> <span class="n">signal_density_medium</span><span class="p">:</span>
+    <span class="n">step_size</span> <span class="o">=</span> <span class="mf">100e3</span>  <span class="c1"># 100 kHz steps (current)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">step_size</span> <span class="o">=</span> <span class="mf">1e6</span>    <span class="c1"># 1 MHz steps</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="memory-and-spectrum-database">
+<h2>Memory and Spectrum Database<a class="headerlink" href="#memory-and-spectrum-database" title="Link to this heading"></a></h2>
+<section id="learned-frequency-database">
+<h3>Learned Frequency Database<a class="headerlink" href="#learned-frequency-database" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># AI remembers where signals were found</span>
+<span class="n">frequency_database</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;FM_radio&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">88e6</span><span class="p">,</span> <span class="mf">108e6</span><span class="p">),</span>
+    <span class="s1">&#39;GPS_L1&#39;</span><span class="p">:</span> <span class="mf">1575.42e6</span><span class="p">,</span>
+    <span class="s1">&#39;WiFi_2.4G&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">2400e6</span><span class="p">,</span> <span class="mf">2485e6</span><span class="p">),</span>
+    <span class="s1">&#39;amateur_2m&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">144e6</span><span class="p">,</span> <span class="mf">148e6</span><span class="p">),</span>
+    <span class="s1">&#39;cellular_850&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">824e6</span><span class="p">,</span> <span class="mf">894e6</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="smart-search-priority">
+<h3>Smart Search Priority<a class="headerlink" href="#smart-search-priority" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Check known active frequencies first</strong></p></li>
+<li><p><strong>Search adjacent frequencies</strong></p></li>
+<li><p><strong>Explore new spectrum areas</strong></p></li>
+<li><p><strong>Update database with new discoveries</strong></p></li>
+</ol>
+</section>
+</section>
+<section id="conclusion">
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Link to this heading"></a></h2>
+<p><strong>Maximum Search Bandwidth</strong>: 5.93 GHz (70 MHz - 6 GHz)
+<strong>Instantaneous Bandwidth</strong>: Up to 61.44 MHz
+<strong>AI Search Speed</strong>: 600-3000× faster than brute force
+<strong>Typical Search Time</strong>: 10-50 seconds vs hours for brute force</p>
+<p>The PlutoSDR with AI can effectively search the entire usable RF spectrum from VHF through C-band, making it a powerful tool for spectrum analysis, signal intelligence, and communications research.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, GeminiSDR Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

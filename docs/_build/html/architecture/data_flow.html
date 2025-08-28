@@ -1,0 +1,370 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Flow and Processing &mdash; GeminiSDR 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Cross-Platform Design" href="cross_platform.html" />
+    <link rel="prev" title="System Components" href="components.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            GeminiSDR
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">User Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API Reference</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Architecture</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="overview.html">Architecture Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="components.html">System Components</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Data Flow and Processing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#signal-processing-pipeline">Signal Processing Pipeline</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data-processing-stages">Data Processing Stages</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#configuration-data-flow">Configuration Data Flow</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#configuration-processing-steps">Configuration Processing Steps</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#model-training-data-flow">Model Training Data Flow</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#training-pipeline-steps">Training Pipeline Steps</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#error-handling-data-flow">Error Handling Data Flow</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#error-processing-steps">Error Processing Steps</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#memory-management-data-flow">Memory Management Data Flow</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#memory-optimization-steps">Memory Optimization Steps</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#metrics-collection-data-flow">Metrics Collection Data Flow</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#metrics-processing-steps">Metrics Processing Steps</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cross_platform.html">Cross-Platform Design</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#architecture-overview">Architecture Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#system-components">System Components</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#data-flow-and-processing">Data Flow and Processing</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Data Flow and Processing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#signal-processing-pipeline">Signal Processing Pipeline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#configuration-data-flow">Configuration Data Flow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#model-training-data-flow">Model Training Data Flow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#error-handling-data-flow">Error Handling Data Flow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#memory-management-data-flow">Memory Management Data Flow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metrics-collection-data-flow">Metrics Collection Data Flow</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#cross-platform-design">Cross-Platform Design</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples and Tutorials</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">GeminiSDR</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">System Architecture</a></li>
+      <li class="breadcrumb-item active">Data Flow and Processing</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/architecture/data_flow.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="data-flow-and-processing">
+<h1>Data Flow and Processing<a class="headerlink" href="#data-flow-and-processing" title="Link to this heading"></a></h1>
+<p>This section describes how data flows through the GeminiSDR system and the processing pipelines for different operations.</p>
+<section id="signal-processing-pipeline">
+<h2>Signal Processing Pipeline<a class="headerlink" href="#signal-processing-pipeline" title="Link to this heading"></a></h2>
+<p>The signal processing pipeline handles real-time SDR data processing with ML-based analysis.</p>
+<section id="data-processing-stages">
+<h3>Data Processing Stages<a class="headerlink" href="#data-processing-stages" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Signal Acquisition</strong></p>
+<ul class="simple">
+<li><p>Hardware SDR devices or simulation generate raw IQ samples</p></li>
+<li><p>Data is buffered and preprocessed for downstream analysis</p></li>
+<li><p>Quality checks and validation ensure signal integrity</p></li>
+</ul>
+</li>
+<li><p><strong>Preprocessing</strong></p>
+<ul class="simple">
+<li><p>Signal conditioning and filtering</p></li>
+<li><p>Normalization and scaling</p></li>
+<li><p>Feature extraction for ML models</p></li>
+</ul>
+</li>
+<li><p><strong>ML Processing</strong></p>
+<ul class="simple">
+<li><p>Intelligent receiver adapts to signal conditions</p></li>
+<li><p>AMR components classify modulation schemes</p></li>
+<li><p>Adversarial analysis detects jamming attempts</p></li>
+</ul>
+</li>
+<li><p><strong>Post-processing</strong></p>
+<ul class="simple">
+<li><p>Results aggregation and validation</p></li>
+<li><p>Performance metrics calculation</p></li>
+<li><p>Output formatting for visualization</p></li>
+</ul>
+</li>
+<li><p><strong>Output and Storage</strong></p>
+<ul class="simple">
+<li><p>Real-time visualization updates</p></li>
+<li><p>Metrics collection and monitoring</p></li>
+<li><p>Structured logging for analysis</p></li>
+</ul>
+</li>
+</ol>
+</section>
+</section>
+<section id="configuration-data-flow">
+<h2>Configuration Data Flow<a class="headerlink" href="#configuration-data-flow" title="Link to this heading"></a></h2>
+<p>Configuration data flows from YAML files through validation to system components.</p>
+<section id="configuration-processing-steps">
+<h3>Configuration Processing Steps<a class="headerlink" href="#configuration-processing-steps" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Loading</strong></p>
+<ul class="simple">
+<li><p>Base configuration loaded from main YAML file</p></li>
+<li><p>Environment-specific overrides applied</p></li>
+<li><p>Command-line arguments take highest precedence</p></li>
+</ul>
+</li>
+<li><p><strong>Validation</strong></p>
+<ul class="simple">
+<li><p>Schema validation against configuration models</p></li>
+<li><p>Type checking and constraint validation</p></li>
+<li><p>Error reporting with clear messages</p></li>
+</ul>
+</li>
+<li><p><strong>Distribution</strong></p>
+<ul class="simple">
+<li><p>Validated configuration distributed to components</p></li>
+<li><p>Hot-reload support for runtime updates</p></li>
+<li><p>Configuration change notifications</p></li>
+</ul>
+</li>
+</ol>
+</section>
+</section>
+<section id="model-training-data-flow">
+<h2>Model Training Data Flow<a class="headerlink" href="#model-training-data-flow" title="Link to this heading"></a></h2>
+<p>The model training pipeline handles data preparation, training, and model persistence.</p>
+<section id="training-pipeline-steps">
+<h3>Training Pipeline Steps<a class="headerlink" href="#training-pipeline-steps" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Data Preparation</strong></p>
+<ul class="simple">
+<li><p>Dataset loading and preprocessing</p></li>
+<li><p>Data validation and quality checks</p></li>
+<li><p>Train/validation/test splits</p></li>
+</ul>
+</li>
+<li><p><strong>Training Loop</strong></p>
+<ul class="simple">
+<li><p>Model initialization with configuration</p></li>
+<li><p>Batch processing with memory optimization</p></li>
+<li><p>Gradient computation and parameter updates</p></li>
+</ul>
+</li>
+<li><p><strong>Validation and Metrics</strong></p>
+<ul class="simple">
+<li><p>Model evaluation on validation set</p></li>
+<li><p>Performance metrics calculation</p></li>
+<li><p>Early stopping and checkpoint decisions</p></li>
+</ul>
+</li>
+<li><p><strong>Model Persistence</strong></p>
+<ul class="simple">
+<li><p>Model saving with comprehensive metadata</p></li>
+<li><p>MLflow experiment tracking</p></li>
+<li><p>Model registry updates</p></li>
+</ul>
+</li>
+</ol>
+</section>
+</section>
+<section id="error-handling-data-flow">
+<h2>Error Handling Data Flow<a class="headerlink" href="#error-handling-data-flow" title="Link to this heading"></a></h2>
+<p>Error handling data flows from detection through recovery to logging.</p>
+<section id="error-processing-steps">
+<h3>Error Processing Steps<a class="headerlink" href="#error-processing-steps" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Detection and Classification</strong></p>
+<ul class="simple">
+<li><p>Error detection by system components</p></li>
+<li><p>Classification by type and severity</p></li>
+<li><p>Context collection for debugging</p></li>
+</ul>
+</li>
+<li><p><strong>Recovery Strategy Selection</strong></p>
+<ul class="simple">
+<li><p>Strategy selection based on error type</p></li>
+<li><p>Recovery attempt with timeout</p></li>
+<li><p>Success/failure determination</p></li>
+</ul>
+</li>
+<li><p><strong>Logging and Monitoring</strong></p>
+<ul class="simple">
+<li><p>Structured logging with full context</p></li>
+<li><p>Metrics updates for monitoring</p></li>
+<li><p>Alert generation for critical errors</p></li>
+</ul>
+</li>
+</ol>
+</section>
+</section>
+<section id="memory-management-data-flow">
+<h2>Memory Management Data Flow<a class="headerlink" href="#memory-management-data-flow" title="Link to this heading"></a></h2>
+<p>Memory management monitors usage and optimizes resource allocation.</p>
+<section id="memory-optimization-steps">
+<h3>Memory Optimization Steps<a class="headerlink" href="#memory-optimization-steps" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Continuous Monitoring</strong></p>
+<ul class="simple">
+<li><p>Real-time memory usage tracking</p></li>
+<li><p>Threshold-based optimization triggers</p></li>
+<li><p>GPU and system memory monitoring</p></li>
+</ul>
+</li>
+<li><p><strong>Optimization Actions</strong></p>
+<ul class="simple">
+<li><p>Dynamic batch size reduction</p></li>
+<li><p>Model cache eviction (LRU)</p></li>
+<li><p>Forced garbage collection</p></li>
+</ul>
+</li>
+<li><p><strong>Verification and Alerting</strong></p>
+<ul class="simple">
+<li><p>Optimization effectiveness verification</p></li>
+<li><p>Alert generation for persistent issues</p></li>
+<li><p>Emergency cleanup procedures</p></li>
+</ul>
+</li>
+</ol>
+</section>
+</section>
+<section id="metrics-collection-data-flow">
+<h2>Metrics Collection Data Flow<a class="headerlink" href="#metrics-collection-data-flow" title="Link to this heading"></a></h2>
+<p>Metrics flow from system components through collection to monitoring systems.</p>
+<section id="metrics-processing-steps">
+<h3>Metrics Processing Steps<a class="headerlink" href="#metrics-processing-steps" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Collection</strong></p>
+<ul class="simple">
+<li><p>Metrics collection from all system components</p></li>
+<li><p>Time-series data with tags and metadata</p></li>
+<li><p>Configurable collection intervals</p></li>
+</ul>
+</li>
+<li><p><strong>Processing and Analysis</strong></p>
+<ul class="simple">
+<li><p>Statistical analysis and aggregation</p></li>
+<li><p>Anomaly detection with thresholds</p></li>
+<li><p>Trend analysis and forecasting</p></li>
+</ul>
+</li>
+<li><p><strong>Storage and Access</strong></p>
+<ul class="simple">
+<li><p>Time-series database storage</p></li>
+<li><p>Query interface for analysis</p></li>
+<li><p>Dashboard and API access</p></li>
+</ul>
+</li>
+<li><p><strong>Alerting</strong></p>
+<ul class="simple">
+<li><p>Threshold-based alert generation</p></li>
+<li><p>Notification delivery to administrators</p></li>
+<li><p>Alert escalation and acknowledgment</p></li>
+</ul>
+</li>
+</ol>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="components.html" class="btn btn-neutral float-left" title="System Components" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cross_platform.html" class="btn btn-neutral float-right" title="Cross-Platform Design" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, GeminiSDR Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

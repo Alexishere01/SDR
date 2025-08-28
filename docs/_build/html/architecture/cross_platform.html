@@ -1,0 +1,510 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cross-Platform Design &mdash; GeminiSDR 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Developer Guide" href="../development/index.html" />
+    <link rel="prev" title="Data Flow and Processing" href="data_flow.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            GeminiSDR
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">User Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API Reference</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Architecture</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="overview.html">Architecture Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="components.html">System Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_flow.html">Data Flow and Processing</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Cross-Platform Design</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#supported-platforms">Supported Platforms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#m1-mac-apple-silicon">M1 Mac (Apple Silicon)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#linux-vm">Linux VM</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cuda-cluster">CUDA Cluster</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#platform-detection-and-selection">Platform Detection and Selection</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#automatic-detection">Automatic Detection</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#device-abstraction-layer">Device Abstraction Layer</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#memory-management-across-platforms">Memory Management Across Platforms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#platform-specific-memory-strategies">Platform-Specific Memory Strategies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#memory-optimization-pipeline">Memory Optimization Pipeline</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#performance-optimization">Performance Optimization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#platform-specific-optimizations">Platform-Specific Optimizations</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#testing-across-platforms">Testing Across Platforms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#cross-platform-test-matrix">Cross-Platform Test Matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#continuous-integration-pipeline">Continuous Integration Pipeline</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#platform-specific-configuration">Platform-Specific Configuration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#configuration-hierarchy">Configuration Hierarchy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#configuration-loading-order">Configuration Loading Order</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#migration-and-compatibility">Migration and Compatibility</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#model-portability">Model Portability</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#backward-compatibility">Backward Compatibility</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#architecture-overview">Architecture Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#system-components">System Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#data-flow-and-processing">Data Flow and Processing</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#cross-platform-design">Cross-Platform Design</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Cross-Platform Design</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#supported-platforms">Supported Platforms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#platform-detection-and-selection">Platform Detection and Selection</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#memory-management-across-platforms">Memory Management Across Platforms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#performance-optimization">Performance Optimization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#testing-across-platforms">Testing Across Platforms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#platform-specific-configuration">Platform-Specific Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#migration-and-compatibility">Migration and Compatibility</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples and Tutorials</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">GeminiSDR</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">System Architecture</a></li>
+      <li class="breadcrumb-item active">Cross-Platform Design</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/architecture/cross_platform.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="cross-platform-design">
+<h1>Cross-Platform Design<a class="headerlink" href="#cross-platform-design" title="Link to this heading"></a></h1>
+<p>GeminiSDR is designed to work seamlessly across multiple platforms with optimizations for each environment. This section describes the cross-platform architecture and platform-specific optimizations.</p>
+<section id="supported-platforms">
+<h2>Supported Platforms<a class="headerlink" href="#supported-platforms" title="Link to this heading"></a></h2>
+<section id="m1-mac-apple-silicon">
+<h3>M1 Mac (Apple Silicon)<a class="headerlink" href="#m1-mac-apple-silicon" title="Link to this heading"></a></h3>
+<p><strong>Hardware Characteristics:</strong>
+* Apple M1/M2 processors with unified memory architecture
+* Metal Performance Shaders (MPS) for GPU acceleration
+* Native ARM64 architecture</p>
+<p><strong>Optimizations:</strong>
+* MPS backend for PyTorch operations
+* Unified memory optimization for large models
+* Native ARM64 compilation for performance
+* Metal compute shaders for signal processing</p>
+<p><strong>Configuration Profile:</strong></p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># conf/hardware/m1_native.yaml</span>
+<span class="nt">hardware</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">device_preference</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mps&quot;</span>
+<span class="w">  </span><span class="nt">memory_optimization</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;unified&quot;</span>
+<span class="w">  </span><span class="nt">compute_backend</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;metal&quot;</span>
+
+<span class="nt">ml</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">batch_size_multiplier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.5</span><span class="w">  </span><span class="c1"># Larger batches due to unified memory</span>
+<span class="w">  </span><span class="nt">precision</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;float16&quot;</span><span class="w">        </span><span class="c1"># Half precision for memory efficiency</span>
+</pre></div>
+</div>
+</section>
+<section id="linux-vm">
+<h3>Linux VM<a class="headerlink" href="#linux-vm" title="Link to this heading"></a></h3>
+<p><strong>Hardware Characteristics:</strong>
+* Virtualized Linux environment
+* Limited GPU access or CPU-only processing
+* Potentially constrained memory and compute resources</p>
+<p><strong>Optimizations:</strong>
+* CPU-optimized PyTorch operations
+* Memory-efficient processing with smaller batch sizes
+* Optimized threading for virtualized environments
+* Fallback strategies for limited resources</p>
+<p><strong>Configuration Profile:</strong></p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># conf/hardware/vm_ubuntu.yaml</span>
+<span class="nt">hardware</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">device_preference</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cpu&quot;</span>
+<span class="w">  </span><span class="nt">memory_optimization</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;conservative&quot;</span>
+<span class="w">  </span><span class="nt">thread_count</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;auto&quot;</span>
+
+<span class="nt">ml</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">batch_size_multiplier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.7</span><span class="w">  </span><span class="c1"># Smaller batches for limited memory</span>
+<span class="w">  </span><span class="nt">precision</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;float32&quot;</span><span class="w">        </span><span class="c1"># Full precision for CPU</span>
+<span class="w">  </span><span class="nt">gradient_checkpointing</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</pre></div>
+</div>
+</section>
+<section id="cuda-cluster">
+<h3>CUDA Cluster<a class="headerlink" href="#cuda-cluster" title="Link to this heading"></a></h3>
+<p><strong>Hardware Characteristics:</strong>
+* NVIDIA GPUs with CUDA support
+* High-performance computing environment
+* Large memory and compute capacity</p>
+<p><strong>Optimizations:</strong>
+* CUDA-accelerated PyTorch operations
+* Multi-GPU support and distributed training
+* Large batch processing capabilities
+* Advanced memory management with GPU pools</p>
+<p><strong>Configuration Profile:</strong></p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># conf/hardware/cuda_cluster.yaml</span>
+<span class="nt">hardware</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">device_preference</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cuda&quot;</span>
+<span class="w">  </span><span class="nt">memory_optimization</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;aggressive&quot;</span>
+<span class="w">  </span><span class="nt">multi_gpu</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+
+<span class="nt">ml</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">batch_size_multiplier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.0</span><span class="w">  </span><span class="c1"># Large batches for GPU memory</span>
+<span class="w">  </span><span class="nt">precision</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mixed&quot;</span><span class="w">          </span><span class="c1"># Mixed precision training</span>
+<span class="w">  </span><span class="nt">distributed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="platform-detection-and-selection">
+<h2>Platform Detection and Selection<a class="headerlink" href="#platform-detection-and-selection" title="Link to this heading"></a></h2>
+<section id="automatic-detection">
+<h3>Automatic Detection<a class="headerlink" href="#automatic-detection" title="Link to this heading"></a></h3>
+<p>The system automatically detects the platform and selects appropriate optimizations:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">detect_platform</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Detect current platform and available hardware.&quot;&quot;&quot;</span>
+    <span class="n">platform_info</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;os&#39;</span><span class="p">:</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">(),</span>
+        <span class="s1">&#39;arch&#39;</span><span class="p">:</span> <span class="n">platform</span><span class="o">.</span><span class="n">machine</span><span class="p">(),</span>
+        <span class="s1">&#39;python_version&#39;</span><span class="p">:</span> <span class="n">platform</span><span class="o">.</span><span class="n">python_version</span><span class="p">()</span>
+    <span class="p">}</span>
+
+    <span class="c1"># Detect available compute devices</span>
+    <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+        <span class="n">platform_info</span><span class="p">[</span><span class="s1">&#39;device&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mps&#39;</span>
+        <span class="n">platform_info</span><span class="p">[</span><span class="s1">&#39;platform&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;m1_native&#39;</span>
+    <span class="k">elif</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+        <span class="n">platform_info</span><span class="p">[</span><span class="s1">&#39;device&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span>
+        <span class="n">platform_info</span><span class="p">[</span><span class="s1">&#39;platform&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;cuda_cluster&#39;</span>
+        <span class="n">platform_info</span><span class="p">[</span><span class="s1">&#39;gpu_count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">device_count</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">platform_info</span><span class="p">[</span><span class="s1">&#39;device&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;cpu&#39;</span>
+        <span class="n">platform_info</span><span class="p">[</span><span class="s1">&#39;platform&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;vm_ubuntu&#39;</span>
+
+    <span class="k">return</span> <span class="n">platform_info</span>
+</pre></div>
+</div>
+</section>
+<section id="device-abstraction-layer">
+<h3>Device Abstraction Layer<a class="headerlink" href="#device-abstraction-layer" title="Link to this heading"></a></h3>
+<p>The hardware abstraction layer provides unified interfaces across platforms:</p>
+</section>
+</section>
+<section id="memory-management-across-platforms">
+<h2>Memory Management Across Platforms<a class="headerlink" href="#memory-management-across-platforms" title="Link to this heading"></a></h2>
+<section id="platform-specific-memory-strategies">
+<h3>Platform-Specific Memory Strategies<a class="headerlink" href="#platform-specific-memory-strategies" title="Link to this heading"></a></h3>
+<p><strong>M1 Mac (Unified Memory):</strong>
+* Leverage unified memory architecture for large models
+* Optimize for memory bandwidth rather than capacity
+* Use Metal memory pools for efficient allocation</p>
+<p><strong>Linux VM (Limited Memory):</strong>
+* Conservative memory usage with frequent cleanup
+* Smaller batch sizes and gradient checkpointing
+* Aggressive garbage collection and memory monitoring</p>
+<p><strong>CUDA Cluster (Large GPU Memory):</strong>
+* Large batch processing with memory pools
+* Multi-GPU memory distribution
+* Advanced caching strategies for model weights</p>
+</section>
+<section id="memory-optimization-pipeline">
+<h3>Memory Optimization Pipeline<a class="headerlink" href="#memory-optimization-pipeline" title="Link to this heading"></a></h3>
+</section>
+</section>
+<section id="performance-optimization">
+<h2>Performance Optimization<a class="headerlink" href="#performance-optimization" title="Link to this heading"></a></h2>
+<section id="platform-specific-optimizations">
+<h3>Platform-Specific Optimizations<a class="headerlink" href="#platform-specific-optimizations" title="Link to this heading"></a></h3>
+<p><strong>M1 Mac Optimizations:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">M1Optimizer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">optimize_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Optimize model for M1 architecture.&quot;&quot;&quot;</span>
+        <span class="c1"># Use MPS device</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">&#39;mps&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Enable Metal Performance Shaders optimizations</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="p">,</span> <span class="s1">&#39;mps&#39;</span><span class="p">):</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">allow_tf32</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Optimize for unified memory</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">set_per_process_memory_fraction</span><span class="p">(</span><span class="mf">0.8</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">model</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">optimize_batch_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_size</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Optimize batch size for unified memory.&quot;&quot;&quot;</span>
+        <span class="c1"># M1 can handle larger batches due to unified memory</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">base_size</span> <span class="o">*</span> <span class="mf">1.5</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Linux VM Optimizations:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">LinuxVMOptimizer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">optimize_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Optimize model for Linux VM environment.&quot;&quot;&quot;</span>
+        <span class="c1"># Use CPU with optimized threading</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Set optimal thread count for VM</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">set_num_threads</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()))</span>
+
+        <span class="c1"># Enable CPU optimizations</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mkldnn</span><span class="o">.</span><span class="n">enabled</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="n">model</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">optimize_batch_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_size</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Conservative batch size for limited memory.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">base_size</span> <span class="o">*</span> <span class="mf">0.7</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>CUDA Optimizations:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">CUDAOptimizer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">optimize_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Optimize model for CUDA environment.&quot;&quot;&quot;</span>
+        <span class="c1"># Use CUDA with mixed precision</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Enable TensorFloat-32 for performance</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">matmul</span><span class="o">.</span><span class="n">allow_tf32</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">cudnn</span><span class="o">.</span><span class="n">allow_tf32</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Enable cuDNN benchmarking</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">cudnn</span><span class="o">.</span><span class="n">benchmark</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="n">model</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">optimize_batch_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_size</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Large batch size for GPU memory.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">base_size</span> <span class="o">*</span> <span class="mf">2.0</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="testing-across-platforms">
+<h2>Testing Across Platforms<a class="headerlink" href="#testing-across-platforms" title="Link to this heading"></a></h2>
+<section id="cross-platform-test-matrix">
+<h3>Cross-Platform Test Matrix<a class="headerlink" href="#cross-platform-test-matrix" title="Link to this heading"></a></h3>
+<p>The testing framework validates functionality across all supported platforms:</p>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Test Matrix</span><a class="headerlink" href="#id1" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Test Category</p></th>
+<th class="head"><p>M1 Mac</p></th>
+<th class="head"><p>Linux VM</p></th>
+<th class="head"><p>CUDA Cluster</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Unit Tests</p></td>
+<td><p>✓ Native ARM64</p></td>
+<td><p>✓ x86_64</p></td>
+<td><p>✓ x86_64 + GPU</p></td>
+</tr>
+<tr class="row-odd"><td><p>Integration Tests</p></td>
+<td><p>✓ MPS Backend</p></td>
+<td><p>✓ CPU Backend</p></td>
+<td><p>✓ CUDA Backend</p></td>
+</tr>
+<tr class="row-even"><td><p>Performance Tests</p></td>
+<td><p>✓ Metal Shaders</p></td>
+<td><p>✓ CPU Optimization</p></td>
+<td><p>✓ GPU Acceleration</p></td>
+</tr>
+<tr class="row-odd"><td><p>Memory Tests</p></td>
+<td><p>✓ Unified Memory</p></td>
+<td><p>✓ Limited Memory</p></td>
+<td><p>✓ Large GPU Memory</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="continuous-integration-pipeline">
+<h3>Continuous Integration Pipeline<a class="headerlink" href="#continuous-integration-pipeline" title="Link to this heading"></a></h3>
+</section>
+</section>
+<section id="platform-specific-configuration">
+<h2>Platform-Specific Configuration<a class="headerlink" href="#platform-specific-configuration" title="Link to this heading"></a></h2>
+<section id="configuration-hierarchy">
+<h3>Configuration Hierarchy<a class="headerlink" href="#configuration-hierarchy" title="Link to this heading"></a></h3>
+<p>The configuration system supports platform-specific overrides:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>conf/
+├── config.yaml              # Base configuration
+├── hardware/
+│   ├── m1_native.yaml       # M1 Mac overrides
+│   ├── vm_ubuntu.yaml       # Linux VM overrides
+│   └── cuda_cluster.yaml    # CUDA overrides
+└── environments/
+    ├── development.yaml     # Development overrides
+    ├── testing.yaml         # Testing overrides
+    └── production.yaml      # Production overrides
+</pre></div>
+</div>
+</section>
+<section id="configuration-loading-order">
+<h3>Configuration Loading Order<a class="headerlink" href="#configuration-loading-order" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Base Configuration</strong>: Load main config.yaml</p></li>
+<li><p><strong>Hardware Profile</strong>: Apply hardware-specific overrides</p></li>
+<li><p><strong>Environment Profile</strong>: Apply environment-specific overrides</p></li>
+<li><p><strong>Runtime Overrides</strong>: Apply command-line arguments and environment variables</p></li>
+</ol>
+<p>Example configuration loading:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">load_platform_config</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load configuration with platform-specific overrides.&quot;&quot;&quot;</span>
+    <span class="c1"># Detect platform</span>
+    <span class="n">platform_info</span> <span class="o">=</span> <span class="n">detect_platform</span><span class="p">()</span>
+
+    <span class="c1"># Load base configuration</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">load_base_config</span><span class="p">()</span>
+
+    <span class="c1"># Apply hardware-specific overrides</span>
+    <span class="n">hardware_config</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;hardware/</span><span class="si">{</span><span class="n">platform_info</span><span class="p">[</span><span class="s1">&#39;platform&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">.yaml&quot;</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">apply_overrides</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">hardware_config</span><span class="p">)</span>
+
+    <span class="c1"># Apply environment overrides</span>
+    <span class="n">env_config</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;environments/</span><span class="si">{</span><span class="n">get_environment</span><span class="p">()</span><span class="si">}</span><span class="s2">.yaml&quot;</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">apply_overrides</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">env_config</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">config</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="migration-and-compatibility">
+<h2>Migration and Compatibility<a class="headerlink" href="#migration-and-compatibility" title="Link to this heading"></a></h2>
+<section id="model-portability">
+<h3>Model Portability<a class="headerlink" href="#model-portability" title="Link to this heading"></a></h3>
+<p>Models trained on one platform can be used on others with automatic optimization:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">migrate_model</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">target_platform</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Migrate model to target platform with optimizations.&quot;&quot;&quot;</span>
+    <span class="c1"># Load model metadata</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">load_model_metadata</span><span class="p">(</span><span class="n">model_path</span><span class="p">)</span>
+
+    <span class="c1"># Check compatibility</span>
+    <span class="n">compatibility</span> <span class="o">=</span> <span class="n">check_platform_compatibility</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">target_platform</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">compatibility</span><span class="o">.</span><span class="n">requires_migration</span><span class="p">:</span>
+        <span class="c1"># Apply platform-specific optimizations</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">load_and_optimize_model</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">target_platform</span><span class="p">)</span>
+
+        <span class="c1"># Update metadata</span>
+        <span class="n">metadata</span><span class="o">.</span><span class="n">platform</span> <span class="o">=</span> <span class="n">target_platform</span>
+        <span class="n">metadata</span><span class="o">.</span><span class="n">optimizations</span> <span class="o">=</span> <span class="n">compatibility</span><span class="o">.</span><span class="n">applied_optimizations</span>
+
+        <span class="c1"># Save optimized model</span>
+        <span class="n">save_model_with_metadata</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">model</span>
+</pre></div>
+</div>
+</section>
+<section id="backward-compatibility">
+<h3>Backward Compatibility<a class="headerlink" href="#backward-compatibility" title="Link to this heading"></a></h3>
+<p>The system maintains backward compatibility across platform updates:</p>
+<ul class="simple">
+<li><p><strong>Model Format Versioning</strong>: Models include format version for compatibility checking</p></li>
+<li><p><strong>Configuration Migration</strong>: Automatic migration of old configuration formats</p></li>
+<li><p><strong>API Stability</strong>: Stable APIs with deprecation warnings for breaking changes</p></li>
+<li><p><strong>Fallback Strategies</strong>: Graceful degradation when features are unavailable</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="data_flow.html" class="btn btn-neutral float-left" title="Data Flow and Processing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../development/index.html" class="btn btn-neutral float-right" title="Developer Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, GeminiSDR Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,10 @@
+# @package hardware
+# CUDA cluster hardware configuration
+# Optimized for high-performance GPU computing
+
+device_preference: cuda
+sdr_mode: auto  # May have hardware SDR access
+memory_limit_gb: null  # Use available system memory
+max_threads: null      # Auto-detect for multi-core systems
+gpu_memory_fraction: 0.9  # Aggressive GPU memory usage
+enable_mixed_precision: true  # CUDA supports efficient mixed precision

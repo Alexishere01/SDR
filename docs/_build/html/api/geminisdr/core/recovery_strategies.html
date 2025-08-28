@@ -1,0 +1,366 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recovery Strategies &mdash; GeminiSDR 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="System Architecture" href="../../../architecture/index.html" />
+    <link rel="prev" title="Model Metadata" href="model_metadata.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            GeminiSDR
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../guides/index.html">User Guides</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../geminisdr.html">GeminiSDR Package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../config.html">config package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../core.html">core package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../geminisdr.html#configuration-management">Configuration Management</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../../geminisdr.html#core-components">Core Components</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="error_handling.html">Error Handling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="logging_manager.html">Logging Manager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="memory_manager.html">Memory Manager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="metrics_collector.html">Metrics Collector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model_manager.html">Model Manager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model_metadata.html">Model Metadata</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Recovery Strategies</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#core-modules">Core Modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#machine-learning-modules">Machine Learning Modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#environment-modules">Environment Modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#configuration">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#utilities">Utilities</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../architecture/index.html">System Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/index.html">Examples and Tutorials</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">GeminiSDR</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../../geminisdr.html">GeminiSDR Package</a></li>
+      <li class="breadcrumb-item active">Recovery Strategies</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/api/geminisdr/core/recovery_strategies.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="recovery-strategies">
+<h1>Recovery Strategies<a class="headerlink" href="#recovery-strategies" title="Link to this heading"></a></h1>
+<p id="module-geminisdr.core.recovery_strategies">Recovery Strategies for GeminiSDR Error Handling</p>
+<p>This module provides specific recovery strategies for different types of errors
+that can occur in the GeminiSDR system, including hardware failures, configuration
+issues, and memory problems.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="geminisdr.core.recovery_strategies.RecoveryStrategies">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">geminisdr.core.recovery_strategies.</span></span><span class="sig-name descname"><span class="pre">RecoveryStrategies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.Logger" title="(in Python v3.13)"><span class="pre">Logger</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/geminisdr/core/recovery_strategies.html#RecoveryStrategies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geminisdr.core.recovery_strategies.RecoveryStrategies" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Collection of recovery strategies for different error types.</p>
+<p>Each strategy is a callable that takes (error, context) and returns
+a boolean indicating whether recovery was successful.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="geminisdr.core.recovery_strategies.RecoveryStrategies.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.Logger" title="(in Python v3.13)"><span class="pre">Logger</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/geminisdr/core/recovery_strategies.html#RecoveryStrategies.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geminisdr.core.recovery_strategies.RecoveryStrategies.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="geminisdr.core.recovery_strategies.RecoveryStrategies.hardware_to_simulation_fallback">
+<span class="sig-name descname"><span class="pre">hardware_to_simulation_fallback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="error_handling.html#id9" title="geminisdr.core.error_handling.HardwareError"><span class="pre">HardwareError</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="error_handling.html#geminisdr.core.error_handling.ErrorContext" title="geminisdr.core.error_handling.ErrorContext"><span class="pre">ErrorContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../_modules/geminisdr/core/recovery_strategies.html#RecoveryStrategies.hardware_to_simulation_fallback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geminisdr.core.recovery_strategies.RecoveryStrategies.hardware_to_simulation_fallback" title="Link to this definition"></a></dt>
+<dd><p>Fallback from hardware to simulation mode when hardware is unavailable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>error</strong> – The hardware error that occurred</p></li>
+<li><p><strong>context</strong> – Error context information</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if fallback was successful</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="geminisdr.core.recovery_strategies.RecoveryStrategies.gpu_to_cpu_fallback">
+<span class="sig-name descname"><span class="pre">gpu_to_cpu_fallback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="error_handling.html#id15" title="geminisdr.core.error_handling.MemoryError"><span class="pre">MemoryError</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="error_handling.html#geminisdr.core.error_handling.ErrorContext" title="geminisdr.core.error_handling.ErrorContext"><span class="pre">ErrorContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../_modules/geminisdr/core/recovery_strategies.html#RecoveryStrategies.gpu_to_cpu_fallback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geminisdr.core.recovery_strategies.RecoveryStrategies.gpu_to_cpu_fallback" title="Link to this definition"></a></dt>
+<dd><p>Fallback from GPU to CPU when GPU memory is exhausted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>error</strong> – The memory error that occurred</p></li>
+<li><p><strong>context</strong> – Error context information</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if fallback was successful</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="geminisdr.core.recovery_strategies.RecoveryStrategies.reduce_batch_size_recovery">
+<span class="sig-name descname"><span class="pre">reduce_batch_size_recovery</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="error_handling.html#id15" title="geminisdr.core.error_handling.MemoryError"><span class="pre">MemoryError</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="error_handling.html#geminisdr.core.error_handling.ErrorContext" title="geminisdr.core.error_handling.ErrorContext"><span class="pre">ErrorContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../_modules/geminisdr/core/recovery_strategies.html#RecoveryStrategies.reduce_batch_size_recovery"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geminisdr.core.recovery_strategies.RecoveryStrategies.reduce_batch_size_recovery" title="Link to this definition"></a></dt>
+<dd><p>Reduce batch size when memory is insufficient.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>error</strong> – The memory error that occurred</p></li>
+<li><p><strong>context</strong> – Error context information</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if batch size was successfully reduced</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="geminisdr.core.recovery_strategies.RecoveryStrategies.configuration_default_fallback">
+<span class="sig-name descname"><span class="pre">configuration_default_fallback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="error_handling.html#id11" title="geminisdr.core.error_handling.ConfigurationError"><span class="pre">ConfigurationError</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="error_handling.html#geminisdr.core.error_handling.ErrorContext" title="geminisdr.core.error_handling.ErrorContext"><span class="pre">ErrorContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../_modules/geminisdr/core/recovery_strategies.html#RecoveryStrategies.configuration_default_fallback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geminisdr.core.recovery_strategies.RecoveryStrategies.configuration_default_fallback" title="Link to this definition"></a></dt>
+<dd><p>Use default configuration values when configuration is invalid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>error</strong> – The configuration error that occurred</p></li>
+<li><p><strong>context</strong> – Error context information</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if default configuration was applied</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="geminisdr.core.recovery_strategies.RecoveryStrategies.model_version_fallback">
+<span class="sig-name descname"><span class="pre">model_version_fallback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="error_handling.html#id13" title="geminisdr.core.error_handling.ModelError"><span class="pre">ModelError</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="error_handling.html#geminisdr.core.error_handling.ErrorContext" title="geminisdr.core.error_handling.ErrorContext"><span class="pre">ErrorContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../_modules/geminisdr/core/recovery_strategies.html#RecoveryStrategies.model_version_fallback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geminisdr.core.recovery_strategies.RecoveryStrategies.model_version_fallback" title="Link to this definition"></a></dt>
+<dd><p>Try to load an alternative model version when model loading fails.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>error</strong> – The model error that occurred</p></li>
+<li><p><strong>context</strong> – Error context information</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if alternative model was loaded</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="geminisdr.core.recovery_strategies.RecoveryStrategies.memory_cleanup_recovery">
+<span class="sig-name descname"><span class="pre">memory_cleanup_recovery</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="error_handling.html#id15" title="geminisdr.core.error_handling.MemoryError"><span class="pre">MemoryError</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="error_handling.html#geminisdr.core.error_handling.ErrorContext" title="geminisdr.core.error_handling.ErrorContext"><span class="pre">ErrorContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../_modules/geminisdr/core/recovery_strategies.html#RecoveryStrategies.memory_cleanup_recovery"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geminisdr.core.recovery_strategies.RecoveryStrategies.memory_cleanup_recovery" title="Link to this definition"></a></dt>
+<dd><p>Perform aggressive memory cleanup to recover from memory errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>error</strong> – The memory error that occurred</p></li>
+<li><p><strong>context</strong> – Error context information</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if memory cleanup was successful</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="geminisdr.core.recovery_strategies.RecoveryStrategies.retry_with_delay_recovery">
+<span class="sig-name descname"><span class="pre">retry_with_delay_recovery</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.13)"><span class="pre">Exception</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="error_handling.html#geminisdr.core.error_handling.ErrorContext" title="geminisdr.core.error_handling.ErrorContext"><span class="pre">ErrorContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../_modules/geminisdr/core/recovery_strategies.html#RecoveryStrategies.retry_with_delay_recovery"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geminisdr.core.recovery_strategies.RecoveryStrategies.retry_with_delay_recovery" title="Link to this definition"></a></dt>
+<dd><p>Generic retry strategy with delay for transient errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>error</strong> – The error that occurred</p></li>
+<li><p><strong>context</strong> – Error context information</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if retry should be attempted</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="geminisdr.core.recovery_strategies.RecoveryStrategies.get_all_strategies">
+<span class="sig-name descname"><span class="pre">get_all_strategies</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.13)"><span class="pre">type</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../_modules/geminisdr/core/recovery_strategies.html#RecoveryStrategies.get_all_strategies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geminisdr.core.recovery_strategies.RecoveryStrategies.get_all_strategies" title="Link to this definition"></a></dt>
+<dd><p>Get all available recovery strategies mapped to error types.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict mapping error types to lists of recovery strategies</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="geminisdr.core.recovery_strategies.RecoveryStrategies.is_simulation_mode">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_simulation_mode</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></em><a class="headerlink" href="#geminisdr.core.recovery_strategies.RecoveryStrategies.is_simulation_mode" title="Link to this definition"></a></dt>
+<dd><p>Check if system is currently in simulation mode.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="geminisdr.core.recovery_strategies.RecoveryStrategies.is_cpu_fallback_active">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_cpu_fallback_active</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></em><a class="headerlink" href="#geminisdr.core.recovery_strategies.RecoveryStrategies.is_cpu_fallback_active" title="Link to this definition"></a></dt>
+<dd><p>Check if CPU fallback is currently active.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="geminisdr.core.recovery_strategies.RecoveryStrategies.reset_fallback_states">
+<span class="sig-name descname"><span class="pre">reset_fallback_states</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../_modules/geminisdr/core/recovery_strategies.html#RecoveryStrategies.reset_fallback_states"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geminisdr.core.recovery_strategies.RecoveryStrategies.reset_fallback_states" title="Link to this definition"></a></dt>
+<dd><p>Reset all fallback states to normal operation.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="geminisdr.core.recovery_strategies.setup_default_recovery_strategies">
+<span class="sig-prename descclassname"><span class="pre">geminisdr.core.recovery_strategies.</span></span><span class="sig-name descname"><span class="pre">setup_default_recovery_strategies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error_handler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.Logger" title="(in Python v3.13)"><span class="pre">Logger</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/geminisdr/core/recovery_strategies.html#setup_default_recovery_strategies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geminisdr.core.recovery_strategies.setup_default_recovery_strategies" title="Link to this definition"></a></dt>
+<dd><p>Set up default recovery strategies for an ErrorHandler instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>error_handler</strong> – ErrorHandler instance to configure</p></li>
+<li><p><strong>logger</strong> – Optional logger for recovery strategies</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading"></a></h2>
+<section id="recoverystrategy">
+<h3>RecoveryStrategy<a class="headerlink" href="#recoverystrategy" title="Link to this heading"></a></h3>
+</section>
+<section id="hardwarerecoverystrategy">
+<h3>HardwareRecoveryStrategy<a class="headerlink" href="#hardwarerecoverystrategy" title="Link to this heading"></a></h3>
+</section>
+<section id="memoryrecoverystrategy">
+<h3>MemoryRecoveryStrategy<a class="headerlink" href="#memoryrecoverystrategy" title="Link to this heading"></a></h3>
+</section>
+<section id="modelrecoverystrategy">
+<h3>ModelRecoveryStrategy<a class="headerlink" href="#modelrecoverystrategy" title="Link to this heading"></a></h3>
+</section>
+<section id="configrecoverystrategy">
+<h3>ConfigRecoveryStrategy<a class="headerlink" href="#configrecoverystrategy" title="Link to this heading"></a></h3>
+</section>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h2>
+<section id="register-recovery-strategies">
+<h3>register_recovery_strategies<a class="headerlink" href="#register-recovery-strategies" title="Link to this heading"></a></h3>
+</section>
+<section id="create-recovery-chain">
+<h3>create_recovery_chain<a class="headerlink" href="#create-recovery-chain" title="Link to this heading"></a></h3>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="model_metadata.html" class="btn btn-neutral float-left" title="Model Metadata" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../../architecture/index.html" class="btn btn-neutral float-right" title="System Architecture" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, GeminiSDR Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

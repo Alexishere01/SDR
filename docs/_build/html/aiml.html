@@ -1,0 +1,463 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI/ML Architecture for SDR System &mdash; GeminiSDR 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            GeminiSDR
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="guides/index.html">User Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture/index.html">System Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/index.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/index.html">Examples and Tutorials</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">GeminiSDR</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">AI/ML Architecture for SDR System</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/aiml.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ai-ml-architecture-for-sdr-system">
+<h1>AI/ML Architecture for SDR System<a class="headerlink" href="#ai-ml-architecture-for-sdr-system" title="Link to this heading"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>This document explains the AI/ML architecture of our Software Defined Radio (SDR) system, which combines traditional signal processing with modern machine learning techniques to create intelligent, adaptive radio systems.</p>
+</section>
+<section id="system-architecture">
+<h2>System Architecture<a class="headerlink" href="#system-architecture" title="Link to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌─────────────────────────────────────────────────────────────────┐
+│                    SDR AI/ML SYSTEM                             │
+├─────────────────────────────────────────────────────────────────┤
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐  │
+│  │   Signal Gen    │  │   SDR Interface │  │   Visualizer    │  │
+│  │                 │  │                 │  │                 │  │
+│  │ • Modulations   │  │ • PlutoSDR      │  │ • Real-time     │  │
+│  │ • Channel Fx    │  │ • Simulation    │  │ • Spectrograms  │  │
+│  │ • Noise/Jamming │  │ • Streaming     │  │ • Constellations│  │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘  │
+├─────────────────────────────────────────────────────────────────┤
+│                        ML LAYER                                 │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐  │
+│  │ Traditional AMR │  │   Neural AMR    │  │ Intelligent RX  │  │
+│  │                 │  │                 │  │                 │  │
+│  │ • Hand-crafted  │  │ • CNN-based     │  │ • Deep Q-Net    │  │
+│  │ • Features      │  │ • End-to-end    │  │ • Reinforcement │  │
+│  │ • Random Forest │  │ • PyTorch       │  │ • Signal Search │  │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘  │
+├─────────────────────────────────────────────────────────────────┤
+│                    ADVERSARIAL LAYER                            │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐  │
+│  │ Smart Jammer    │  │ Adversarial Env │  │ Battle-hardened │  │
+│  │                 │  │                 │  │ Receiver        │  │
+│  │ • Multi-strategy│  │ • Game Theory   │  │ • Anti-jamming  │  │
+│  │ • Learning      │  │ • Co-evolution  │  │ • Frequency Hop │  │
+│  │ • Adaptation    │  │ • Real-time     │  │ • Robust        │  │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+</pre></div>
+</div>
+</section>
+<section id="core-components">
+<h2>Core Components<a class="headerlink" href="#core-components" title="Link to this heading"></a></h2>
+<section id="signal-generation-processing">
+<h3>1. Signal Generation &amp; Processing<a class="headerlink" href="#signal-generation-processing" title="Link to this heading"></a></h3>
+<p><strong>Purpose</strong>: Create realistic training data and test scenarios</p>
+<p><strong>Key Features</strong>:</p>
+<ul class="simple">
+<li><p>Multiple modulation schemes (BPSK, QPSK, 8PSK, 16QAM, 64QAM)</p></li>
+<li><p>Realistic channel impairments (noise, fading, frequency offset)</p></li>
+<li><p>Pulse shaping and filtering</p></li>
+<li><p>Configurable SNR and interference</p></li>
+</ul>
+<p><strong>Implementation</strong>: <code class="docutils literal notranslate"><span class="pre">core/signal_generator.py</span></code></p>
+</section>
+<section id="sdr-interface-layer">
+<h3>2. SDR Interface Layer<a class="headerlink" href="#sdr-interface-layer" title="Link to this heading"></a></h3>
+<p><strong>Purpose</strong>: Abstract hardware/simulation interface</p>
+<p><strong>Key Features</strong>:</p>
+<ul class="simple">
+<li><p>PlutoSDR hardware support</p></li>
+<li><p>Simulation fallback mode</p></li>
+<li><p>Real-time streaming</p></li>
+<li><p>Batch capture modes</p></li>
+<li><p>Automatic retry and error handling</p></li>
+</ul>
+<p><strong>Implementation</strong>: <code class="docutils literal notranslate"><span class="pre">core/sdr_interface.py</span></code></p>
+</section>
+<section id="traditional-amr-automatic-modulation-recognition">
+<h3>3. Traditional AMR (Automatic Modulation Recognition)<a class="headerlink" href="#traditional-amr-automatic-modulation-recognition" title="Link to this heading"></a></h3>
+<p><strong>Purpose</strong>: Baseline modulation classification using classical methods</p>
+<p><strong>Architecture</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Signal → Feature Extraction → Classification → Prediction
+         ├─ Statistical moments
+         ├─ Higher-order cumulants  
+         ├─ Spectral features
+         ├─ Cyclostationary features
+         └─ Instantaneous features
+</pre></div>
+</div>
+<p><strong>Features Extracted</strong>:</p>
+<ul class="simple">
+<li><p><strong>Statistical Moments</strong>: 2nd-4th order moments of amplitude and phase</p></li>
+<li><p><strong>Cumulants</strong>: C20, C21, C40, C41, C42 for modulation discrimination</p></li>
+<li><p><strong>Spectral</strong>: Centroid, bandwidth, rolloff, PAPR</p></li>
+<li><p><strong>Cyclostationary</strong>: Cyclic spectral density at key frequencies</p></li>
+<li><p><strong>Instantaneous</strong>: Amplitude, phase, frequency variations</p></li>
+</ul>
+<p><strong>Classifier</strong>: Random Forest (100 trees)</p>
+<p><strong>Implementation</strong>: <code class="docutils literal notranslate"><span class="pre">ml/traditional_amr.py</span></code></p>
+</section>
+<section id="neural-amr">
+<h3>4. Neural AMR<a class="headerlink" href="#neural-amr" title="Link to this heading"></a></h3>
+<p><strong>Purpose</strong>: Deep learning approach to modulation recognition</p>
+<p><strong>Architecture</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>I/Q Signal → CNN Layers → Dense Layers → Softmax → Classification
+             ├─ Conv1D(64, kernel=7)
+             ├─ Conv1D(128, kernel=5)  
+             ├─ Conv1D(256, kernel=3)
+             ├─ MaxPool + BatchNorm
+             ├─ Dense(256)
+             ├─ Dense(128)
+             └─ Dense(num_classes)
+</pre></div>
+</div>
+<p><strong>Key Features</strong>:</p>
+<ul class="simple">
+<li><p>End-to-end learning from raw I/Q samples</p></li>
+<li><p>Convolutional layers for feature extraction</p></li>
+<li><p>Batch normalization for training stability</p></li>
+<li><p>Dropout for regularization</p></li>
+<li><p>Multi-class softmax output</p></li>
+</ul>
+<p><strong>Training</strong>: Adam optimizer, cross-entropy loss, learning rate scheduling</p>
+<p><strong>Implementation</strong>: <code class="docutils literal notranslate"><span class="pre">ml/neural_amr.py</span></code></p>
+</section>
+<section id="intelligent-receiver-deep-q-learning">
+<h3>5. Intelligent Receiver (Deep Q-Learning)<a class="headerlink" href="#intelligent-receiver-deep-q-learning" title="Link to this heading"></a></h3>
+<p><strong>Purpose</strong>: Autonomous signal acquisition and optimization</p>
+<p><strong>Architecture</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Environment State → DQN → Action Selection → SDR Control
+                    ├─ Dueling Architecture
+                    ├─ Experience Replay
+                    ├─ Target Network
+                    └─ Epsilon-Greedy
+</pre></div>
+</div>
+<p><strong>State Space</strong>: 256-dimensional vector containing:</p>
+<ul class="simple">
+<li><p>Spectrum analysis (250 bins)</p></li>
+<li><p>Current frequency, gain, bandwidth</p></li>
+<li><p>SNR estimate, signal power, noise floor</p></li>
+</ul>
+<p><strong>Action Space</strong>: 3-dimensional continuous control:</p>
+<ul class="simple">
+<li><p>Frequency adjustment (-1MHz to +1MHz)</p></li>
+<li><p>Gain adjustment (-10dB to +10dB)</p></li>
+<li><p>Bandwidth factor (-0.5 to +0.5)</p></li>
+</ul>
+<p><strong>Reward Function</strong>:</p>
+<ul class="simple">
+<li><p>Primary: Achieved SNR</p></li>
+<li><p>Bonus: Frequency accuracy, signal acquisition</p></li>
+<li><p>Penalty: Poor performance, excessive adjustments</p></li>
+</ul>
+<p><strong>Implementation</strong>: <code class="docutils literal notranslate"><span class="pre">ml/intelligent_receiver.py</span></code></p>
+</section>
+</section>
+<section id="adversarial-ai-system">
+<h2>Adversarial AI System<a class="headerlink" href="#adversarial-ai-system" title="Link to this heading"></a></h2>
+<section id="smart-jammer-architecture">
+<h3>Smart Jammer Architecture<a class="headerlink" href="#smart-jammer-architecture" title="Link to this heading"></a></h3>
+<p><strong>Purpose</strong>: Intelligent opposition to test receiver robustness</p>
+<p><strong>Jamming Strategies</strong>:</p>
+<ol class="arabic simple">
+<li><p><strong>Narrowband</strong>: Concentrated power at receiver frequency</p></li>
+<li><p><strong>Wideband</strong>: Spread spectrum noise jamming</p></li>
+<li><p><strong>Sweep</strong>: Frequency sweeping around target</p></li>
+<li><p><strong>Pulse</strong>: High-power intermittent jamming</p></li>
+<li><p><strong>Adaptive</strong>: Learns receiver patterns</p></li>
+<li><p><strong>Deceptive</strong>: Fake signals to confuse</p></li>
+<li><p><strong>Smart Follow</strong>: Predicts receiver movement</p></li>
+</ol>
+<p><strong>Learning Algorithm</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Receiver Observation → Strategy Selection → Jamming → Effectiveness → Learning Update
+                       ├─ Multi-armed Bandit
+                       ├─ Upper Confidence Bound
+                       ├─ Success Rate Tracking
+                       └─ Power Allocation
+</pre></div>
+</div>
+<p><strong>Implementation</strong>: <code class="docutils literal notranslate"><span class="pre">ml/adversarial_jamming.py</span></code></p>
+</section>
+<section id="adversarial-training-environment">
+<h3>Adversarial Training Environment<a class="headerlink" href="#adversarial-training-environment" title="Link to this heading"></a></h3>
+<p><strong>Purpose</strong>: Co-evolutionary training of receiver vs jammer</p>
+<p><strong>Game Theory Approach</strong>:</p>
+<ul class="simple">
+<li><p>Receiver tries to maximize SNR and signal acquisition</p></li>
+<li><p>Jammer tries to minimize receiver performance</p></li>
+<li><p>Both agents learn and adapt in real-time</p></li>
+<li><p>Nash equilibrium emerges through training</p></li>
+</ul>
+<p><strong>Training Phases</strong>:</p>
+<ol class="arabic simple">
+<li><p><strong>Random Jammer</strong>: Baseline performance</p></li>
+<li><p><strong>Adaptive Jammer</strong>: Pattern learning</p></li>
+<li><p><strong>Intelligent Jammer</strong>: Predictive strategies</p></li>
+</ol>
+<p><strong>Metrics</strong>:</p>
+<ul class="simple">
+<li><p>Win/loss ratios</p></li>
+<li><p>SNR degradation</p></li>
+<li><p>Strategy effectiveness</p></li>
+<li><p>Adaptation speed</p></li>
+</ul>
+</section>
+</section>
+<section id="parameter-selection-optimization">
+<h2>Parameter Selection &amp; Optimization<a class="headerlink" href="#parameter-selection-optimization" title="Link to this heading"></a></h2>
+<section id="why-these-parameters">
+<h3>Why These Parameters?<a class="headerlink" href="#why-these-parameters" title="Link to this heading"></a></h3>
+<p><strong>DQN Architecture</strong>:</p>
+<ul class="simple">
+<li><p><strong>State size (256)</strong>: Balances information richness with computational efficiency</p></li>
+<li><p><strong>Hidden layers (512)</strong>: Sufficient capacity for complex signal patterns</p></li>
+<li><p><strong>Dueling architecture</strong>: Separates value and advantage for better learning</p></li>
+<li><p><strong>Experience replay (10k-20k)</strong>: Breaks correlation, improves stability</p></li>
+</ul>
+<p><strong>Training Hyperparameters</strong>:</p>
+<ul class="simple">
+<li><p><strong>Learning rate (1e-4 to 5e-5)</strong>: Conservative for stable convergence</p></li>
+<li><p><strong>Epsilon decay (0.995-0.9998)</strong>: Gradual shift from exploration to exploitation</p></li>
+<li><p><strong>Batch size (32-64)</strong>: Balance between gradient noise and memory efficiency</p></li>
+<li><p><strong>Target network update (10-20 episodes)</strong>: Stability vs adaptation speed</p></li>
+</ul>
+<p><strong>Action Discretization</strong>:</p>
+<ul class="simple">
+<li><p><strong>Frequency steps (11-21)</strong>: Fine enough for precise tuning</p></li>
+<li><p><strong>Gain steps (11-21)</strong>: Covers typical dynamic range</p></li>
+<li><p><strong>Bandwidth steps (11)</strong>: Sufficient for most scenarios</p></li>
+</ul>
+</section>
+<section id="feature-engineering-rationale">
+<h3>Feature Engineering Rationale<a class="headerlink" href="#feature-engineering-rationale" title="Link to this heading"></a></h3>
+<p><strong>Traditional AMR Features</strong>:</p>
+<ul class="simple">
+<li><p><strong>Moments</strong>: Capture amplitude/phase statistics</p></li>
+<li><p><strong>Cumulants</strong>: Modulation-specific signatures</p></li>
+<li><p><strong>Spectral</strong>: Frequency domain characteristics</p></li>
+<li><p><strong>Cyclostationary</strong>: Exploit periodic properties of digital modulations</p></li>
+</ul>
+<p><strong>Neural AMR Input</strong>:</p>
+<ul class="simple">
+<li><p><strong>I/Q samples</strong>: Raw complex baseband preserves all information</p></li>
+<li><p><strong>Sequence length (1024)</strong>: Compromise between context and computation</p></li>
+<li><p><strong>Normalization</strong>: Prevents saturation, improves convergence</p></li>
+</ul>
+</section>
+</section>
+<section id="training-methodology">
+<h2>Training Methodology<a class="headerlink" href="#training-methodology" title="Link to this heading"></a></h2>
+<section id="progressive-difficulty-training">
+<h3>Progressive Difficulty Training<a class="headerlink" href="#progressive-difficulty-training" title="Link to this heading"></a></h3>
+<p><strong>Intelligent Receiver</strong>:</p>
+<ol class="arabic simple">
+<li><p><strong>Simulation Environment</strong>: Learn basic signal acquisition</p></li>
+<li><p><strong>Noise Robustness</strong>: Handle various SNR conditions</p></li>
+<li><p><strong>Adversarial Training</strong>: Battle against intelligent jamming</p></li>
+</ol>
+<p><strong>Adversarial Training</strong>:</p>
+<ol class="arabic simple">
+<li><p><strong>Weak Jammer (20W)</strong>: Basic anti-jamming skills</p></li>
+<li><p><strong>Moderate Jammer (40W)</strong>: Intermediate challenges</p></li>
+<li><p><strong>Strong Jammer (60W)</strong>: Advanced techniques</p></li>
+<li><p><strong>Powerful Jammer (80W)</strong>: Extreme scenarios</p></li>
+<li><p><strong>Elite Jammer (100W)</strong>: Ultimate test</p></li>
+</ol>
+</section>
+<section id="curriculum-learning-benefits">
+<h3>Curriculum Learning Benefits<a class="headerlink" href="#curriculum-learning-benefits" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Gradual Complexity</strong>: Prevents overwhelming the learning agent</p></li>
+<li><p><strong>Skill Building</strong>: Each level builds on previous capabilities</p></li>
+<li><p><strong>Robust Performance</strong>: Handles wide range of scenarios</p></li>
+<li><p><strong>Transfer Learning</strong>: Skills transfer across difficulty levels</p></li>
+</ul>
+</section>
+</section>
+<section id="performance-metrics">
+<h2>Performance Metrics<a class="headerlink" href="#performance-metrics" title="Link to this heading"></a></h2>
+<section id="traditional-amr">
+<h3>Traditional AMR<a class="headerlink" href="#traditional-amr" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Accuracy</strong>: Overall classification rate</p></li>
+<li><p><strong>Confusion Matrix</strong>: Per-class performance</p></li>
+<li><p><strong>SNR Sensitivity</strong>: Performance vs noise level</p></li>
+<li><p><strong>Feature Importance</strong>: Which features matter most</p></li>
+</ul>
+</section>
+<section id="id1">
+<h3>Neural AMR<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Validation Accuracy</strong>: Generalization performance</p></li>
+<li><p><strong>Training Loss</strong>: Convergence monitoring</p></li>
+<li><p><strong>Per-class Precision/Recall</strong>: Balanced performance</p></li>
+<li><p><strong>Computational Efficiency</strong>: Inference speed</p></li>
+</ul>
+</section>
+<section id="intelligent-receiver">
+<h3>Intelligent Receiver<a class="headerlink" href="#intelligent-receiver" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Signal Acquisition Rate</strong>: How often it finds signals</p></li>
+<li><p><strong>Convergence Speed</strong>: Time to optimal tuning</p></li>
+<li><p><strong>SNR Achievement</strong>: Quality of acquired signals</p></li>
+<li><p><strong>Robustness</strong>: Performance under interference</p></li>
+</ul>
+</section>
+<section id="adversarial-system">
+<h3>Adversarial System<a class="headerlink" href="#adversarial-system" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Win/Loss Ratios</strong>: Receiver vs jammer success</p></li>
+<li><p><strong>SNR Degradation</strong>: Jamming effectiveness</p></li>
+<li><p><strong>Strategy Adaptation</strong>: Learning speed</p></li>
+<li><p><strong>Anti-jamming Success</strong>: Overcoming interference</p></li>
+</ul>
+</section>
+</section>
+<section id="real-world-applications">
+<h2>Real-World Applications<a class="headerlink" href="#real-world-applications" title="Link to this heading"></a></h2>
+<section id="military-defense">
+<h3>Military/Defense<a class="headerlink" href="#military-defense" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Electronic Warfare</strong>: Robust communications under jamming</p></li>
+<li><p><strong>Spectrum Surveillance</strong>: Automatic signal identification</p></li>
+<li><p><strong>Cognitive Radio</strong>: Adaptive spectrum usage</p></li>
+</ul>
+</section>
+<section id="commercial">
+<h3>Commercial<a class="headerlink" href="#commercial" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>5G/6G Networks</strong>: Intelligent interference mitigation</p></li>
+<li><p><strong>IoT Communications</strong>: Adaptive low-power protocols</p></li>
+<li><p><strong>Satellite Communications</strong>: Robust uplink/downlink</p></li>
+</ul>
+</section>
+<section id="research">
+<h3>Research<a class="headerlink" href="#research" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Spectrum Management</strong>: Dynamic allocation algorithms</p></li>
+<li><p><strong>Protocol Development</strong>: AI-assisted design</p></li>
+<li><p><strong>Security</strong>: Anti-jamming and spoofing resistance</p></li>
+</ul>
+</section>
+</section>
+<section id="future-enhancements">
+<h2>Future Enhancements<a class="headerlink" href="#future-enhancements" title="Link to this heading"></a></h2>
+<section id="planned-improvements">
+<h3>Planned Improvements<a class="headerlink" href="#planned-improvements" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Multi-agent Systems</strong>: Cooperative receiver networks</p></li>
+<li><p><strong>Transfer Learning</strong>: Pre-trained models for new scenarios</p></li>
+<li><p><strong>Federated Learning</strong>: Distributed training across devices</p></li>
+<li><p><strong>Explainable AI</strong>: Understanding decision processes</p></li>
+<li><p><strong>Real-time Optimization</strong>: Hardware-accelerated inference</p></li>
+</ol>
+</section>
+<section id="advanced-techniques">
+<h3>Advanced Techniques<a class="headerlink" href="#advanced-techniques" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Graph Neural Networks</strong>: For network topology awareness</p></li>
+<li><p><strong>Transformer Models</strong>: For sequence modeling</p></li>
+<li><p><strong>Meta-learning</strong>: Quick adaptation to new environments</p></li>
+<li><p><strong>Adversarial Training</strong>: More sophisticated opponents</p></li>
+</ul>
+<p>This AI/ML architecture represents a comprehensive approach to intelligent radio systems, combining classical signal processing wisdom with cutting-edge machine learning techniques to create robust, adaptive, and intelligent SDR systems.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, GeminiSDR Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

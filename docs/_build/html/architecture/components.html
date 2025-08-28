@@ -1,0 +1,362 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>System Components &mdash; GeminiSDR 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Data Flow and Processing" href="data_flow.html" />
+    <link rel="prev" title="Architecture Overview" href="overview.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            GeminiSDR
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">User Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API Reference</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Architecture</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="overview.html">Architecture Overview</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">System Components</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#configuration-management">Configuration Management</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#components">Components:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#key-features">Key Features:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#error-handling-and-recovery">Error Handling and Recovery</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id1">Components:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#recovery-strategies">Recovery Strategies:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#memory-management">Memory Management</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id2">Components:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id3">Key Features:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#logging-and-monitoring">Logging and Monitoring</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id4">Components:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#monitoring-capabilities">Monitoring Capabilities:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#model-management">Model Management</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id5">Components:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id6">Key Features:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#hardware-abstraction">Hardware Abstraction</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id7">Components:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#supported-platforms">Supported Platforms:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#machine-learning-components">Machine Learning Components</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id8">Components:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id9">Key Features:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#testing-framework">Testing Framework</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id10">Components:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#testing-capabilities">Testing Capabilities:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#component-dependencies">Component Dependencies</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="data_flow.html">Data Flow and Processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cross_platform.html">Cross-Platform Design</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#architecture-overview">Architecture Overview</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#system-components">System Components</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">System Components</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#configuration-management">Configuration Management</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#error-handling-and-recovery">Error Handling and Recovery</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#memory-management">Memory Management</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#logging-and-monitoring">Logging and Monitoring</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#model-management">Model Management</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hardware-abstraction">Hardware Abstraction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#machine-learning-components">Machine Learning Components</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#testing-framework">Testing Framework</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#component-dependencies">Component Dependencies</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#data-flow-and-processing">Data Flow and Processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#cross-platform-design">Cross-Platform Design</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples and Tutorials</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">GeminiSDR</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">System Architecture</a></li>
+      <li class="breadcrumb-item active">System Components</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/architecture/components.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="system-components">
+<h1>System Components<a class="headerlink" href="#system-components" title="Link to this heading"></a></h1>
+<p>This section provides detailed information about the major system components and their responsibilities.</p>
+<section id="configuration-management">
+<h2>Configuration Management<a class="headerlink" href="#configuration-management" title="Link to this heading"></a></h2>
+<p>The configuration management system provides centralized configuration with environment-specific overrides and validation.</p>
+<section id="components">
+<h3>Components:<a class="headerlink" href="#components" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>ConfigManager</strong>: Main configuration loading and management class</p></li>
+<li><p><strong>Configuration Models</strong>: Typed data classes for different configuration sections</p></li>
+<li><p><strong>Validation</strong>: Schema validation with clear error reporting</p></li>
+<li><p><strong>Hot Reload</strong>: Support for runtime configuration updates</p></li>
+</ul>
+</section>
+<section id="key-features">
+<h3>Key Features:<a class="headerlink" href="#key-features" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Hierarchical configuration with environment overrides</p></li>
+<li><p>Type-safe configuration models with validation</p></li>
+<li><p>Support for development, testing, and production environments</p></li>
+<li><p>Integration with Hydra for advanced configuration management</p></li>
+</ul>
+</section>
+</section>
+<section id="error-handling-and-recovery">
+<h2>Error Handling and Recovery<a class="headerlink" href="#error-handling-and-recovery" title="Link to this heading"></a></h2>
+<p>The error handling system provides comprehensive error management with automatic recovery strategies.</p>
+<section id="id1">
+<h3>Components:<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>ErrorHandler</strong>: Centralized error handling with recovery strategies</p></li>
+<li><p><strong>Error Classes</strong>: Hierarchical error classification with severity levels</p></li>
+<li><p><strong>Recovery Strategies</strong>: Pluggable recovery strategies for different error types</p></li>
+<li><p><strong>Context Management</strong>: Error context tracking and structured logging</p></li>
+</ul>
+</section>
+<section id="recovery-strategies">
+<h3>Recovery Strategies:<a class="headerlink" href="#recovery-strategies" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Hardware Failures</strong>: Automatic fallback to simulation mode</p></li>
+<li><p><strong>Memory Issues</strong>: Dynamic batch size reduction and cleanup</p></li>
+<li><p><strong>Model Errors</strong>: Alternative version loading and migration</p></li>
+<li><p><strong>Configuration Errors</strong>: Fallback to defaults with validation</p></li>
+</ul>
+</section>
+</section>
+<section id="memory-management">
+<h2>Memory Management<a class="headerlink" href="#memory-management" title="Link to this heading"></a></h2>
+<p>The memory management system provides intelligent resource optimization and monitoring.</p>
+<section id="id2">
+<h3>Components:<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>MemoryManager</strong>: System memory monitoring and optimization</p></li>
+<li><p><strong>ModelCache</strong>: LRU cache for ML models with memory limits</p></li>
+<li><p><strong>Resource Monitoring</strong>: Real-time tracking of RAM and GPU memory</p></li>
+<li><p><strong>Optimization</strong>: Dynamic batch size and resource allocation</p></li>
+</ul>
+</section>
+<section id="id3">
+<h3>Key Features:<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Automatic memory pressure detection and mitigation</p></li>
+<li><p>Dynamic batch size optimization based on available resources</p></li>
+<li><p>Model caching with intelligent eviction policies</p></li>
+<li><p>Memory-efficient context managers for large operations</p></li>
+</ul>
+</section>
+</section>
+<section id="logging-and-monitoring">
+<h2>Logging and Monitoring<a class="headerlink" href="#logging-and-monitoring" title="Link to this heading"></a></h2>
+<p>The logging and monitoring system provides comprehensive observability and metrics collection.</p>
+<section id="id4">
+<h3>Components:<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>StructuredLogger</strong>: JSON-based structured logging with context</p></li>
+<li><p><strong>MetricsCollector</strong>: System and ML metrics collection</p></li>
+<li><p><strong>AnomalyDetector</strong>: Statistical anomaly detection for monitoring</p></li>
+<li><p><strong>Log Rotation</strong>: Automatic log rotation and archival</p></li>
+</ul>
+</section>
+<section id="monitoring-capabilities">
+<h3>Monitoring Capabilities:<a class="headerlink" href="#monitoring-capabilities" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Real-time system performance metrics</p></li>
+<li><p>ML training and inference metrics tracking</p></li>
+<li><p>Anomaly detection with configurable thresholds</p></li>
+<li><p>Integration with external monitoring systems</p></li>
+</ul>
+</section>
+</section>
+<section id="model-management">
+<h2>Model Management<a class="headerlink" href="#model-management" title="Link to this heading"></a></h2>
+<p>The model management system provides version-controlled model persistence with comprehensive metadata.</p>
+<section id="id5">
+<h3>Components:<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>ModelManager</strong>: Centralized model saving, loading, and versioning</p></li>
+<li><p><strong>ModelMetadata</strong>: Comprehensive metadata structure for model tracking</p></li>
+<li><p><strong>ModelRegistry</strong>: Registry for tracking model versions and relationships</p></li>
+<li><p><strong>MLflow Integration</strong>: Integration with MLflow for experiment tracking</p></li>
+</ul>
+</section>
+<section id="id6">
+<h3>Key Features:<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Model versioning with compatibility validation</p></li>
+<li><p>Comprehensive metadata including performance metrics and reproducibility info</p></li>
+<li><p>Model comparison and migration utilities</p></li>
+<li><p>Integration with experiment tracking systems</p></li>
+</ul>
+</section>
+</section>
+<section id="hardware-abstraction">
+<h2>Hardware Abstraction<a class="headerlink" href="#hardware-abstraction" title="Link to this heading"></a></h2>
+<p>The hardware abstraction layer provides unified interfaces for different SDR devices and compute platforms.</p>
+<section id="id7">
+<h3>Components:<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>HardwareAbstraction</strong>: Unified interface for hardware operations</p></li>
+<li><p><strong>Device Detection</strong>: Automatic detection of available hardware</p></li>
+<li><p><strong>Platform Optimization</strong>: Platform-specific optimizations for M1, Linux, CUDA</p></li>
+<li><p><strong>Simulation Mode</strong>: Software simulation for development and testing</p></li>
+</ul>
+</section>
+<section id="supported-platforms">
+<h3>Supported Platforms:<a class="headerlink" href="#supported-platforms" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>M1 Mac</strong>: Native Apple Silicon optimization with Metal Performance Shaders</p></li>
+<li><p><strong>Linux VM</strong>: Optimized for virtualized Linux environments</p></li>
+<li><p><strong>CUDA</strong>: GPU acceleration for NVIDIA hardware</p></li>
+<li><p><strong>Simulation</strong>: Software-only mode for development and CI/CD</p></li>
+</ul>
+</section>
+</section>
+<section id="machine-learning-components">
+<h2>Machine Learning Components<a class="headerlink" href="#machine-learning-components" title="Link to this heading"></a></h2>
+<p>The ML components provide adaptive signal processing capabilities with reinforcement learning.</p>
+<section id="id8">
+<h3>Components:<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Intelligent Receiver</strong>: Adaptive signal reception with RL</p></li>
+<li><p><strong>Neural AMR</strong>: Neural network-based automatic modulation recognition</p></li>
+<li><p><strong>Traditional AMR</strong>: Classical signal processing AMR techniques</p></li>
+<li><p><strong>Adversarial Jamming</strong>: Anti-jamming and jamming detection capabilities</p></li>
+</ul>
+</section>
+<section id="id9">
+<h3>Key Features:<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Cross-platform ML optimization</p></li>
+<li><p>Automatic model selection based on performance</p></li>
+<li><p>Real-time signal processing and analysis</p></li>
+<li><p>Integration with hardware abstraction layer</p></li>
+</ul>
+</section>
+</section>
+<section id="testing-framework">
+<h2>Testing Framework<a class="headerlink" href="#testing-framework" title="Link to this heading"></a></h2>
+<p>The testing framework provides comprehensive validation across multiple platforms.</p>
+<section id="id10">
+<h3>Components:<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>TestBase</strong>: Base classes for consistent test setup</p></li>
+<li><p><strong>PerformanceTest</strong>: Performance benchmarking and regression detection</p></li>
+<li><p><strong>CrossPlatformTest</strong>: Platform-specific validation</p></li>
+<li><p><strong>CI/CD Pipeline</strong>: Automated testing across M1, Linux, and CUDA</p></li>
+</ul>
+</section>
+<section id="testing-capabilities">
+<h3>Testing Capabilities:<a class="headerlink" href="#testing-capabilities" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Unit tests for individual components</p></li>
+<li><p>Integration tests for end-to-end workflows</p></li>
+<li><p>Performance benchmarks with regression detection</p></li>
+<li><p>Cross-platform compatibility validation</p></li>
+</ul>
+</section>
+</section>
+<section id="component-dependencies">
+<h2>Component Dependencies<a class="headerlink" href="#component-dependencies" title="Link to this heading"></a></h2>
+<p>The following diagram shows the dependencies between major system components:</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="overview.html" class="btn btn-neutral float-left" title="Architecture Overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="data_flow.html" class="btn btn-neutral float-right" title="Data Flow and Processing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, GeminiSDR Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

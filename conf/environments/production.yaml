@@ -1,0 +1,32 @@
+# @package _global_
+# Production environment configuration
+# Settings optimized for production deployment and performance
+
+environment: production
+debug_mode: false
+
+hardware:
+  enable_mixed_precision: true  # Performance optimization
+
+ml:
+  model_cache_size: 5           # More aggressive caching
+  checkpoint_frequency: 1000    # Less frequent checkpoints
+
+logging:
+  level: INFO
+  format: structured
+  output: [file, syslog]
+  rotation: daily
+  max_file_size_mb: 200
+  backup_count: 10
+  log_dir: /var/log/geminisdr
+  enable_performance_logging: true
+
+performance:
+  memory_threshold: 0.8
+  auto_optimize: true
+  profiling_enabled: false  # Disable profiling overhead
+  gc_frequency: 200
+  memory_cleanup_threshold: 0.9
+  batch_size_auto_tune: true
+  model_compilation: true   # Optimize for production performance

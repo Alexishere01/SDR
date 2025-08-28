@@ -1,0 +1,174 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Installation Guides &mdash; GeminiSDR 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="M1 Mac Installation Guide" href="m1_mac.html" />
+    <link rel="prev" title="User Guides" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            GeminiSDR
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">User Guides</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Installation Guides</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="m1_mac.html">M1 Mac Installation Guide</a></li>
+<li class="toctree-l3"><a class="reference internal" href="linux_vm.html">Linux VM Installation Guide</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cuda_cluster.html">CUDA Cluster Installation Guide</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#quick-platform-selection">Quick Platform Selection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#detailed-installation-guides">Detailed Installation Guides</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../troubleshooting.html">Troubleshooting Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../performance_optimization.html">Performance Optimization Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#installation-guides">Installation Guides</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#essential-guides">Essential Guides</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#quick-start">Quick Start</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../architecture/index.html">System Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/index.html">Examples and Tutorials</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">GeminiSDR</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">User Guides</a></li>
+      <li class="breadcrumb-item active">Installation Guides</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/guides/installation/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="installation-guides">
+<h1>Installation Guides<a class="headerlink" href="#installation-guides" title="Link to this heading"></a></h1>
+<p>Platform-specific installation instructions for GeminiSDR.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="m1_mac.html">M1 Mac Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="linux_vm.html">Linux VM Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cuda_cluster.html">CUDA Cluster Installation Guide</a></li>
+</ul>
+</div>
+<section id="quick-platform-selection">
+<h2>Quick Platform Selection<a class="headerlink" href="#quick-platform-selection" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt><strong>Apple Silicon Mac (M1/M2)</strong></dt><dd><p>Best for: Development, prototyping, and moderate-scale training</p>
+<ul class="simple">
+<li><p>Native ARM64 performance</p></li>
+<li><p>Metal Performance Shaders acceleration</p></li>
+<li><p>Unified memory architecture</p></li>
+<li><p><a class="reference internal" href="m1_mac.html"><span class="doc">→ M1 Mac Guide</span></a></p></li>
+</ul>
+</dd>
+<dt><strong>Linux Virtual Machine</strong></dt><dd><p>Best for: Development in constrained environments, CI/CD</p>
+<ul class="simple">
+<li><p>CPU-optimized processing</p></li>
+<li><p>Conservative memory usage</p></li>
+<li><p>Cross-platform compatibility testing</p></li>
+<li><p><a class="reference internal" href="linux_vm.html"><span class="doc">→ Linux VM Guide</span></a></p></li>
+</ul>
+</dd>
+<dt><strong>CUDA Cluster</strong></dt><dd><p>Best for: Large-scale training, production workloads</p>
+<ul class="simple">
+<li><p>Multi-GPU acceleration</p></li>
+<li><p>Distributed training support</p></li>
+<li><p>High-performance computing</p></li>
+<li><p><a class="reference internal" href="cuda_cluster.html"><span class="doc">→ CUDA Cluster Guide</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="detailed-installation-guides">
+<h2>Detailed Installation Guides<a class="headerlink" href="#detailed-installation-guides" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="m1_mac.html"><span class="doc">M1 Mac Installation Guide</span></a> - Installation on Apple Silicon Macs with Metal Performance Shaders</p></li>
+<li><p><a class="reference internal" href="linux_vm.html"><span class="doc">Linux VM Installation Guide</span></a> - Installation on Linux Virtual Machines with CPU optimization</p></li>
+<li><p><a class="reference internal" href="cuda_cluster.html"><span class="doc">CUDA Cluster Installation Guide</span></a> - Installation on CUDA-enabled clusters with multi-GPU support</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../index.html" class="btn btn-neutral float-left" title="User Guides" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="m1_mac.html" class="btn btn-neutral float-right" title="M1 Mac Installation Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, GeminiSDR Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

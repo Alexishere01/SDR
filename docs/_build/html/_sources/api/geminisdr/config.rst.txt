@@ -1,0 +1,16 @@
+config package
+==============
+
+.. automodule:: config
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   config.config_manager
+   config.config_models

@@ -1,0 +1,10 @@
+# @package hardware
+# M1 Mac native hardware configuration
+# Optimized for Apple Silicon with Metal Performance Shaders
+
+device_preference: mps
+sdr_mode: simulation  # Default to simulation on M1
+memory_limit_gb: null  # Use unified memory efficiently
+max_threads: 8        # Typical M1 performance cores
+gpu_memory_fraction: 0.7  # Conservative for unified memory
+enable_mixed_precision: true  # MPS supports mixed precision

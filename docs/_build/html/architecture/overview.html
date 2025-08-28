@@ -1,0 +1,239 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Architecture Overview &mdash; GeminiSDR 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="System Components" href="components.html" />
+    <link rel="prev" title="System Architecture" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            GeminiSDR
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">User Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API Reference</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Architecture</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Architecture Overview</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#system-architecture-diagram">System Architecture Diagram</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#design-principles">Design Principles</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#modularity">Modularity</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cross-platform-compatibility">Cross-Platform Compatibility</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#scalability">Scalability</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#developer-experience">Developer Experience</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#component-interactions">Component Interactions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#configuration-flow">Configuration Flow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#error-handling-flow">Error Handling Flow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#memory-management-flow">Memory Management Flow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#model-lifecycle">Model Lifecycle</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="components.html">System Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_flow.html">Data Flow and Processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cross_platform.html">Cross-Platform Design</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#architecture-overview">Architecture Overview</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Architecture Overview</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#system-architecture-diagram">System Architecture Diagram</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#design-principles">Design Principles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#component-interactions">Component Interactions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#system-components">System Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#data-flow-and-processing">Data Flow and Processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#cross-platform-design">Cross-Platform Design</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples and Tutorials</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">GeminiSDR</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">System Architecture</a></li>
+      <li class="breadcrumb-item active">Architecture Overview</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/architecture/overview.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="architecture-overview">
+<h1>Architecture Overview<a class="headerlink" href="#architecture-overview" title="Link to this heading"></a></h1>
+<p>GeminiSDR is designed as a modular, cross-platform software-defined radio system with advanced machine learning capabilities. The architecture emphasizes maintainability, scalability, and developer experience while supporting multiple hardware platforms.</p>
+<section id="system-architecture-diagram">
+<h2>System Architecture Diagram<a class="headerlink" href="#system-architecture-diagram" title="Link to this heading"></a></h2>
+</section>
+<section id="design-principles">
+<h2>Design Principles<a class="headerlink" href="#design-principles" title="Link to this heading"></a></h2>
+<section id="modularity">
+<h3>Modularity<a class="headerlink" href="#modularity" title="Link to this heading"></a></h3>
+<p>The system is designed with clear separation of concerns:</p>
+<ul class="simple">
+<li><p><strong>Configuration Management</strong>: Centralized configuration with environment-specific overrides</p></li>
+<li><p><strong>Error Handling</strong>: Comprehensive error handling with automatic recovery strategies</p></li>
+<li><p><strong>Memory Management</strong>: Intelligent memory optimization and resource management</p></li>
+<li><p><strong>Model Management</strong>: Version-controlled model persistence with metadata tracking</p></li>
+</ul>
+</section>
+<section id="cross-platform-compatibility">
+<h3>Cross-Platform Compatibility<a class="headerlink" href="#cross-platform-compatibility" title="Link to this heading"></a></h3>
+<p>The architecture supports multiple platforms through:</p>
+<ul class="simple">
+<li><p><strong>Hardware Abstraction</strong>: Unified interface for different SDR devices and compute platforms</p></li>
+<li><p><strong>Device Detection</strong>: Automatic detection and optimization for M1 Mac, Linux VM, and CUDA environments</p></li>
+<li><p><strong>Configuration Profiles</strong>: Platform-specific configuration templates</p></li>
+<li><p><strong>Testing Framework</strong>: Cross-platform validation and performance benchmarking</p></li>
+</ul>
+</section>
+<section id="scalability">
+<h3>Scalability<a class="headerlink" href="#scalability" title="Link to this heading"></a></h3>
+<p>The system is designed to scale across different deployment scenarios:</p>
+<ul class="simple">
+<li><p><strong>Resource Optimization</strong>: Dynamic batch size adjustment and memory management</p></li>
+<li><p><strong>Model Caching</strong>: LRU cache for efficient model loading and memory usage</p></li>
+<li><p><strong>Monitoring</strong>: Comprehensive metrics collection and anomaly detection</p></li>
+<li><p><strong>Recovery</strong>: Automatic fallback and recovery strategies for system resilience</p></li>
+</ul>
+</section>
+<section id="developer-experience">
+<h3>Developer Experience<a class="headerlink" href="#developer-experience" title="Link to this heading"></a></h3>
+<p>The architecture prioritizes developer productivity:</p>
+<ul class="simple">
+<li><p><strong>Comprehensive Documentation</strong>: Auto-generated API docs with examples</p></li>
+<li><p><strong>Testing Framework</strong>: Cross-platform CI/CD with performance regression detection</p></li>
+<li><p><strong>Error Messages</strong>: Clear, actionable error messages with context</p></li>
+<li><p><strong>Configuration</strong>: Simple YAML-based configuration with validation</p></li>
+</ul>
+</section>
+</section>
+<section id="component-interactions">
+<h2>Component Interactions<a class="headerlink" href="#component-interactions" title="Link to this heading"></a></h2>
+<section id="configuration-flow">
+<h3>Configuration Flow<a class="headerlink" href="#configuration-flow" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Startup</strong>: ConfigManager loads base configuration from YAML files</p></li>
+<li><p><strong>Environment Detection</strong>: System detects platform and applies environment-specific overrides</p></li>
+<li><p><strong>Validation</strong>: Configuration is validated against schema with clear error reporting</p></li>
+<li><p><strong>Distribution</strong>: Validated configuration is distributed to all system components</p></li>
+</ol>
+</section>
+<section id="error-handling-flow">
+<h3>Error Handling Flow<a class="headerlink" href="#error-handling-flow" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Error Detection</strong>: Components detect and classify errors by severity</p></li>
+<li><p><strong>Context Collection</strong>: Error context is collected including system state</p></li>
+<li><p><strong>Recovery Strategy</strong>: Appropriate recovery strategy is selected and executed</p></li>
+<li><p><strong>Logging</strong>: Error and recovery actions are logged with full context</p></li>
+<li><p><strong>Notification</strong>: Critical errors trigger alerts and notifications</p></li>
+</ol>
+</section>
+<section id="memory-management-flow">
+<h3>Memory Management Flow<a class="headerlink" href="#memory-management-flow" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Monitoring</strong>: Continuous monitoring of RAM and GPU memory usage</p></li>
+<li><p><strong>Optimization</strong>: Dynamic batch size adjustment based on available resources</p></li>
+<li><p><strong>Caching</strong>: Intelligent model caching with LRU eviction</p></li>
+<li><p><strong>Cleanup</strong>: Automatic garbage collection and resource cleanup</p></li>
+<li><p><strong>Alerting</strong>: Memory pressure alerts and automatic mitigation</p></li>
+</ol>
+</section>
+<section id="model-lifecycle">
+<h3>Model Lifecycle<a class="headerlink" href="#model-lifecycle" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Training</strong>: Models are trained with comprehensive metadata collection</p></li>
+<li><p><strong>Validation</strong>: Model performance is validated against minimum thresholds</p></li>
+<li><p><strong>Saving</strong>: Models are saved with metadata, fingerprints, and reproducibility info</p></li>
+<li><p><strong>Registration</strong>: Models are registered in MLflow with version tracking</p></li>
+<li><p><strong>Loading</strong>: Models are loaded with compatibility validation</p></li>
+<li><p><strong>Caching</strong>: Frequently used models are cached for performance</p></li>
+</ol>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="System Architecture" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="components.html" class="btn btn-neutral float-right" title="System Components" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, GeminiSDR Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

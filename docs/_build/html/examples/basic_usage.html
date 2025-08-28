@@ -1,0 +1,762 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Basic Usage Examples &mdash; GeminiSDR 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Examples and Tutorials" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            GeminiSDR
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">User Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/index.html">System Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Developer Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Examples and Tutorials</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Basic Usage Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#quick-start-example">Quick Start Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuration-examples">Configuration Examples</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#basic-configuration">Basic Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#platform-specific-configuration">Platform-Specific Configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#data-loading-examples">Data Loading Examples</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#loading-signal-data">Loading Signal Data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#generating-synthetic-data">Generating Synthetic Data</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#model-usage-examples">Model Usage Examples</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#neural-amr-automatic-modulation-recognition">Neural AMR (Automatic Modulation Recognition)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#traditional-amr">Traditional AMR</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#hardware-interface-examples">Hardware Interface Examples</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#sdr-device-interface">SDR Device Interface</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#simulation-mode">Simulation Mode</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#error-handling-examples">Error Handling Examples</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#basic-error-handling">Basic Error Handling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#automatic-recovery">Automatic Recovery</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#memory-management-examples">Memory Management Examples</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#memory-monitoring">Memory Monitoring</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#batch-size-optimization">Batch Size Optimization</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#logging-examples">Logging Examples</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#structured-logging">Structured Logging</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#complete-training-example">Complete Training Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#next-steps">Next Steps</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#getting-started">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#quick-examples">Quick Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#for-more-examples">For More Examples</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">GeminiSDR</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Examples and Tutorials</a></li>
+      <li class="breadcrumb-item active">Basic Usage Examples</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/examples/basic_usage.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="basic-usage-examples">
+<h1>Basic Usage Examples<a class="headerlink" href="#basic-usage-examples" title="Link to this heading"></a></h1>
+<p>This section provides basic examples to get you started with GeminiSDR quickly.</p>
+<section id="quick-start-example">
+<h2>Quick Start Example<a class="headerlink" href="#quick-start-example" title="Link to this heading"></a></h2>
+<p>Here’s a minimal example to get GeminiSDR running:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.config.config_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.environments.hardware_abstraction</span><span class="w"> </span><span class="kn">import</span> <span class="n">HardwareAbstraction</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.ml.neural_amr</span><span class="w"> </span><span class="kn">import</span> <span class="n">NeuralAMR</span>
+
+<span class="c1"># Load configuration</span>
+<span class="n">config_manager</span> <span class="o">=</span> <span class="n">ConfigManager</span><span class="p">()</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">config_manager</span><span class="o">.</span><span class="n">load_config</span><span class="p">()</span>
+
+<span class="c1"># Initialize hardware abstraction</span>
+<span class="n">hw_abstraction</span> <span class="o">=</span> <span class="n">HardwareAbstraction</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+<span class="n">device</span> <span class="o">=</span> <span class="n">hw_abstraction</span><span class="o">.</span><span class="n">detect_optimal_device</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using device: </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Create and configure model</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">NeuralAMR</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+<span class="c1"># Generate sample data for testing</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="n">sample_data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">1024</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>  <span class="c1"># Batch of I/Q samples</span>
+
+<span class="c1"># Run inference</span>
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+    <span class="n">predictions</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">sample_data</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Predictions shape: </span><span class="si">{</span><span class="n">predictions</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="configuration-examples">
+<h2>Configuration Examples<a class="headerlink" href="#configuration-examples" title="Link to this heading"></a></h2>
+<section id="basic-configuration">
+<h3>Basic Configuration<a class="headerlink" href="#basic-configuration" title="Link to this heading"></a></h3>
+<p>Create a simple configuration file:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># conf/basic_config.yaml</span>
+<span class="nt">hardware</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">device_preference</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;auto&quot;</span><span class="w">  </span><span class="c1"># Let system choose optimal device</span>
+<span class="w">  </span><span class="nt">sdr_mode</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;simulation&quot;</span><span class="w">     </span><span class="c1"># Use simulation for testing</span>
+
+<span class="nt">ml</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">batch_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">32</span>
+<span class="w">  </span><span class="nt">learning_rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.001</span>
+<span class="w">  </span><span class="nt">model_cache_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+
+<span class="nt">logging</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">level</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;INFO&quot;</span>
+<span class="w">  </span><span class="nt">format</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;simple&quot;</span>
+<span class="w">  </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;console&quot;</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+<p>Load and use the configuration:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.config.config_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigManager</span>
+
+<span class="c1"># Load specific configuration</span>
+<span class="n">config_manager</span> <span class="o">=</span> <span class="n">ConfigManager</span><span class="p">()</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">config_manager</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="s2">&quot;basic_config&quot;</span><span class="p">)</span>
+
+<span class="c1"># Access configuration values</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Device preference: </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">device_preference</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Batch size: </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">ml</span><span class="o">.</span><span class="n">batch_size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Learning rate: </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">ml</span><span class="o">.</span><span class="n">learning_rate</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="platform-specific-configuration">
+<h3>Platform-Specific Configuration<a class="headerlink" href="#platform-specific-configuration" title="Link to this heading"></a></h3>
+<p><strong>M1 Mac Configuration</strong>:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># conf/m1_config.yaml</span>
+<span class="nt">hardware</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">device_preference</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mps&quot;</span>
+<span class="w">  </span><span class="nt">memory_optimization</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;unified&quot;</span>
+
+<span class="nt">ml</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">batch_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">48</span><span class="w">  </span><span class="c1"># Larger batches for unified memory</span>
+<span class="w">  </span><span class="nt">precision</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;float16&quot;</span>
+
+<span class="nt">performance</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">memory_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.85</span>
+</pre></div>
+</div>
+<p><strong>Linux VM Configuration</strong>:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># conf/vm_config.yaml</span>
+<span class="nt">hardware</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">device_preference</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cpu&quot;</span>
+<span class="w">  </span><span class="nt">memory_optimization</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;conservative&quot;</span>
+
+<span class="nt">ml</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">batch_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16</span><span class="w">  </span><span class="c1"># Smaller batches for limited memory</span>
+<span class="w">  </span><span class="nt">precision</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;float32&quot;</span>
+<span class="w">  </span><span class="nt">gradient_checkpointing</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</pre></div>
+</div>
+<p><strong>CUDA Configuration</strong>:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># conf/cuda_config.yaml</span>
+<span class="nt">hardware</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">device_preference</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cuda&quot;</span>
+<span class="w">  </span><span class="nt">memory_optimization</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;aggressive&quot;</span>
+
+<span class="nt">ml</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">batch_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">64</span><span class="w">  </span><span class="c1"># Large batches for GPU</span>
+<span class="w">  </span><span class="nt">precision</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mixed&quot;</span>
+<span class="w">  </span><span class="nt">distributed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="data-loading-examples">
+<h2>Data Loading Examples<a class="headerlink" href="#data-loading-examples" title="Link to this heading"></a></h2>
+<section id="loading-signal-data">
+<h3>Loading Signal Data<a class="headerlink" href="#loading-signal-data" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DataLoader</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">SignalDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Dataset for loading I/Q signal data.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_path</span><span class="p">,</span> <span class="n">labels_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">labels_path</span><span class="p">)</span> <span class="k">if</span> <span class="n">labels_path</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="n">transform</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="n">sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">:</span>
+            <span class="n">sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+<span class="c1"># Create dataset and dataloader</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">SignalDataset</span><span class="p">(</span><span class="s1">&#39;signals.npy&#39;</span><span class="p">,</span> <span class="s1">&#39;labels.npy&#39;</span><span class="p">)</span>
+<span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+<span class="c1"># Iterate through data</span>
+<span class="k">for</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataloader</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Batch </span><span class="si">{</span><span class="n">batch_idx</span><span class="si">}</span><span class="s2">: data shape </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">, labels shape </span><span class="si">{</span><span class="n">labels</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">batch_idx</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>  <span class="c1"># Just show first few batches</span>
+        <span class="k">break</span>
+</pre></div>
+</div>
+</section>
+<section id="generating-synthetic-data">
+<h3>Generating Synthetic Data<a class="headerlink" href="#generating-synthetic-data" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_bpsk_signal</span><span class="p">(</span><span class="n">num_samples</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">snr_db</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate BPSK modulated signal with noise.&quot;&quot;&quot;</span>
+    <span class="c1"># Generate random bits</span>
+    <span class="n">bits</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">num_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="c1"># BPSK modulation (map 0-&gt;-1, 1-&gt;1)</span>
+    <span class="n">symbols</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">bits</span> <span class="o">-</span> <span class="mi">1</span>
+
+    <span class="c1"># Add noise</span>
+    <span class="n">noise_power</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="n">snr_db</span> <span class="o">/</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="n">noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">noise_power</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">symbols</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">symbols</span><span class="p">))</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Create complex signal</span>
+    <span class="n">signal</span> <span class="o">=</span> <span class="n">symbols</span> <span class="o">+</span> <span class="n">noise</span>
+
+    <span class="c1"># Convert to I/Q format</span>
+    <span class="n">iq_signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">signal</span><span class="o">.</span><span class="n">real</span><span class="p">,</span> <span class="n">signal</span><span class="o">.</span><span class="n">imag</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">iq_signal</span><span class="p">,</span> <span class="n">bits</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_dataset</span><span class="p">(</span><span class="n">num_signals</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">modulations</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;bpsk&#39;</span><span class="p">,</span> <span class="s1">&#39;qpsk&#39;</span><span class="p">,</span> <span class="s1">&#39;8psk&#39;</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a dataset with multiple modulation types.&quot;&quot;&quot;</span>
+    <span class="n">signals</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_signals</span><span class="p">):</span>
+        <span class="n">mod_type</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">modulations</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">mod_type</span> <span class="o">==</span> <span class="s1">&#39;bpsk&#39;</span><span class="p">:</span>
+            <span class="n">signal</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">generate_bpsk_signal</span><span class="p">()</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">elif</span> <span class="n">mod_type</span> <span class="o">==</span> <span class="s1">&#39;qpsk&#39;</span><span class="p">:</span>
+            <span class="n">signal</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">generate_qpsk_signal</span><span class="p">()</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">mod_type</span> <span class="o">==</span> <span class="s1">&#39;8psk&#39;</span><span class="p">:</span>
+            <span class="n">signal</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">generate_8psk_signal</span><span class="p">()</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="mi">2</span>
+
+        <span class="n">signals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span>
+        <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">signals</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+
+<span class="c1"># Generate and save dataset</span>
+<span class="n">signals</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">generate_dataset</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;synthetic_signals.npy&#39;</span><span class="p">,</span> <span class="n">signals</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;synthetic_labels.npy&#39;</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generated dataset: </span><span class="si">{</span><span class="n">signals</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> signals, </span><span class="si">{</span><span class="n">labels</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> labels&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="model-usage-examples">
+<h2>Model Usage Examples<a class="headerlink" href="#model-usage-examples" title="Link to this heading"></a></h2>
+<section id="neural-amr-automatic-modulation-recognition">
+<h3>Neural AMR (Automatic Modulation Recognition)<a class="headerlink" href="#neural-amr-automatic-modulation-recognition" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.ml.neural_amr</span><span class="w"> </span><span class="kn">import</span> <span class="n">NeuralAMR</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.config.config_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigManager</span>
+
+<span class="c1"># Load configuration</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">ConfigManager</span><span class="p">()</span><span class="o">.</span><span class="n">load_config</span><span class="p">()</span>
+
+<span class="c1"># Create model</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">NeuralAMR</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+<span class="c1"># Load sample data</span>
+<span class="n">sample_signals</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1024</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># 10 signals, 1024 samples, I/Q</span>
+
+<span class="c1"># Run inference</span>
+<span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+    <span class="n">predictions</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">sample_signals</span><span class="p">)</span>
+    <span class="n">predicted_classes</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Predicted modulation classes: </span><span class="si">{</span><span class="n">predicted_classes</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Get class probabilities</span>
+<span class="n">probabilities</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Class probabilities shape: </span><span class="si">{</span><span class="n">probabilities</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="traditional-amr">
+<h3>Traditional AMR<a class="headerlink" href="#traditional-amr" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.ml.traditional_amr</span><span class="w"> </span><span class="kn">import</span> <span class="n">TraditionalAMR</span>
+
+<span class="c1"># Create traditional AMR classifier</span>
+<span class="n">traditional_amr</span> <span class="o">=</span> <span class="n">TraditionalAMR</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+<span class="c1"># Extract features from signals</span>
+<span class="n">features</span> <span class="o">=</span> <span class="n">traditional_amr</span><span class="o">.</span><span class="n">extract_features</span><span class="p">(</span><span class="n">sample_signals</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Extracted features shape: </span><span class="si">{</span><span class="n">features</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Classify using traditional methods</span>
+<span class="n">predictions</span> <span class="o">=</span> <span class="n">traditional_amr</span><span class="o">.</span><span class="n">classify</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Traditional AMR predictions: </span><span class="si">{</span><span class="n">predictions</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="hardware-interface-examples">
+<h2>Hardware Interface Examples<a class="headerlink" href="#hardware-interface-examples" title="Link to this heading"></a></h2>
+<section id="sdr-device-interface">
+<h3>SDR Device Interface<a class="headerlink" href="#sdr-device-interface" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.core.sdr_interface</span><span class="w"> </span><span class="kn">import</span> <span class="n">SDRInterface</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.environments.hardware_abstraction</span><span class="w"> </span><span class="kn">import</span> <span class="n">HardwareAbstraction</span>
+
+<span class="c1"># Initialize hardware abstraction</span>
+<span class="n">hw_abstraction</span> <span class="o">=</span> <span class="n">HardwareAbstraction</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+<span class="c1"># Detect available SDR devices</span>
+<span class="n">available_devices</span> <span class="o">=</span> <span class="n">hw_abstraction</span><span class="o">.</span><span class="n">detect_available_devices</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Available SDR devices: </span><span class="si">{</span><span class="n">available_devices</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">available_devices</span><span class="p">:</span>
+    <span class="c1"># Initialize SDR interface</span>
+    <span class="n">sdr</span> <span class="o">=</span> <span class="n">SDRInterface</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="c1"># Configure SDR parameters</span>
+    <span class="n">sdr</span><span class="o">.</span><span class="n">set_sample_rate</span><span class="p">(</span><span class="mf">2e6</span><span class="p">)</span>  <span class="c1"># 2 MHz</span>
+    <span class="n">sdr</span><span class="o">.</span><span class="n">set_center_frequency</span><span class="p">(</span><span class="mf">100e6</span><span class="p">)</span>  <span class="c1"># 100 MHz</span>
+    <span class="n">sdr</span><span class="o">.</span><span class="n">set_gain</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>  <span class="c1"># 20 dB</span>
+
+    <span class="c1"># Capture samples</span>
+    <span class="n">samples</span> <span class="o">=</span> <span class="n">sdr</span><span class="o">.</span><span class="n">capture_samples</span><span class="p">(</span><span class="n">num_samples</span><span class="o">=</span><span class="mi">1024</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Captured </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span><span class="si">}</span><span class="s2"> samples&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Close SDR</span>
+    <span class="n">sdr</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No SDR devices found, using simulation mode&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="simulation-mode">
+<h3>Simulation Mode<a class="headerlink" href="#simulation-mode" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.core.signal_generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">SignalGenerator</span>
+
+<span class="c1"># Create signal generator for simulation</span>
+<span class="n">signal_gen</span> <span class="o">=</span> <span class="n">SignalGenerator</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+<span class="c1"># Generate different types of signals</span>
+<span class="n">bpsk_signal</span> <span class="o">=</span> <span class="n">signal_gen</span><span class="o">.</span><span class="n">generate_bpsk</span><span class="p">(</span>
+    <span class="n">num_samples</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span>
+    <span class="n">symbol_rate</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span>
+    <span class="n">carrier_freq</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="c1"># Baseband</span>
+    <span class="n">snr_db</span><span class="o">=</span><span class="mi">20</span>
+<span class="p">)</span>
+
+<span class="n">qpsk_signal</span> <span class="o">=</span> <span class="n">signal_gen</span><span class="o">.</span><span class="n">generate_qpsk</span><span class="p">(</span>
+    <span class="n">num_samples</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span>
+    <span class="n">symbol_rate</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span>
+    <span class="n">carrier_freq</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">snr_db</span><span class="o">=</span><span class="mi">15</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generated BPSK signal shape: </span><span class="si">{</span><span class="n">bpsk_signal</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generated QPSK signal shape: </span><span class="si">{</span><span class="n">qpsk_signal</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="error-handling-examples">
+<h2>Error Handling Examples<a class="headerlink" href="#error-handling-examples" title="Link to this heading"></a></h2>
+<section id="basic-error-handling">
+<h3>Basic Error Handling<a class="headerlink" href="#basic-error-handling" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.core.error_handling</span><span class="w"> </span><span class="kn">import</span> <span class="n">ErrorHandler</span><span class="p">,</span> <span class="n">GeminiSDRError</span>
+
+<span class="c1"># Initialize error handler</span>
+<span class="n">error_handler</span> <span class="o">=</span> <span class="n">ErrorHandler</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+<span class="c1"># Use error context for automatic handling</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">error_handler</span><span class="o">.</span><span class="n">error_context</span><span class="p">(</span><span class="s2">&quot;model_loading&quot;</span><span class="p">):</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">NeuralAMR</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;model.pth&quot;</span><span class="p">))</span>
+
+<span class="k">except</span> <span class="n">GeminiSDRError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GeminiSDR error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error severity: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">severity</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error context: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">context</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="automatic-recovery">
+<h3>Automatic Recovery<a class="headerlink" href="#automatic-recovery" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.core.error_handling</span><span class="w"> </span><span class="kn">import</span> <span class="n">retry_with_backoff</span><span class="p">,</span> <span class="n">fallback_to_simulation</span>
+
+<span class="nd">@retry_with_backoff</span><span class="p">(</span><span class="n">max_retries</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">base_delay</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_model_with_retry</span><span class="p">(</span><span class="n">model_path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load model with automatic retry on failure.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">model_path</span><span class="p">)</span>
+
+<span class="c1"># Use fallback to simulation on hardware errors</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">capture_samples_with_fallback</span><span class="p">():</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">fallback_to_simulation</span><span class="p">():</span>
+            <span class="c1"># Try hardware first</span>
+            <span class="n">sdr</span> <span class="o">=</span> <span class="n">SDRInterface</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+            <span class="n">samples</span> <span class="o">=</span> <span class="n">sdr</span><span class="o">.</span><span class="n">capture_samples</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">samples</span><span class="p">,</span> <span class="s2">&quot;hardware&quot;</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="c1"># Fallback to simulation</span>
+        <span class="n">signal_gen</span> <span class="o">=</span> <span class="n">SignalGenerator</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="n">signal_gen</span><span class="o">.</span><span class="n">generate_bpsk</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">samples</span><span class="p">,</span> <span class="s2">&quot;simulation&quot;</span>
+
+<span class="n">samples</span><span class="p">,</span> <span class="n">source</span> <span class="o">=</span> <span class="n">capture_samples_with_fallback</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Captured samples from: </span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="memory-management-examples">
+<h2>Memory Management Examples<a class="headerlink" href="#memory-management-examples" title="Link to this heading"></a></h2>
+<section id="memory-monitoring">
+<h3>Memory Monitoring<a class="headerlink" href="#memory-monitoring" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.core.memory_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">MemoryManager</span>
+
+<span class="c1"># Initialize memory manager</span>
+<span class="n">memory_manager</span> <span class="o">=</span> <span class="n">MemoryManager</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+<span class="c1"># Monitor memory usage</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">monitor_memory_during_training</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="c1"># Get memory stats before training</span>
+        <span class="n">stats_before</span> <span class="o">=</span> <span class="n">memory_manager</span><span class="o">.</span><span class="n">get_memory_stats</span><span class="p">()</span>
+
+        <span class="c1"># Simulate training</span>
+        <span class="n">large_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">mm</span><span class="p">(</span><span class="n">large_tensor</span><span class="p">,</span> <span class="n">large_tensor</span><span class="p">)</span>
+
+        <span class="c1"># Get memory stats after</span>
+        <span class="n">stats_after</span> <span class="o">=</span> <span class="n">memory_manager</span><span class="o">.</span><span class="n">get_memory_stats</span><span class="p">()</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Memory before: </span><span class="si">{</span><span class="n">stats_before</span><span class="o">.</span><span class="n">used_ram_mb</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MB&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Memory after: </span><span class="si">{</span><span class="n">stats_after</span><span class="o">.</span><span class="n">used_ram_mb</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MB&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Memory diff: </span><span class="si">{</span><span class="n">stats_after</span><span class="o">.</span><span class="n">used_ram_mb</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">stats_before</span><span class="o">.</span><span class="n">used_ram_mb</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MB&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Cleanup</span>
+        <span class="k">del</span> <span class="n">large_tensor</span><span class="p">,</span> <span class="n">result</span>
+        <span class="n">memory_manager</span><span class="o">.</span><span class="n">cleanup_memory</span><span class="p">()</span>
+
+<span class="n">monitor_memory_during_training</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="batch-size-optimization">
+<h3>Batch Size Optimization<a class="headerlink" href="#batch-size-optimization" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Find optimal batch size for your hardware</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">find_optimal_batch_size</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">):</span>
+    <span class="n">memory_manager</span> <span class="o">=</span> <span class="n">MemoryManager</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="c1"># Estimate model size</span>
+    <span class="n">model_size_mb</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">*</span> <span class="n">p</span><span class="o">.</span><span class="n">element_size</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span> <span class="o">/</span> <span class="mf">1e6</span>
+
+    <span class="c1"># Get optimal batch size</span>
+    <span class="n">optimal_batch_size</span> <span class="o">=</span> <span class="n">memory_manager</span><span class="o">.</span><span class="n">optimize_batch_size</span><span class="p">(</span>
+        <span class="n">base_batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
+        <span class="n">model_size_mb</span><span class="o">=</span><span class="n">model_size_mb</span>
+    <span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model size: </span><span class="si">{</span><span class="n">model_size_mb</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MB&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Optimal batch size: </span><span class="si">{</span><span class="n">optimal_batch_size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">optimal_batch_size</span>
+
+<span class="c1"># Use optimal batch size</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">NeuralAMR</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+<span class="n">optimal_batch_size</span> <span class="o">=</span> <span class="n">find_optimal_batch_size</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+<span class="c1"># Create dataloader with optimal batch size</span>
+<span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">optimal_batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="logging-examples">
+<h2>Logging Examples<a class="headerlink" href="#logging-examples" title="Link to this heading"></a></h2>
+<section id="structured-logging">
+<h3>Structured Logging<a class="headerlink" href="#structured-logging" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.core.logging_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">StructuredLogger</span>
+
+<span class="c1"># Initialize structured logger</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">StructuredLogger</span><span class="p">(</span><span class="s2">&quot;example_module&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">logging</span><span class="p">)</span>
+
+<span class="c1"># Add persistent context</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">add_context</span><span class="p">(</span>
+    <span class="n">experiment_id</span><span class="o">=</span><span class="s2">&quot;exp_001&quot;</span><span class="p">,</span>
+    <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;neural_amr&quot;</span><span class="p">,</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s2">&quot;synthetic&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># Log with different levels</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Starting training&quot;</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
+    <span class="s2">&quot;epoch&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;batch_size&quot;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+    <span class="s2">&quot;learning_rate&quot;</span><span class="p">:</span> <span class="mf">0.001</span>
+<span class="p">})</span>
+
+<span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Memory usage high&quot;</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
+    <span class="s2">&quot;memory_usage_mb&quot;</span><span class="p">:</span> <span class="mi">1500</span><span class="p">,</span>
+    <span class="s2">&quot;threshold_mb&quot;</span><span class="p">:</span> <span class="mi">1024</span>
+<span class="p">})</span>
+
+<span class="c1"># Log performance metrics</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">log_performance</span><span class="p">(</span>
+    <span class="n">operation</span><span class="o">=</span><span class="s2">&quot;training_epoch&quot;</span><span class="p">,</span>
+    <span class="n">duration</span><span class="o">=</span><span class="mf">45.2</span><span class="p">,</span>
+    <span class="n">samples_processed</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+    <span class="n">accuracy</span><span class="o">=</span><span class="mf">0.95</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="complete-training-example">
+<h2>Complete Training Example<a class="headerlink" href="#complete-training-example" title="Link to this heading"></a></h2>
+<p>Here’s a complete example that puts everything together:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.optim</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">optim</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.config.config_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.ml.neural_amr</span><span class="w"> </span><span class="kn">import</span> <span class="n">NeuralAMR</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.core.memory_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">MemoryManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.core.logging_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">StructuredLogger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geminisdr.core.error_handling</span><span class="w"> </span><span class="kn">import</span> <span class="n">ErrorHandler</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">complete_training_example</span><span class="p">():</span>
+    <span class="c1"># Load configuration</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">ConfigManager</span><span class="p">()</span><span class="o">.</span><span class="n">load_config</span><span class="p">()</span>
+
+    <span class="c1"># Initialize components</span>
+    <span class="n">memory_manager</span> <span class="o">=</span> <span class="n">MemoryManager</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">StructuredLogger</span><span class="p">(</span><span class="s2">&quot;training&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">logging</span><span class="p">)</span>
+    <span class="n">error_handler</span> <span class="o">=</span> <span class="n">ErrorHandler</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="c1"># Add logging context</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">add_context</span><span class="p">(</span><span class="n">experiment</span><span class="o">=</span><span class="s2">&quot;basic_example&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;neural_amr&quot;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">error_handler</span><span class="o">.</span><span class="n">error_context</span><span class="p">(</span><span class="s2">&quot;training_setup&quot;</span><span class="p">):</span>
+            <span class="c1"># Create model</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">NeuralAMR</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+            <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+            <span class="c1"># Create synthetic dataset</span>
+            <span class="n">signals</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">generate_dataset</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">SignalDataset</span><span class="p">(</span><span class="n">signals</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+
+            <span class="c1"># Optimize batch size</span>
+            <span class="n">optimal_batch_size</span> <span class="o">=</span> <span class="n">memory_manager</span><span class="o">.</span><span class="n">optimize_batch_size</span><span class="p">(</span>
+                <span class="n">base_batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
+                <span class="n">model_size_mb</span><span class="o">=</span><span class="mi">50</span>  <span class="c1"># Estimated model size</span>
+            <span class="p">)</span>
+
+            <span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span>
+                <span class="n">dataset</span><span class="p">,</span>
+                <span class="n">batch_size</span><span class="o">=</span><span class="n">optimal_batch_size</span><span class="p">,</span>
+                <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Setup training</span>
+            <span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
+            <span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">ml</span><span class="o">.</span><span class="n">learning_rate</span><span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Training started&quot;</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;batch_size&quot;</span><span class="p">:</span> <span class="n">optimal_batch_size</span><span class="p">,</span>
+                <span class="s2">&quot;dataset_size&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span>
+                <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="p">})</span>
+
+            <span class="c1"># Training loop</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>  <span class="c1"># Just 5 epochs for example</span>
+                <span class="n">epoch_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
+                <span class="n">correct</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
+
+                <span class="k">for</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataloader</span><span class="p">):</span>
+                    <span class="n">data</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">),</span> <span class="n">targets</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+                    <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+                    <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+                    <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+                    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+                    <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+
+                    <span class="c1"># Statistics</span>
+                    <span class="n">epoch_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+                    <span class="n">_</span><span class="p">,</span> <span class="n">predicted</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">outputs</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="n">total</span> <span class="o">+=</span> <span class="n">targets</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="n">correct</span> <span class="o">+=</span> <span class="p">(</span><span class="n">predicted</span> <span class="o">==</span> <span class="n">targets</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+                    <span class="c1"># Memory cleanup</span>
+                    <span class="k">if</span> <span class="n">batch_idx</span> <span class="o">%</span> <span class="mi">10</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">memory_manager</span><span class="o">.</span><span class="n">cleanup_memory</span><span class="p">()</span>
+
+                <span class="c1"># Log epoch results</span>
+                <span class="n">accuracy</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">correct</span> <span class="o">/</span> <span class="n">total</span>
+                <span class="n">avg_loss</span> <span class="o">=</span> <span class="n">epoch_loss</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataloader</span><span class="p">)</span>
+
+                <span class="n">logger</span><span class="o">.</span><span class="n">log_performance</span><span class="p">(</span>
+                    <span class="n">operation</span><span class="o">=</span><span class="s2">&quot;training_epoch&quot;</span><span class="p">,</span>
+                    <span class="n">duration</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="c1"># Would measure actual time</span>
+                    <span class="n">epoch</span><span class="o">=</span><span class="n">epoch</span><span class="p">,</span>
+                    <span class="n">loss</span><span class="o">=</span><span class="n">avg_loss</span><span class="p">,</span>
+                    <span class="n">accuracy</span><span class="o">=</span><span class="n">accuracy</span>
+                <span class="p">)</span>
+
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">: Loss=</span><span class="si">{</span><span class="n">avg_loss</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, Accuracy=</span><span class="si">{</span><span class="n">accuracy</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Training completed successfully&quot;</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Training failed&quot;</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)})</span>
+        <span class="k">raise</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">complete_training_example</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="next-steps">
+<h2>Next Steps<a class="headerlink" href="#next-steps" title="Link to this heading"></a></h2>
+<p>After trying these basic examples:</p>
+<ol class="arabic simple">
+<li><p><strong>Explore Advanced Examples</strong>: <span class="xref std std-doc">ml_training</span> for more complex training scenarios</p></li>
+<li><p><strong>Learn About Configuration</strong>: <span class="xref std std-doc">../guides/configuration</span> for detailed configuration options</p></li>
+<li><p><strong>Read API Documentation</strong>: <a class="reference internal" href="../api/index.html"><span class="doc">API Reference</span></a> for complete API reference</p></li>
+<li><p><strong>Check Troubleshooting</strong>: <a class="reference internal" href="../guides/troubleshooting.html"><span class="doc">Troubleshooting Guide</span></a> if you encounter issues</p></li>
+</ol>
+<p>For platform-specific optimizations, see:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../guides/installation/m1_mac.html"><span class="doc">M1 Mac Installation Guide</span></a> - M1 Mac specific examples</p></li>
+<li><p><a class="reference internal" href="../guides/installation/linux_vm.html"><span class="doc">Linux VM Installation Guide</span></a> - Linux VM specific examples</p></li>
+<li><p><a class="reference internal" href="../guides/installation/cuda_cluster.html"><span class="doc">CUDA Cluster Installation Guide</span></a> - CUDA specific examples</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Examples and Tutorials" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, GeminiSDR Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

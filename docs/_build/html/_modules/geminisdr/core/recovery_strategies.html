@@ -1,0 +1,518 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>geminisdr.core.recovery_strategies &mdash; GeminiSDR 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            GeminiSDR
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../guides/index.html">User Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../architecture/index.html">System Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/index.html">Examples and Tutorials</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">GeminiSDR</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">geminisdr.core.recovery_strategies</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for geminisdr.core.recovery_strategies</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Recovery Strategies for GeminiSDR Error Handling</span>
+
+<span class="sd">This module provides specific recovery strategies for different types of errors</span>
+<span class="sd">that can occur in the GeminiSDR system, including hardware failures, configuration</span>
+<span class="sd">issues, and memory problems.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.error_handling</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ErrorContext</span><span class="p">,</span>
+    <span class="n">HardwareError</span><span class="p">,</span>
+    <span class="n">ConfigurationError</span><span class="p">,</span>
+    <span class="n">ModelError</span><span class="p">,</span>
+    <span class="ne">MemoryError</span><span class="p">,</span>
+    <span class="n">ErrorSeverity</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="RecoveryStrategies">
+<a class="viewcode-back" href="../../../api/geminisdr/core/recovery_strategies.html#geminisdr.core.recovery_strategies.RecoveryStrategies">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RecoveryStrategies</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Collection of recovery strategies for different error types.</span>
+<span class="sd">    </span>
+<span class="sd">    Each strategy is a callable that takes (error, context) and returns</span>
+<span class="sd">    a boolean indicating whether recovery was successful.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+<div class="viewcode-block" id="RecoveryStrategies.__init__">
+<a class="viewcode-back" href="../../../api/geminisdr/core/recovery_strategies.html#geminisdr.core.recovery_strategies.RecoveryStrategies.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span> <span class="ow">or</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_mode</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cpu_fallback_active</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+    
+<div class="viewcode-block" id="RecoveryStrategies.hardware_to_simulation_fallback">
+<a class="viewcode-back" href="../../../api/geminisdr/core/recovery_strategies.html#geminisdr.core.recovery_strategies.RecoveryStrategies.hardware_to_simulation_fallback">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">hardware_to_simulation_fallback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="n">HardwareError</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">ErrorContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fallback from hardware to simulation mode when hardware is unavailable.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            error: The hardware error that occurred</span>
+<span class="sd">            context: Error context information</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if fallback was successful</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Attempting hardware to simulation fallback for device: </span><span class="si">{</span><span class="n">error</span><span class="o">.</span><span class="n">device_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            
+            <span class="c1"># Mark simulation mode as active</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_mode</span> <span class="o">=</span> <span class="kc">True</span>
+            
+            <span class="c1"># Update context to indicate fallback mode</span>
+            <span class="n">context</span><span class="o">.</span><span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;fallback_mode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;simulation&#39;</span>
+            <span class="n">context</span><span class="o">.</span><span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;original_device&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">error</span><span class="o">.</span><span class="n">device_type</span>
+            <span class="n">context</span><span class="o">.</span><span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;recovery_strategy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;hardware_to_simulation&#39;</span>
+            
+            <span class="c1"># In a real implementation, this would:</span>
+            <span class="c1"># 1. Switch configuration to simulation mode</span>
+            <span class="c1"># 2. Initialize simulation hardware abstraction</span>
+            <span class="c1"># 3. Update any active connections or interfaces</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Successfully switched to simulation mode&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+            
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">recovery_error</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to switch to simulation mode: </span><span class="si">{</span><span class="n">recovery_error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+    
+<div class="viewcode-block" id="RecoveryStrategies.gpu_to_cpu_fallback">
+<a class="viewcode-back" href="../../../api/geminisdr/core/recovery_strategies.html#geminisdr.core.recovery_strategies.RecoveryStrategies.gpu_to_cpu_fallback">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gpu_to_cpu_fallback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="ne">MemoryError</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">ErrorContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fallback from GPU to CPU when GPU memory is exhausted.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            error: The memory error that occurred</span>
+<span class="sd">            context: Error context information</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if fallback was successful</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">error</span><span class="o">.</span><span class="n">memory_type</span> <span class="o">!=</span> <span class="s1">&#39;gpu&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>  <span class="c1"># This strategy only handles GPU memory errors</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Attempting GPU to CPU fallback due to memory exhaustion&quot;</span><span class="p">)</span>
+            
+            <span class="c1"># Clear GPU memory</span>
+            <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Cleared GPU cache&quot;</span><span class="p">)</span>
+            
+            <span class="c1"># Mark CPU fallback as active</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cpu_fallback_active</span> <span class="o">=</span> <span class="kc">True</span>
+            
+            <span class="c1"># Update context</span>
+            <span class="n">context</span><span class="o">.</span><span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;fallback_mode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;cpu&#39;</span>
+            <span class="n">context</span><span class="o">.</span><span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;original_device&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;gpu&#39;</span>
+            <span class="n">context</span><span class="o">.</span><span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;recovery_strategy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;gpu_to_cpu&#39;</span>
+            
+            <span class="c1"># In a real implementation, this would:</span>
+            <span class="c1"># 1. Move models from GPU to CPU</span>
+            <span class="c1"># 2. Update device configuration</span>
+            <span class="c1"># 3. Adjust batch sizes for CPU processing</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Successfully switched to CPU processing&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+            
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">recovery_error</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to switch to CPU processing: </span><span class="si">{</span><span class="n">recovery_error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+    
+<div class="viewcode-block" id="RecoveryStrategies.reduce_batch_size_recovery">
+<a class="viewcode-back" href="../../../api/geminisdr/core/recovery_strategies.html#geminisdr.core.recovery_strategies.RecoveryStrategies.reduce_batch_size_recovery">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reduce_batch_size_recovery</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="ne">MemoryError</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">ErrorContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reduce batch size when memory is insufficient.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            error: The memory error that occurred</span>
+<span class="sd">            context: Error context information</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if batch size was successfully reduced</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">current_batch_size</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">user_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;batch_size&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">current_batch_size</span> <span class="ow">or</span> <span class="n">current_batch_size</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>  <span class="c1"># Can&#39;t reduce further</span>
+            
+            <span class="c1"># Reduce batch size by half</span>
+            <span class="n">new_batch_size</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">current_batch_size</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reducing batch size from </span><span class="si">{</span><span class="n">current_batch_size</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">new_batch_size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            
+            <span class="c1"># Update context with new batch size</span>
+            <span class="n">context</span><span class="o">.</span><span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;batch_size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_batch_size</span>
+            <span class="n">context</span><span class="o">.</span><span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;recovery_strategy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;reduce_batch_size&#39;</span>
+            <span class="n">context</span><span class="o">.</span><span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;original_batch_size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_batch_size</span>
+            
+            <span class="c1"># Force garbage collection</span>
+            <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">()</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successfully reduced batch size to </span><span class="si">{</span><span class="n">new_batch_size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+            
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">recovery_error</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to reduce batch size: </span><span class="si">{</span><span class="n">recovery_error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+    
+<div class="viewcode-block" id="RecoveryStrategies.configuration_default_fallback">
+<a class="viewcode-back" href="../../../api/geminisdr/core/recovery_strategies.html#geminisdr.core.recovery_strategies.RecoveryStrategies.configuration_default_fallback">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">configuration_default_fallback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="n">ConfigurationError</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">ErrorContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Use default configuration values when configuration is invalid.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            error: The configuration error that occurred</span>
+<span class="sd">            context: Error context information</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if default configuration was applied</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">config_key</span> <span class="o">=</span> <span class="n">error</span><span class="o">.</span><span class="n">config_key</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">config_key</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            
+            <span class="c1"># Default configuration values</span>
+            <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;ml.batch_size&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+                <span class="s1">&#39;ml.learning_rate&#39;</span><span class="p">:</span> <span class="mf">1e-4</span><span class="p">,</span>
+                <span class="s1">&#39;hardware.device_preference&#39;</span><span class="p">:</span> <span class="s1">&#39;auto&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;hardware.memory_limit_gb&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s1">&#39;logging.level&#39;</span><span class="p">:</span> <span class="s1">&#39;INFO&#39;</span>
+            <span class="p">}</span>
+            
+            <span class="n">default_value</span> <span class="o">=</span> <span class="n">defaults</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">config_key</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">default_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Using default value &#39;</span><span class="si">{</span><span class="n">default_value</span><span class="si">}</span><span class="s2">&#39; for invalid config key &#39;</span><span class="si">{</span><span class="n">config_key</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+            <span class="p">)</span>
+            
+            <span class="c1"># Update context with default value</span>
+            <span class="n">context</span><span class="o">.</span><span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;default_value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">default_value</span>
+            <span class="n">context</span><span class="o">.</span><span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;recovery_strategy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;configuration_default&#39;</span>
+            <span class="n">context</span><span class="o">.</span><span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;invalid_value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">user_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;config_value&#39;</span><span class="p">)</span>
+            
+            <span class="c1"># In a real implementation, this would update the actual configuration</span>
+            
+            <span class="k">return</span> <span class="kc">True</span>
+            
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">recovery_error</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to apply default configuration: </span><span class="si">{</span><span class="n">recovery_error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+    
+<div class="viewcode-block" id="RecoveryStrategies.model_version_fallback">
+<a class="viewcode-back" href="../../../api/geminisdr/core/recovery_strategies.html#geminisdr.core.recovery_strategies.RecoveryStrategies.model_version_fallback">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">model_version_fallback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="n">ModelError</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">ErrorContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Try to load an alternative model version when model loading fails.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            error: The model error that occurred</span>
+<span class="sd">            context: Error context information</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if alternative model was loaded</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">model_name</span> <span class="o">=</span> <span class="n">error</span><span class="o">.</span><span class="n">model_name</span>
+            <span class="n">current_version</span> <span class="o">=</span> <span class="n">error</span><span class="o">.</span><span class="n">model_version</span>
+            
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">model_name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            
+            <span class="c1"># In a real implementation, this would:</span>
+            <span class="c1"># 1. Query available model versions</span>
+            <span class="c1"># 2. Try loading the most recent compatible version</span>
+            <span class="c1"># 3. Update model metadata</span>
+            
+            <span class="c1"># For now, simulate finding an alternative version</span>
+            <span class="n">fallback_version</span> <span class="o">=</span> <span class="s2">&quot;v1.0.0&quot;</span>  <span class="c1"># Default fallback version</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Attempting to load fallback model version </span><span class="si">{</span><span class="n">fallback_version</span><span class="si">}</span><span class="s2"> &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;for </span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2"> (failed version: </span><span class="si">{</span><span class="n">current_version</span><span class="si">}</span><span class="s2">)&quot;</span>
+            <span class="p">)</span>
+            
+            <span class="c1"># Update context</span>
+            <span class="n">context</span><span class="o">.</span><span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;fallback_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fallback_version</span>
+            <span class="n">context</span><span class="o">.</span><span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;failed_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_version</span>
+            <span class="n">context</span><span class="o">.</span><span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;recovery_strategy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;model_version_fallback&#39;</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successfully loaded fallback model version </span><span class="si">{</span><span class="n">fallback_version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+            
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">recovery_error</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to load fallback model version: </span><span class="si">{</span><span class="n">recovery_error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+    
+<div class="viewcode-block" id="RecoveryStrategies.memory_cleanup_recovery">
+<a class="viewcode-back" href="../../../api/geminisdr/core/recovery_strategies.html#geminisdr.core.recovery_strategies.RecoveryStrategies.memory_cleanup_recovery">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">memory_cleanup_recovery</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="ne">MemoryError</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">ErrorContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform aggressive memory cleanup to recover from memory errors.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            error: The memory error that occurred</span>
+<span class="sd">            context: Error context information</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if memory cleanup was successful</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Performing aggressive memory cleanup&quot;</span><span class="p">)</span>
+            
+            <span class="c1"># Force garbage collection</span>
+            <span class="n">collected</span> <span class="o">=</span> <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Garbage collection freed </span><span class="si">{</span><span class="n">collected</span><span class="si">}</span><span class="s2"> objects&quot;</span><span class="p">)</span>
+            
+            <span class="c1"># Clear GPU memory if available</span>
+            <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">()</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Cleared GPU memory cache&quot;</span><span class="p">)</span>
+            
+            <span class="c1"># Update context</span>
+            <span class="n">context</span><span class="o">.</span><span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;recovery_strategy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;memory_cleanup&#39;</span>
+            <span class="n">context</span><span class="o">.</span><span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;objects_collected&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">collected</span>
+            
+            <span class="c1"># In a real implementation, this might also:</span>
+            <span class="c1"># 1. Clear model caches</span>
+            <span class="c1"># 2. Release unused data structures</span>
+            <span class="c1"># 3. Compact memory pools</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Memory cleanup completed successfully&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+            
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">recovery_error</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Memory cleanup failed: </span><span class="si">{</span><span class="n">recovery_error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+    
+<div class="viewcode-block" id="RecoveryStrategies.retry_with_delay_recovery">
+<a class="viewcode-back" href="../../../api/geminisdr/core/recovery_strategies.html#geminisdr.core.recovery_strategies.RecoveryStrategies.retry_with_delay_recovery">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">retry_with_delay_recovery</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">ErrorContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generic retry strategy with delay for transient errors.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            error: The error that occurred</span>
+<span class="sd">            context: Error context information</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if retry should be attempted</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">retry_count</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">user_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;retry_count&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">max_retries</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">user_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;max_retries&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="n">retry_count</span> <span class="o">&gt;=</span> <span class="n">max_retries</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            
+            <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+            <span class="n">delay</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="n">retry_count</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>  <span class="c1"># Exponential backoff, max 30 seconds</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Retrying operation after </span><span class="si">{</span><span class="n">delay</span><span class="si">}</span><span class="s2"> seconds (attempt </span><span class="si">{</span><span class="n">retry_count</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">max_retries</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+            
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">delay</span><span class="p">)</span>
+            
+            <span class="c1"># Update retry count</span>
+            <span class="n">context</span><span class="o">.</span><span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;retry_count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">retry_count</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">context</span><span class="o">.</span><span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;recovery_strategy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;retry_with_delay&#39;</span>
+            
+            <span class="k">return</span> <span class="kc">True</span>
+            
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">recovery_error</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Retry strategy failed: </span><span class="si">{</span><span class="n">recovery_error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+    
+<div class="viewcode-block" id="RecoveryStrategies.get_all_strategies">
+<a class="viewcode-back" href="../../../api/geminisdr/core/recovery_strategies.html#geminisdr.core.recovery_strategies.RecoveryStrategies.get_all_strategies">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_all_strategies</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="nb">list</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get all available recovery strategies mapped to error types.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict mapping error types to lists of recovery strategies</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">HardwareError</span><span class="p">:</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hardware_to_simulation_fallback</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">retry_with_delay_recovery</span>
+            <span class="p">],</span>
+            <span class="ne">MemoryError</span><span class="p">:</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">memory_cleanup_recovery</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">reduce_batch_size_recovery</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">gpu_to_cpu_fallback</span>
+            <span class="p">],</span>
+            <span class="n">ConfigurationError</span><span class="p">:</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">configuration_default_fallback</span>
+            <span class="p">],</span>
+            <span class="n">ModelError</span><span class="p">:</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model_version_fallback</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">retry_with_delay_recovery</span>
+            <span class="p">]</span>
+        <span class="p">}</span></div>
+
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_simulation_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if system is currently in simulation mode.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_mode</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_cpu_fallback_active</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if CPU fallback is currently active.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cpu_fallback_active</span>
+    
+<div class="viewcode-block" id="RecoveryStrategies.reset_fallback_states">
+<a class="viewcode-back" href="../../../api/geminisdr/core/recovery_strategies.html#geminisdr.core.recovery_strategies.RecoveryStrategies.reset_fallback_states">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset_fallback_states</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reset all fallback states to normal operation.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_mode</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cpu_fallback_active</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Reset all fallback states to normal operation&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="setup_default_recovery_strategies">
+<a class="viewcode-back" href="../../../api/geminisdr/core/recovery_strategies.html#geminisdr.core.recovery_strategies.setup_default_recovery_strategies">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">setup_default_recovery_strategies</span><span class="p">(</span><span class="n">error_handler</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set up default recovery strategies for an ErrorHandler instance.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        error_handler: ErrorHandler instance to configure</span>
+<span class="sd">        logger: Optional logger for recovery strategies</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">strategies</span> <span class="o">=</span> <span class="n">RecoveryStrategies</span><span class="p">(</span><span class="n">logger</span><span class="p">)</span>
+    
+    <span class="c1"># Register all strategies</span>
+    <span class="k">for</span> <span class="n">error_type</span><span class="p">,</span> <span class="n">strategy_list</span> <span class="ow">in</span> <span class="n">strategies</span><span class="o">.</span><span class="n">get_all_strategies</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">strategy</span> <span class="ow">in</span> <span class="n">strategy_list</span><span class="p">:</span>
+            <span class="n">error_handler</span><span class="o">.</span><span class="n">register_recovery_strategy</span><span class="p">(</span><span class="n">error_type</span><span class="p">,</span> <span class="n">strategy</span><span class="p">)</span>
+    
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span> <span class="ow">or</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Registered default recovery strategies&quot;</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">strategies</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, GeminiSDR Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
